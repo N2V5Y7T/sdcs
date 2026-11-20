@@ -1,0 +1,1138 @@
+<title>Multistage Amplifiers Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout concept: engineer's graph-paper notebook. Sticky chip bar, single reading column, every topic = intuition > diagram > mechanism > derivation > example > try-it > exam skeleton. */
+:root{
+  --bg:#EEF2F5; --grid:rgba(18,32,41,.045); --surface:#FFFFFF; --surface2:#E7EDF2; --fg:#112029; --muted:#4A5E6C; --line:#C6D2DA;
+  --accent:#0B5FD3; --accent-ink:#FFFFFF; --dc:#B84E06; --ac:#087A5A; --bad:#B82633; --wire:#1B2B36; --fill:#DCE8F6;
+  --display:"Space Grotesk","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{margin:0;font:16px/1.65 var(--body);color:var(--fg);background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;background-attachment:fixed;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 4rem}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,3.6vw,2rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:600;margin:2rem 0 .5rem}
+p{margin:.6rem 0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,.mono{font-family:var(--mono);font-size:.9em}
+sub,sup{line-height:0}
+
+/* top bar */
+.bar{position:relative;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);
+  margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.bar .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:.75rem;min-height:52px}
+.brand{font:700 .95rem var(--display);color:var(--fg);text-decoration:none;white-space:nowrap}
+.chips{display:flex;gap:.35rem;overflow-x:auto;flex:1;min-width:0;scrollbar-width:thin;padding:.4rem 0}
+.chips a{white-space:nowrap;font:500 .8rem var(--body);text-decoration:none;color:var(--muted);padding:.25rem .6rem;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.chips a:hover{color:var(--fg);border-color:var(--accent)}
+.chips a.done::before{content:"✓ ";color:var(--ac)}
+.chips a.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#themeBtn{font:500 .8rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:.3rem .6rem;cursor:pointer}
+
+/* hero */
+.hero{padding:2.6rem 0 1.2rem}
+.kicker{font:500 .75rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:1.08rem;color:var(--muted);max-width:62ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.6rem;margin:1.2rem 0}
+.topic{display:block;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.7rem .85rem}
+.topic:hover{border-color:var(--accent)}
+.topic b{display:block;font:600 .95rem var(--display)}
+.topic span{font-size:.8rem;color:var(--muted)}
+.topic .q{display:inline-block;margin-top:.3rem;font:500 .68rem var(--mono);color:var(--dc)}
+
+/* sections */
+section.sec{padding:2.8rem 0 .5rem;border-top:2px solid var(--fg);margin-top:2.4rem;}
+.sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem .8rem;margin-bottom:.4rem}
+.secno{font:500 .8rem var(--mono);color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0 1rem}
+.tag{font:500 .72rem var(--mono);padding:.15rem .5rem;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--muted)}
+.tag.hot{color:var(--dc);border-color:var(--dc)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:1rem 0}
+.card>:first-child{margin-top:0}.card>:last-child{margin-bottom:0}
+.label{display:inline-block;font:600 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.1rem .5rem;border-radius:4px;margin-bottom:.4rem;background:var(--surface2);color:var(--muted)}
+.intuition .label{background:var(--ac);color:var(--bg)}
+.exam .label{background:var(--accent);color:var(--accent-ink)}
+.watch .label{background:var(--bad);color:var(--bg)}
+.try .label{background:var(--dc);color:var(--bg)}
+.exam ol,.exam ul{margin:.3rem 0;padding-left:1.2rem}
+.exam li{margin:.2rem 0}
+ul,ol{padding-left:1.25rem}
+li{margin:.25rem 0}
+
+/* equations */
+.eq{font:500 1rem/1.9 var(--mono);background:var(--surface2);border-radius:8px;padding:.6rem 1rem;margin:.7rem 0;overflow-x:auto;text-align:center;white-space:nowrap}
+.eq.l{text-align:left}
+.eq.key{background:var(--fill);outline:1.5px solid var(--accent)}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;line-height:1.35}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .35em}
+.frac>span:last-child{padding:0 .35em}
+.steps{counter-reset:s;list-style:none;padding:0;margin:.8rem 0}
+.steps>li{counter-increment:s;position:relative;padding-left:2.2rem;margin:.7rem 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:.05rem;width:1.55rem;height:1.55rem;border-radius:50%;background:var(--fg);color:var(--bg);font:600 .78rem/1.55rem var(--mono);text-align:center}
+
+/* tables */
+.tw{overflow-x:auto;margin:.9rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface2);font:600 .78rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+
+/* diagrams */
+figure{margin:1.1rem 0}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:.35rem}
+svg.dg{display:block;width:100%;height:auto;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+svg.dg path{fill:none;stroke:var(--wire);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+svg.dg path.fl{fill:var(--wire);stroke:none}
+svg.dg path.dc{stroke:var(--dc)}svg.dg path.ac{stroke:var(--ac)}svg.dg path.ac2{stroke:var(--accent)}svg.dg path.bad{stroke:var(--bad)}
+svg.dg path.dash{stroke-dasharray:5 4}
+svg.dg path.thin{stroke-width:1;stroke:var(--line)}
+svg.dg path.shade{fill:var(--fill);stroke:none;opacity:.85}
+svg.dg path.shadeb{fill:var(--bad);stroke:none;opacity:.14}
+svg.dg path.shadeg{fill:var(--ac);stroke:none;opacity:.14}
+svg.dg circle.dot{fill:var(--wire);stroke:none}
+svg.dg circle.node{fill:var(--surface);stroke:var(--wire);stroke-width:1.6}
+svg.dg circle.sym{fill:var(--surface);stroke:var(--wire);stroke-width:1.7}
+svg.dg circle.q{fill:var(--bad);stroke:none}
+svg.dg polygon{stroke:var(--wire);stroke-width:1.7;fill:var(--surface)}
+svg.dg rect.box{fill:var(--surface2);stroke:var(--wire);stroke-width:1.7}
+svg.dg text{fill:var(--fg);font:12.5px var(--mono)}
+svg.dg text.s{font-size:11px;fill:var(--muted)}
+svg.dg text.b{font-weight:600;font-size:13px}
+svg.dg text.dc{fill:var(--dc)}svg.dg text.ac{fill:var(--ac)}svg.dg text.ac2{fill:var(--accent)}svg.dg text.bad{fill:var(--bad)}
+
+/* widgets */
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:1.2rem 0}
+.wlabel{display:inline-block;font:600 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.1rem .5rem;border-radius:4px;background:var(--dc);color:var(--bg);margin-bottom:.5rem}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem .9rem;margin:.6rem 0}
+.fld{display:flex;flex-direction:column;gap:.15rem;font-size:.82rem;color:var(--muted);min-width:0}
+.fld .row{display:flex;gap:.4rem;align-items:center}
+.fld input[type=number],.fld select{font:500 .95rem var(--mono);width:100%;min-width:0;padding:.3rem .45rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.fld input[type=range]{width:100%;accent-color:var(--accent)}
+.fld .u{font:.8rem var(--mono);white-space:nowrap}
+.fld output{font:600 .85rem var(--mono);color:var(--fg)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem;margin-top:.8rem}
+.res div{background:var(--surface2);border-radius:8px;padding:.5rem .7rem;min-width:0}
+.res small{display:block;font:500 .7rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.res b{font:600 1.05rem var(--mono);overflow-wrap:anywhere}
+.res .note{grid-column:1/-1;background:none;padding:0;font-size:.85rem;color:var(--muted)}
+.res .warn{grid-column:1/-1;background:var(--bad);color:var(--bg);font-size:.85rem;border-radius:8px;padding:.5rem .7rem}
+.pill{display:inline-block;font:600 .8rem var(--mono);padding:.15rem .6rem;border-radius:999px;color:var(--bg)}
+details{margin:.5rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:.1rem .8rem}
+summary{cursor:pointer;padding:.5rem 0;font-weight:500}
+details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:.4rem}
+.done-row{display:flex;align-items:center;gap:.5rem;margin:1.6rem 0 .5rem;font-size:.9rem;color:var(--muted)}
+.done-row input{width:1.1rem;height:1.1rem;accent-color:var(--ac)}
+footer{margin-top:3rem;font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.brand{display:none}.eq{font-size:.88rem}}
+
+svg.dg,.widget,.fld input[type=range]{touch-action:pan-y}
+.eq,.tw,.chips{overscroll-behavior-x:contain}
+.two{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+
+.sqrt{display:inline-flex;align-items:baseline;vertical-align:middle;margin:0 .15em;line-height:1}
+.radic{font-size:1.25em;line-height:.9;padding-right:1px;font-family:var(--display),serif;transform:translateY(1px)}
+.radicand{border-top:1.6px solid currentColor;padding:.05em .25em 0 .15em;display:inline-block;line-height:1.25}
+</style>
+<header class="bar"><div class="in">
+  <a class="brand" href="#top">Multistage Guide</a>
+  <nav class="chips" id="chips" aria-label="Topics">
+    <a href="#s0">Start</a><a href="#s1">Frequency regions</a><a href="#s2">High freq &amp; Miller</a><a href="#s3">Why multistage</a><a href="#s4">Loading &amp; parameters</a><a href="#s5">Choice of stages</a><a href="#s6">RC-coupled</a><a href="#s7">Direct-coupled</a><a href="#s8">Transformer</a><a href="#s9">Darlington</a><a href="#s10">Cascode</a><a href="#s11">Compare &amp; design</a><a href="#s12">Exam map</a>
+  </nav>
+  <button id="themeBtn" type="button" aria-label="Switch light or dark theme">Theme</button>
+</div></header>
+
+<main class="wrap" id="top">
+<div class="hero">
+  <div class="kicker">Semiconductor Devices &amp; Circuits · Unit 3</div>
+  <h1>Multistage BJT amplifiers, explained from the ground up</h1>
+  <p class="lead">Same format as Units 1 and 2: picture in your head → circuit → what physically happens → derivation → solved example → calculator → 10-mark answer skeleton. Built from Prof. Ghongade’s Unit 3 notes (32 pages, all 11 worked problems rebuilt as calculators) and your Summer 2019 Applied Electronic Circuits paper, which asks RC-coupled, direct-coupled, cascode and transformer-coupled questions.</p>
+  <div class="grid">
+    <a class="topic" href="#s1"><b>1 · Frequency regions</b><span>Low, mid, high; coupling and bypass capacitors</span><span class="q">Asked as the base of every RC-coupled question</span></a>
+    <a class="topic" href="#s2"><b>2 · High frequency and Miller</b><span>Hybrid-π, Miller theorem, f<sub>H</sub>, f<sub>T</sub></span></a>
+    <a class="topic" href="#s3"><b>3 · Why multistage</b><span>Need, classification, three coupling methods</span></a>
+    <a class="topic" href="#s4"><b>4 · Loading and parameters</b><span>A<sub>v</sub>, Z<sub>i</sub>, Z<sub>o</sub>, A<sub>i</sub>, bandwidth shrinkage</span></a>
+    <a class="topic" href="#s5"><b>5 · Choice of configuration</b><span>CE, CC, CB, Darlington, cascode in a cascade</span></a>
+    <a class="topic" href="#s6"><b>6 · RC-coupled amplifier</b><span>Midband gain, capacitor design</span><span class="q">Summer 2019 Q1 (a) and (b)</span></a>
+    <a class="topic" href="#s7"><b>7 · Direct-coupled amplifier</b><span>DC bias chain, drift, f<sub>L</sub></span><span class="q">Summer 2019 Q1 OR (a)</span></a>
+    <a class="topic" href="#s8"><b>8 · Transformer-coupled</b><span>n², reflected load, L<sub>m</sub></span><span class="q">Summer 2019 Q3 (b)</span></a>
+    <a class="topic" href="#s9"><b>9 · Darlington amplifier</b><span>β<sub>D</sub>, input resistance, follower gain</span></a>
+    <a class="topic" href="#s10"><b>10 · Cascode amplifier</b><span>Output resistance, Miller reduction</span><span class="q">Summer 2019 Q1 (b)</span></a>
+    <a class="topic" href="#s11"><b>11 · Comparison and design</b><span>Which circuit when; design workflow</span></a>
+    <a class="topic" href="#s12"><b>Exam map &amp; formulas</b><span>Past questions, formula sheet</span></a>
+  </div>
+  <p class="mono" style="font-size:.8rem;color:var(--muted)">Tick “Mark as done” at the end of each topic. Equations in a blue box are the ones to memorise. Units 1 and 2 are separate pages.</p>
+</div>
+
+<!-- ============ 0 ============ -->
+<section class="sec" id="s0">
+  <div class="sechead"><span class="secno">Start here</span></div>
+  <h2>Six ideas behind everything in this unit</h2>
+  <p>A single transistor stage rarely gives enough gain or the right input and output resistance. Unit 3 is about joining stages and understanding what the joining does.</p>
+
+  <div class="card intuition"><span class="label">Idea 1 · Stages load each other</span>
+  <p>The input resistance of stage 2 is a real resistor hanging on the collector of stage 1. So stage 1’s gain must be calculated <b>with stage 2 connected</b>. Multiplying the <i>unloaded</i> gains of the two stages is the classic wrong answer, and it gives a result that is far too big.</p></div>
+
+  <div class="card intuition"><span class="label">Idea 2 · Gain of each stage = −g<sub>m</sub> × (its own loaded collector resistance)</span>
+  <div class="eq key">A_{v1} = −g_{m1}R_{C1}′, &nbsp; R_{C1}′ = R_{C1} ∥ r_{o1} ∥ R_{i2} &nbsp;→&nbsp; A_{v} = A_{v1}A_{v2}</div>
+  <p>The “next stage’s R<sub>i</sub>” is the only new idea compared with Unit 1. The rest is hybrid-π from Unit 1.</p></div>
+
+  <div class="card intuition"><span class="label">Idea 3 · R<sub>i</sub> comes from the first stage, R<sub>o</sub> from the last</span>
+  <p>The source only ever sees the first transistor’s input. The load only ever sees the last transistor’s output. Everything in between changes <i>gain</i>, not what the outside world sees (to first order). That is why a follower is put first when you need high R<sub>i</sub> and last when you need low R<sub>o</sub>.</p></div>
+
+  <div class="card intuition"><span class="label">Idea 4 · Every capacitor creates a corner frequency</span>
+  <p>Coupling and bypass capacitors kill the gain at low frequency. Junction capacitances (and the Miller multiplication of C<sub>μ</sub>) kill the gain at high frequency. Between the corners is the <b>mid-band</b>, where all the “gain = −g<sub>m</sub>R′” formulas are valid.</p></div>
+
+  <div class="card intuition"><span class="label">Idea 5 · Cascading narrows the bandwidth</span>
+  <p>Each added stage adds another pole at each end. The −3 dB point of the combination is reached sooner: f<sub>L</sub> goes up, f<sub>H</sub> goes down. More gain costs bandwidth.</p></div>
+
+  <div class="card intuition"><span class="label">Idea 6 · Three coupling methods and two special stages</span>
+  <ul><li><b>RC coupling:</b> a capacitor between stages. Independent bias, no DC passes.</li>
+  <li><b>Direct coupling:</b> a wire between stages. DC passes, so bias and drift are shared.</li>
+  <li><b>Transformer coupling:</b> a transformer. Matches impedances, delivers power.</li>
+  <li><b>Darlington:</b> two transistors as one, huge current gain. <b>Cascode:</b> CE on CB, high gain with wide bandwidth.</li></ul></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="sec" id="s1">
+  <div class="sechead"><span class="secno">Topic 1</span></div>
+  <h2>BJT behaviour at low, mid and high frequency</h2>
+  <div class="tags"><span class="tag hot">Base of every RC-coupled question, including “derive the mid-band gain”</span><span class="tag">Notes: Section 1–2</span></div>
+
+  <h3>1.1 The three regions</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>A capacitor’s reactance is 1/(2πfC). At low frequency this is large, so a series coupling capacitor blocks the signal and a bypass capacitor stops bypassing. At high frequency the reactance is small, so tiny capacitances <i>inside</i> the transistor, which are open circuits at audio, start to short the signal away. In between, the big capacitors are shorts and the tiny ones are opens: a clean region with constant gain.</p></div>
+  <figure><div data-dg="regions"></div><figcaption>Gain versus frequency for a typical RC-coupled stage (log frequency axis). The shaded band between f<sub>L</sub> and f<sub>H</sub> is the bandwidth, where the gain is within 3 dB of the mid-band value.</figcaption></figure>
+  <div class="tw"><table><thead><tr><th>Region</th><th>Coupling / bypass C</th><th>Junction C (C<sub>π</sub>, C<sub>μ</sub>)</th><th>Model to use</th></tr></thead><tbody>
+  <tr><td><b>Low</b> (f &lt; f<sub>L</sub>)</td><td>Reactance comparable to resistors: they set the corners</td><td>Open</td><td>Mid-band model + the external capacitors</td></tr>
+  <tr><td><b>Mid</b></td><td>Short circuits</td><td>Open circuits</td><td>Plain hybrid-π, gain constant</td></tr>
+  <tr><td><b>High</b> (f &gt; f<sub>H</sub>)</td><td>Short</td><td>Reactance comparable to resistors: they set the corners</td><td>High-frequency hybrid-π with C<sub>π</sub>, C<sub>μ</sub></td></tr>
+  </tbody></table></div>
+
+  <h3>1.2 Mid-band parameters (revision of Unit 1)</h3>
+  <div class="eq key l">g_{m} = [[I_{C}|V_{T}]], &nbsp; r_{π} = [[β|g_{m}]], &nbsp; r_{e} ≈ [[1|g_{m}]], &nbsp; r_{o} ≈ [[V_{A}|I_{C}]] &nbsp;&nbsp;(V_{T} ≈ 25 mV)</div>
+  <div class="eq key">A_{v} ≈ −g_{m}R_{C}′ &nbsp;(emitter bypassed) &nbsp;&nbsp; A_{v} ≈ −[[g_{m}R_{C}′|1 + g_{m}R_{E}]] &nbsp;(emitter not bypassed)</div>
+  <p>where R<sub>C</sub>′ = R<sub>C</sub> ∥ r<sub>o</sub> ∥ R<sub>L</sub> (or ∥ R<sub>i</sub> of the next stage in a cascade).</p>
+  <div class="card intuition"><span class="label">Worked Problem 1 (notes): mid-band CE parameters and gain</span>
+  <p>I<sub>C</sub> = 1.5 mA, β = 120, V<sub>A</sub> = 90 V, R<sub>C</sub> = 3.3 kΩ, R<sub>L</sub> = 10 kΩ, emitter bypassed.</p>
+  <p>g<sub>m</sub> = 1.5 mA/25 mV = <b>60 mS</b>. r<sub>π</sub> = 120/0.06 = <b>2.0 kΩ</b>. r<sub>e</sub> = 1/g<sub>m</sub> = <b>16.7 Ω</b>. r<sub>o</sub> = 90/1.5 mA = <b>60 kΩ</b>.</p>
+  <p>R<sub>C</sub>′ = 3.3k ∥ 10k ∥ 60k = <b>2.383 kΩ</b>, so A<sub>v</sub> ≈ −(0.06)(2383) = <b>−143</b>.</p></div>
+
+  <h3>1.3 Low-frequency response: three capacitors, three corners</h3>
+  <p>Look at the single CE stage with input coupling C<sub>1</sub>, emitter bypass C<sub>E</sub> and output coupling C<sub>2</sub>. For each capacitor, ask one question: <b>what total resistance does this capacitor see, looking out of its two terminals with all sources turned off?</b> The corner frequency is then 1/(2π × that resistance × C).</p>
+  <figure><div data-dg="ceCkt"></div><figcaption>CE amplifier with voltage-divider bias. C<sub>1</sub>, C<sub>2</sub> couple the signal; C<sub>E</sub> bypasses R<sub>E</sub>.</figcaption></figure>
+  <ol class="steps">
+    <li><b>C<sub>1</sub> (input).</b> Sees the source resistance in series with the amplifier’s input resistance: R<sub>i</sub> = R<sub>1</sub> ∥ R<sub>2</sub> ∥ r<sub>π</sub>. So f<sub>p1</sub> = 1/[2πC<sub>1</sub>(r<sub>s</sub> + R<sub>i</sub>)].</li>
+    <li><b>C<sub>2</sub> (output).</b> Sees the output resistance R<sub>o</sub> = R<sub>C</sub> ∥ r<sub>o</sub> in series with R<sub>L</sub>. So f<sub>p2</sub> = 1/[2πC<sub>2</sub>(R<sub>o</sub> + R<sub>L</sub>)].</li>
+    <li><b>C<sub>E</sub> (bypass).</b> Sees R<sub>E</sub> in parallel with the small resistance looking into the emitter, (r<sub>π</sub> + R<sub>B</sub>)/(β + 1), where R<sub>B</sub> = r<sub>s</sub> ∥ R<sub>1</sub> ∥ R<sub>2</sub>. That is only a few tens of ohms, so C<sub>E</sub> must be <b>hundreds of µF</b>. This is why bypass capacitors are the big electrolytics.</li>
+  </ol>
+  <div class="eq key l">C_{1} ≥ [[1|2πf_{p1}(r_{s}+R_{i})]], &nbsp; C_{2} ≥ [[1|2πf_{p2}(R_{o}+R_{L})]], &nbsp; C_{E} ≥ [[1|2πf_{pE}R_{E,seen}]], &nbsp; R_{E,seen} = R_{E} ∥ [[r_{π}+R_{B}|β+1]]</div>
+  <p>With several corners, the highest one dominates f<sub>L</sub>. In a design you place each individual pole <b>below</b> the required f<sub>L</sub> (or make one intentionally dominant) because the corners add up in the overall response.</p>
+  <div class="card intuition"><span class="label">Worked Problem 2 (notes): design C<sub>1</sub>, C<sub>E</sub>, C<sub>2</sub> for 20 Hz poles</span>
+  <p>r<sub>s</sub> = 600 Ω, R<sub>1</sub> = 47 kΩ, R<sub>2</sub> = 10 kΩ, r<sub>π</sub> = 2.5 kΩ, β = 100, R<sub>E</sub> = 1 kΩ, R<sub>C</sub> = 4.7 kΩ, r<sub>o</sub> = 100 kΩ, R<sub>L</sub> = 10 kΩ.</p>
+  <p>R<sub>i</sub> = 47k ∥ 10k ∥ 2.5k = 1.918 kΩ → C<sub>1</sub> = 1/[2π(20)(600 + 1918)] = <b>3.16 µF</b>.</p>
+  <p>R<sub>B</sub> = 600 ∥ 47k ∥ 10k = 559 Ω → R<sub>E,seen</sub> = 1k ∥ (2500+559)/101 = 29.4 Ω → C<sub>E</sub> = 1/[2π(20)(29.4)] = <b>271 µF</b>.</p>
+  <p>R<sub>o</sub> = 4.7k ∥ 100k = 4.489 kΩ → C<sub>2</sub> = 1/[2π(20)(4489 + 10000)] = <b>0.549 µF</b>.</p>
+  <p>Standard values: 4.7 µF, 330 µF, 0.68 µF (round <i>up</i>, which moves the pole lower).</p></div>
+  <div class="widget" data-w="lfcaps"></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Explain the frequency response of a BJT amplifier”</span>
+  <ol>
+    <li>Gain-vs-frequency curve on a log axis with f<sub>L</sub>, f<sub>H</sub>, mid-band gain, −3 dB line and bandwidth shaded (3).</li>
+    <li>Why the gain falls at low frequency: coupling and bypass capacitor reactance; one sentence per capacitor and the formula for its corner (3).</li>
+    <li>Why the gain falls at high frequency: C<sub>π</sub>, C<sub>μ</sub> and Miller effect (see Topic 2) (3).</li>
+    <li>BW = f<sub>H</sub> − f<sub>L</sub> (1).</li>
+  </ol></div>
+  <details><summary>Quick check 1: why is C<sub>E</sub> so much larger than C<sub>1</sub>?</summary><p>C<sub>E</sub> sees only ~30 Ω (the emitter-side resistance), while C<sub>1</sub> sees kΩ. For the same corner frequency C ∝ 1/R, so C<sub>E</sub> must be about 100 times larger.</p></details>
+  <details><summary>Quick check 2: the mid-band gain is 40 dB. At what gain are f<sub>L</sub> and f<sub>H</sub>?</summary><p>At 37 dB (3 dB below mid-band), i.e. at 0.707 of the mid-band voltage gain.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s1"> Mark topic 1 as done</label>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="sec" id="s2">
+  <div class="sechead"><span class="secno">Topic 2</span></div>
+  <h2>High-frequency response, Miller effect and f<sub>T</sub></h2>
+  <div class="tags"><span class="tag hot">Cascode (Topic 10) is only understandable after this topic</span><span class="tag">Notes: Section 2.3; Worked Problem 3</span></div>
+
+  <h3>2.1 The high-frequency hybrid-π model</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>A transistor has two p–n junctions. Each junction stores charge and so behaves like a capacitor. The base–emitter junction (forward biased) gives <b>C<sub>π</sub></b> (also written C<sub>e</sub>), tens of pF. The base–collector junction (reverse biased) gives <b>C<sub>μ</sub></b> (C<sub>c</sub>), a few pF. Add the base spreading resistance r<sub>bb′</sub> (the resistance of the thin base between the pin and the active region) and the model is complete.</p></div>
+  <figure><div data-dg="hybridHF"></div><figcaption>High-frequency hybrid-π. B′ is the internal base node. The control voltage of the current source is v<sub>b′e</sub>, the voltage across r<sub>π</sub> and C<sub>π</sub>.</figcaption></figure>
+
+  <h3>2.2 Why C<sub>μ</sub> is the troublemaker: Miller theorem</h3>
+  <p>C<sub>μ</sub> sits between the input node (B′) and the output node (C), where the voltage is a large, inverted copy of the input. Miller’s theorem lets you replace it by <b>two grounded capacitors</b>, one at each end.</p>
+  <figure><div data-dg="miller"></div><figcaption>Miller theorem. An impedance Z across an amplifier of gain K = v<sub>2</sub>/v<sub>1</sub> is equivalent to Z<sub>1</sub> at the input and Z<sub>2</sub> at the output.</figcaption></figure>
+  <div class="card intuition"><span class="label">Derivation (added; the notes give the result)</span>
+  <p>Current leaving node 1 through Z: I = (v<sub>1</sub> − v<sub>2</sub>)/Z = v<sub>1</sub>(1 − K)/Z. So the impedance seen at the input is v<sub>1</sub>/I:</p>
+  <div class="eq">Z_{1} = [[Z|1 − K]]</div>
+  <p>Current entering node 2 through Z: I = (v<sub>2</sub> − v<sub>1</sub>)/Z with v<sub>1</sub> = v<sub>2</sub>/K, so I = v<sub>2</sub>(K − 1)/(KZ). Seen from the output:</p>
+  <div class="eq">Z_{2} = [[ZK|K − 1]]</div>
+  <p>For a capacitor Z = 1/(jωC<sub>μ</sub>), and with K = A<sub>vbc</sub> a large negative number:</p>
+  <div class="eq key">C_{Mi} = C_{μ}(1 − A_{vbc}) = C_{μ}(1 + |A_{vbc}|) &nbsp;&nbsp; C_{Mo} = C_{μ}(1 − [[1|A_{vbc}]]) ≈ C_{μ}</div></div>
+  <p><b>Physical meaning.</b> When the base rises by 1 mV, the collector falls by |A<sub>v</sub>| mV. Across C<sub>μ</sub> the voltage changes by (1 + |A<sub>v</sub>|) mV, so it draws (1 + |A<sub>v</sub>|) times the charging current. From the input it looks like a capacitor (1 + |A<sub>v</sub>|) times bigger. A 4 pF capacitor with gain −40 looks like 164 pF.</p>
+
+  <h3>2.3 Input and output poles</h3>
+  <div class="eq key l">C_{in} = C_{π} + C_{μ}(1 − A_{vbc}), &nbsp; f_{Hi} = [[1|2πR_{Hi}C_{in}]] &nbsp;&nbsp; f_{Ho} = [[1|2πR_{Ho}C_{Mo}]]</div>
+  <p>R<sub>Hi</sub> is the resistance across C<sub>in</sub>: r<sub>π</sub> in parallel with (r<sub>bb′</sub> + r<sub>s</sub> ∥ R<sub>1</sub> ∥ R<sub>2</sub>). R<sub>Ho</sub> is the resistance at the collector node, R<sub>C</sub> ∥ r<sub>o</sub> ∥ R<sub>L</sub>. The lower of the two poles dominates f<sub>H</sub>. In almost every high-gain CE stage it is the <b>input pole</b>, because of the Miller multiplication.</p>
+  <div class="card intuition"><span class="label">Worked Problem 3 (notes): Miller effect and upper cut-off</span>
+  <p>C<sub>π</sub> = 25 pF, C<sub>μ</sub> = 4 pF, A<sub>vbc</sub> = −40, R<sub>Hi</sub> = 5 kΩ, R<sub>Ho</sub> = 3 kΩ.</p>
+  <p>C<sub>in</sub> = 25 + 4[1 − (−40)] = <b>189 pF</b>. f<sub>Hi</sub> = 1/[2π(5k)(189p)] = <b>168 kHz</b>.</p>
+  <p>C<sub>Mo</sub> = 4(1 − 1/(−40)) = <b>4.10 pF</b>. f<sub>Ho</sub> = 1/[2π(3k)(4.10p)] ≈ <b>12.9 MHz</b>.</p>
+  <p>The input pole is 77 times lower, so the <b>Miller-multiplied input capacitance sets f<sub>H</sub></b>.</p></div>
+  <div class="widget" data-w="hfmiller"></div>
+
+  <h3>2.4 The transition frequency f<sub>T</sub></h3>
+  <p>f<sub>T</sub> is the frequency at which the short-circuit current gain |h<sub>fe</sub>| falls to 1. With the output shorted, the current gain is β/(1 + jωr<sub>π</sub>(C<sub>π</sub> + C<sub>μ</sub>)), which falls to 1 at</p>
+  <div class="eq key">f_{T} = [[g_{m}|2π(C_{π} + C_{μ})]]</div>
+  <p>It measures how fast the transistor itself is. For g<sub>m</sub> = 40 mS, C<sub>π</sub> = 25 pF, C<sub>μ</sub> = 4 pF: f<sub>T</sub> ≈ 220 MHz. (The expression above is the notes’ formula; the one-line derivation is added.) A usable amplifier bandwidth is always far below f<sub>T</sub> because of Miller multiplication.</p>
+
+  <div class="card watch"><span class="label">Exam traps</span><ul>
+  <li>Miller multiplies C<sub>μ</sub> by (1 + |A<sub>v</sub>|) <b>only at the input</b>. At the output it is about C<sub>μ</sub>.</li>
+  <li>A<sub>vbc</sub> is the gain from the <i>internal</i> base B′ to the collector, not from the source. Use −g<sub>m</sub>R<sub>C</sub>′.</li>
+  <li>Do not mix the notation: C<sub>e</sub> = C<sub>π</sub> and C<sub>c</sub> = C<sub>μ</sub>. The notes use both.</li></ul></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Explain the high-frequency response of a CE amplifier”</span>
+  <ol>
+    <li>High-frequency hybrid-π figure with r<sub>bb′</sub>, r<sub>π</sub>, C<sub>π</sub>, C<sub>μ</sub>, g<sub>m</sub>v<sub>b′e</sub>, r<sub>ce</sub> (3).</li>
+    <li>Statement and derivation of Miller’s theorem (3).</li>
+    <li>C<sub>in</sub> = C<sub>π</sub> + C<sub>μ</sub>(1 + g<sub>m</sub>R<sub>C</sub>′), C<sub>Mo</sub> ≈ C<sub>μ</sub> and the two poles (2).</li>
+    <li>f<sub>H</sub> set by the lower pole; f<sub>T</sub> formula (2).</li>
+  </ol></div>
+  <details><summary>Quick check 1: gain −100, C<sub>μ</sub> = 3 pF. Miller input capacitance?</summary><p>3 × (1 + 100) = <b>303 pF</b>.</p></details>
+  <details><summary>Quick check 2: why does halving the gain roughly double f<sub>H</sub> in a high-gain stage?</summary><p>When |A<sub>v</sub>| ≫ 1 the Miller term dominates C<sub>in</sub>, so C<sub>in</sub> ∝ |A<sub>v</sub>| and f<sub>Hi</sub> ∝ 1/|A<sub>v</sub>|. That is the gain–bandwidth trade-off (a standard result, not in the notes).</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s2"> Mark topic 2 as done</label>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="sec" id="s3">
+  <div class="sechead"><span class="secno">Topic 3</span></div>
+  <h2>Why multistage? Classification and coupling methods</h2>
+  <div class="tags"><span class="tag">Notes: Section 3 · Short answer, 4–6 marks</span></div>
+
+  <h3>3.1 The need</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>One CE stage gives a gain of perhaps 50 to 150. A microphone gives millivolts and a speaker needs volts. You need 1000 or more. Also, a single stage has one input resistance and one output resistance, and they are rarely what you need: a high-resistance sensor wants a high R<sub>i</sub> (use a follower first), and a low-resistance speaker wants a low R<sub>o</sub> (use a follower or power stage last). So you chain stages, each doing one job.</p></div>
+  <ul>
+    <li><b>Gain:</b> the total is the product of the stage gains (or the sum, in dB).</li>
+    <li><b>Impedance matching:</b> choose each stage’s R<sub>i</sub> and R<sub>o</sub> for the neighbours.</li>
+    <li><b>Bandwidth and drive:</b> a wideband stage, a power stage and so on.</li>
+  </ul>
+
+  <h3>3.2 Classification</h3>
+  <p>Multistage amplifiers are classified in three ways. In an exam, name all three.</p>
+  <ul>
+    <li><b>By coupling:</b> RC, direct, transformer.</li>
+    <li><b>By signal type:</b> small-signal voltage amplifier stages or large-signal (power) output stages.</li>
+    <li><b>By configuration of the stages:</b> CE–CE, CE–CC, CC–CE, CE–CB (cascode), Darlington.</li>
+  </ul>
+
+  <h3>3.3 The three coupling methods</h3>
+  <figure><div data-dg="coupling3"></div><figcaption>What sits between the collector of stage 1 and the base of stage 2.</figcaption></figure>
+  <div class="tw"><table><thead><tr><th>Method</th><th>Main advantage</th><th>Main limitation</th><th>Typical use</th></tr></thead><tbody>
+  <tr><td><b>RC coupling</b></td><td>Simple, cheap, independent DC bias of each stage</td><td>Low-frequency roll-off; interstage loading; cannot amplify DC</td><td>General voltage amplification, audio</td></tr>
+  <tr><td><b>Direct coupling</b></td><td>No coupling capacitor; response extends to DC</td><td>DC bias and drift of each stage affect the next</td><td>DC and very-low-frequency amplifiers, ICs</td></tr>
+  <tr><td><b>Transformer coupling</b></td><td>Impedance matching, DC isolation, power transfer</td><td>Bulky, expensive; bandwidth limited by transformer non-idealities</td><td>Power/output stages</td></tr>
+  </tbody></table></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Need and types of multistage amplifiers”</span>
+  <ol><li>Need: gain, impedance matching, bandwidth, drive (2).</li><li>Block diagram of an n-stage cascade with source and load (2).</li><li>Classification (2).</li><li>Comparison table of the three couplings with figures (4).</li></ol></div>
+  <details><summary>Quick check: which coupling can amplify a DC signal?</summary><p>Only direct coupling, and only if the external input/output coupling capacitors are also left out.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s3"> Mark topic 3 as done</label>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="sec" id="s4">
+  <div class="sechead"><span class="secno">Topic 4</span></div>
+  <h2>General parameter evaluation: loading, R<sub>i</sub>, R<sub>o</sub>, A<sub>v</sub>, A<sub>i</sub>, bandwidth</h2>
+  <div class="tags"><span class="tag hot">The method behind every numerical in this unit</span><span class="tag">Notes: Section 4; Worked Problems 4 and 5</span></div>
+
+  <h3>4.1 Interstage loading</h3>
+  <figure><div data-dg="loading"></div><figcaption>Cascade of two stages. The input resistance of stage 2 is the load of stage 1; the output resistance of stage 1 and R<sub>i2</sub> form a divider. R<sub>i</sub> is seen by the source, R<sub>o</sub> by the load.</figcaption></figure>
+  <ol class="steps">
+    <li><b>Work from the load backwards for the gains.</b> Stage 2 has the real load R<sub>L</sub>, so find A<sub>v2</sub> first (R<sub>C2</sub>′ = R<sub>C2</sub> ∥ r<sub>o2</sub> ∥ R<sub>L</sub>).</li>
+    <li><b>Find R<sub>i2</sub>.</b> It is the load that stage 1 sees.</li>
+    <li><b>Then stage 1:</b> R<sub>C1</sub>′ = R<sub>C1</sub> ∥ r<sub>o1</sub> ∥ R<sub>i2</sub> and A<sub>v1</sub> = −g<sub>m1</sub>R<sub>C1</sub>′.</li>
+    <li><b>Multiply:</b> A<sub>v</sub> = A<sub>v1</sub>A<sub>v2</sub>. The sign gives the phase: two inverting stages give a positive (in-phase) result.</li>
+  </ol>
+  <div class="eq key l">A_{v} = A_{v1}A_{v2}…, &nbsp; A_{vs} = A_{v}[[R_{i}|R_{s}+R_{i}]], &nbsp; A_{i} = [[i_{o}|i_{i}]] = A_{v}[[R_{i}|R_{L}]]</div>
+  <p>A<sub>v</sub> is the gain from the amplifier’s own input terminal. A<sub>vs</sub> is from the source and includes the input divider. The current-gain formula is valid when A<sub>v</sub> is referenced to the input terminal (v<sub>o</sub>/v<sub>i</sub>); if it is referenced to the source, first include R<sub>i</sub>/(R<sub>s</sub> + R<sub>i</sub>).</p>
+  <p><b>Why A<sub>i</sub> = A<sub>v</sub>R<sub>i</sub>/R<sub>L</sub>:</b> i<sub>o</sub> = v<sub>o</sub>/R<sub>L</sub> and i<sub>i</sub> = v<sub>i</sub>/R<sub>i</sub>, so the ratio is (v<sub>o</sub>/v<sub>i</sub>)(R<sub>i</sub>/R<sub>L</sub>).</p>
+  <p><b>R<sub>i</sub></b> is mainly the first stage’s input resistance. <b>R<sub>o</sub></b> is mainly the last stage’s output resistance (R<sub>C</sub> ∥ r<sub>o</sub> for a CE stage; about 1/g<sub>m</sub>-ish for a follower).</p>
+
+  <div class="card intuition"><span class="label">Worked Problem 4 (notes): two-stage CE with loading</span>
+  <p>g<sub>m1</sub> = 40 mS, R<sub>C1</sub> = 4.7 kΩ, r<sub>o1</sub> = 80 kΩ, R<sub>i2</sub> = 3 kΩ. g<sub>m2</sub> = 35 mS, R<sub>C2</sub> = 3.3 kΩ, r<sub>o2</sub> = 60 kΩ, R<sub>L</sub> = 10 kΩ. R<sub>i</sub> = 4 kΩ, R<sub>s</sub> = 1 kΩ.</p>
+  <p>R<sub>C1</sub>′ = 4.7k ∥ 80k ∥ 3k = 1.790 kΩ → A<sub>v1</sub> = −(0.04)(1790) = <b>−71.6</b>.</p>
+  <p>R<sub>C2</sub>′ = 3.3k ∥ 60k ∥ 10k = 2.383 kΩ → A<sub>v2</sub> = −(0.035)(2383) = <b>−83.4</b>.</p>
+  <p>A<sub>v</sub> = (−71.6)(−83.4) = <b>+5.97 × 10³</b>. A<sub>vs</sub> = 5972 × 4/(1 + 4) = <b>4.78 × 10³</b>. R<sub>o</sub> ≈ 3.3k ∥ 60k = <b>3.13 kΩ</b>. A<sub>i</sub> = 5972 × 4k/10k = <b>2.39 × 10³</b>.</p>
+  <p>Without loading, stage 1 would have claimed −(0.04)(4.7k ∥ 80k) = −178 instead of −71.6. That is the cost of ignoring R<sub>i2</sub>.</p></div>
+  <div class="widget" data-w="cascade2"></div>
+
+  <h3>4.2 Bandwidth of a cascade</h3>
+  <p>Each first-order stage contributes its own low-frequency and high-frequency pole. For n identical stages, the overall response at frequency f (normalised to mid-band) is the single-stage response raised to the power n. Set it equal to 1/√2 and solve.</p>
+  <div class="card intuition"><span class="label">Derivation (the notes give the result)</span>
+  <p>One stage, upper pole: |A|/A<sub>mid</sub> = [1 + (f/f<sub>H,s</sub>)²]<sup>−1/2</sup>. For n stages: [1 + (f/f<sub>H,s</sub>)²]<sup>−n/2</sup>. At the overall −3 dB point this equals 2<sup>−1/2</sup>:</p>
+  <div class="eq">[1 + (f_{H}/f_{H,s})²]^{n} = 2 &nbsp;⟹&nbsp; (f_{H}/f_{H,s})² = 2^{1/n} − 1</div>
+  <p>and by the same steps for the lower pole (f<sub>L,s</sub>/f<sub>L</sub>)² = 2<sup>1/n</sup> − 1.</p></div>
+  <div class="eq key l">f_{H} = f_{H,s}√(2^{1/n} − 1), &nbsp;&nbsp; f_{L} = [[f_{L,s}|√(2^{1/n} − 1)]]</div>
+  <p>The shrinkage factor √(2<sup>1/n</sup> − 1) is 1 for n = 1, 0.644 for n = 2, 0.510 for n = 3, 0.435 for n = 4. So two stages keep only 64% of the single-stage f<sub>H</sub>, and f<sub>L</sub> rises by 1/0.644 = 1.55 times.</p>
+  <figure><div data-dg="bwshrink"></div><figcaption>Normalised response of 1, 2, 3 and 4 identical stages (f<sub>L,s</sub> = 50 Hz, f<sub>H,s</sub> = 100 kHz). Every extra stage narrows the band.</figcaption></figure>
+  <div class="card intuition"><span class="label">Worked Problem 5 (notes): two identical stages</span>
+  <p>f<sub>L,s</sub> = 50 Hz, f<sub>H,s</sub> = 100 kHz.</p>
+  <p>f<sub>L</sub> = 50/√(2<sup>1/2</sup> − 1) = <b>77.7 Hz</b>. f<sub>H</sub> = 100 kHz × √(2<sup>1/2</sup> − 1) = <b>64.4 kHz</b>. BW ≈ 64.4 kHz − 0.078 kHz = <b>64.3 kHz</b>.</p></div>
+  <div class="widget" data-w="bwn"></div>
+  <p>The exact formulas are for identical first-order stages. For quick qualitative reasoning with unequal stages, the stage with the highest f<sub>L</sub> and the stage with the lowest f<sub>H</sub> dominate (the “dominant-stage idea”).</p>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Evaluate the parameters of a multistage amplifier”</span>
+  <ol><li>Block diagram with R<sub>s</sub>, stage 1, stage 2, R<sub>L</sub> (2).</li><li>Loading: R<sub>C1</sub>′ = R<sub>C1</sub> ∥ r<sub>o1</sub> ∥ R<sub>i2</sub> (2).</li><li>A<sub>v</sub>, A<sub>vs</sub>, A<sub>i</sub> with formulas (3).</li><li>R<sub>i</sub> from first stage, R<sub>o</sub> from last stage (1).</li><li>Bandwidth shrinkage with the n-stage formulas (2).</li></ol></div>
+  <details><summary>Quick check 1: three identical stages, each A<sub>v</sub> = 20 dB, f<sub>H,s</sub> = 200 kHz. Gain and f<sub>H</sub>?</summary><p>60 dB overall. f<sub>H</sub> = 200 kHz × √(2<sup>1/3</sup> − 1) = 200 × 0.510 = <b>102 kHz</b>.</p></details>
+  <details><summary>Quick check 2: why not multiply the unloaded gains?</summary><p>Because stage 1 drives R<sub>i2</sub> and its gain is then −g<sub>m1</sub>(R<sub>C1</sub> ∥ r<sub>o1</sub> ∥ R<sub>i2</sub>), which is smaller. Using unloaded gains over-estimates the total.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s4"> Mark topic 4 as done</label>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="sec" id="s5">
+  <div class="sechead"><span class="secno">Topic 5</span></div>
+  <h2>Choice of transistor configuration in a cascade</h2>
+  <div class="tags"><span class="tag">Notes: Section 5 · 4–5 mark question</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Each configuration has a personality. CE gives gain. CC gives a buffer (voltage gain just under 1, high R<sub>i</sub>, low R<sub>o</sub>). CB has a low R<sub>i</sub> and a good high-frequency response. Pick each stage for the <b>job</b> it has to do. The stages in a cascade need not all be the same.</p></div>
+  <div class="tw"><table><thead><tr><th>Configuration</th><th>Voltage gain</th><th>R<sub>i</sub></th><th>R<sub>o</sub></th><th>Why chosen</th></tr></thead><tbody>
+  <tr><td><b>CE</b></td><td>High, inverting</td><td>Moderate</td><td>Moderate to high</td><td>Main voltage-gain stage</td></tr>
+  <tr><td><b>CC</b> (emitter follower)</td><td>Near unity, no inversion</td><td>High</td><td>Low</td><td>Input/output buffer, load driver</td></tr>
+  <tr><td><b>CB</b></td><td>High, no inversion</td><td>Low</td><td>High</td><td>High-frequency stage; upper transistor of a cascode</td></tr>
+  <tr><td><b>Darlington</b></td><td>Near unity as follower</td><td>Very high</td><td>Low</td><td>Very high current gain and high R<sub>i</sub></td></tr>
+  <tr><td><b>Cascode</b> (CE–CB)</td><td>High</td><td>Moderate</td><td>High</td><td>High gain with improved high-frequency response</td></tr>
+  </tbody></table></div>
+  <h3>Typical cascades</h3>
+  <ul>
+    <li><b>CE → CE:</b> high overall voltage gain; the standard RC-coupled voltage amplifier.</li>
+    <li><b>CE → CC:</b> voltage gain, then a low-R<sub>o</sub> buffer so that a low-resistance load does not collapse the gain.</li>
+    <li><b>CC → CE:</b> a high-R<sub>i</sub> front end for a weak, high-resistance source, then voltage gain.</li>
+    <li><b>CE → CB:</b> the cascode (Topic 10) for high gain and wide bandwidth.</li>
+    <li><b>Darlington → CE or Darlington output stage:</b> when the source cannot supply much input current.</li>
+  </ul>
+  <div class="card watch"><span class="label">Exam use</span><p>When a question gives a source resistance and a load resistance and asks “which configuration for each stage”, answer with the table: high-R<sub>s</sub> source → CC/Darlington first; small R<sub>L</sub> → CC/power stage last; gain in the middle with CE.</p></div>
+  <details><summary>Quick check: a 100 kΩ sensor drives an 8 Ω speaker. Sketch the chain.</summary><p>CC/Darlington (high R<sub>i</sub>, not loading the sensor) → CE (voltage gain) → CC or power stage (low R<sub>o</sub> to drive 8 Ω). In practice the speaker stage is transformer-coupled or an emitter-follower power stage.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s5"> Mark topic 5 as done</label>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="sec" id="s6">
+  <div class="sechead"><span class="secno">Topic 6</span></div>
+  <h2>RC-coupled multistage amplifier</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q1 (a) “Derive mid-band voltage gain of RC-coupled amplifier” (6) and Q1 (b) numerical (4)</span><span class="tag">Notes: Section 6; Worked Problems 6 and 7</span></div>
+
+  <h3>6.1 The circuit and what each part does</h3>
+  <figure><div data-dg="rcCkt"></div><figcaption>Two-stage RC-coupled CE amplifier (labels follow Figure 9 of the notes). C<sub>1</sub> input coupling, C<sub>3</sub> interstage coupling, C<sub>5</sub> output coupling, C<sub>2</sub> and C<sub>4</sub> emitter bypass.</figcaption></figure>
+  <ul>
+    <li>Stage 1 amplifies the input voltage. <b>C<sub>3</sub></b> carries the AC to stage 2 but blocks stage 1’s DC collector voltage, so each stage is biased independently.</li>
+    <li>Stage 2 gives more gain. <b>C<sub>5</sub></b> passes the amplified AC to the load and blocks DC.</li>
+    <li><b>C<sub>2</sub>, C<sub>4</sub></b> bypass the emitter resistors so the AC gain is not reduced by emitter degeneration.</li>
+  </ul>
+
+  <h3>6.2 Derivation of the mid-band gain</h3>
+  <p>At mid-band every external capacitor is a short and every junction capacitor is open. So the emitters of both transistors are at AC ground, and Figure 9 reduces to two hybrid-π CE stages with the divider resistors in parallel.</p>
+  <ol class="steps">
+    <li><b>Input resistances.</b> R<sub>i1</sub> = R<sub>1</sub> ∥ R<sub>2</sub> ∥ r<sub>π1</sub> and R<sub>i2</sub> = R<sub>5</sub> ∥ R<sub>6</sub> ∥ r<sub>π2</sub>.</li>
+    <li><b>Loaded collector resistances.</b> R<sub>C1</sub>′ = R<sub>3</sub> ∥ r<sub>o1</sub> ∥ R<sub>i2</sub> (stage 1 is loaded by stage 2) and R<sub>C2</sub>′ = R<sub>7</sub> ∥ r<sub>o2</sub> ∥ R<sub>L</sub>.</li>
+    <li><b>Stage gains.</b> Each transistor gives i<sub>c</sub> = g<sub>m</sub>v<sub>π</sub>, and the current flows in the collector load. So A<sub>v1</sub> = −g<sub>m1</sub>R<sub>C1</sub>′ and A<sub>v2</sub> = −g<sub>m2</sub>R<sub>C2</sub>′.</li>
+    <li><b>Overall.</b> v<sub>o</sub>/v<sub>b1</sub> = A<sub>v1</sub>A<sub>v2</sub>. From the source: v<sub>o</sub>/v<sub>s</sub> = [R<sub>i1</sub>/(r<sub>s</sub> + R<sub>i1</sub>)]A<sub>v1</sub>A<sub>v2</sub>.</li>
+    <li><b>Terminal resistances (first order).</b> R<sub>i</sub> = R<sub>i1</sub> and R<sub>o</sub> ≈ R<sub>7</sub> ∥ r<sub>o2</sub>.</li>
+  </ol>
+  <div class="eq key l">A_{v} = (−g_{m1}R_{C1}′)(−g_{m2}R_{C2}′), &nbsp; [[v_{o}|v_{s}]] = [[R_{i1}|r_{s}+R_{i1}]]A_{v1}A_{v2}</div>
+
+  <div class="card intuition"><span class="label">Worked Problem 6 (notes): mid-band analysis</span>
+  <p>Both transistors: I<sub>C</sub> = 1 mA, β = 100, g<sub>m</sub> = 40 mS, r<sub>π</sub> = 2.5 kΩ, r<sub>o</sub> = 100 kΩ. R<sub>1</sub> = R<sub>5</sub> = 47 kΩ, R<sub>2</sub> = R<sub>6</sub> = 10 kΩ, R<sub>3</sub> = R<sub>7</sub> = 4.7 kΩ, r<sub>s</sub> = 600 Ω, R<sub>L</sub> = 10 kΩ.</p>
+  <p>R<sub>i1</sub> = R<sub>i2</sub> = 47k ∥ 10k ∥ 2.5k = <b>1.918 kΩ</b>.</p>
+  <p>R<sub>C1</sub>′ = 4.7k ∥ 100k ∥ 1.918k = 1.344 kΩ → A<sub>v1</sub> = <b>−53.8</b>. R<sub>C2</sub>′ = 4.7k ∥ 100k ∥ 10k = 3.098 kΩ → A<sub>v2</sub> = <b>−123.9</b>.</p>
+  <p>A<sub>v</sub> = <b>+6.66 × 10³</b>. v<sub>o</sub>/v<sub>s</sub> = 6662 × 1.918/(0.6 + 1.918) = <b>5.08 × 10³</b>. R<sub>o</sub> ≈ 4.7k ∥ 100k = <b>4.49 kΩ</b>.</p>
+  <p>The notes warn that this is a small-signal result: signal swing, nonlinearity and bias headroom limit the usable gain in practice.</p></div>
+
+  <h3>6.3 Choosing all five capacitors</h3>
+  <p>The notes extend the single-stage rule to each capacitor of Figure 9:</p>
+  <div class="eq">C_{1} ≥ [[1|2πf_{p1}(r_{s}+R_{i1})]], &nbsp; C_{3} ≥ [[1|2πf_{p3}(R_{o1}+R_{i2})]], &nbsp; C_{5} ≥ [[1|2πf_{p5}(R_{o2}+R_{L})]]</div>
+  <div class="eq">C_{2} ≥ [[1|2πf_{p2}R_{E1,seen}]], &nbsp; R_{E1,seen} = R_{4} ∥ [[r_{π1}+R_{B1}|β_{1}+1]], &nbsp; R_{B1} = r_{s} ∥ R_{1} ∥ R_{2}</div>
+  <div class="eq">C_{4} ≥ [[1|2πf_{p4}R_{E2,seen}]], &nbsp; R_{E2,seen} = R_{8} ∥ [[r_{π2}+R_{B2}|β_{2}+1]], &nbsp; R_{B2} = R_{5} ∥ R_{6} ∥ R_{o1}</div>
+  <p>Here R<sub>o1</sub> ≈ R<sub>3</sub> ∥ r<sub>o1</sub> and R<sub>o2</sub> ≈ R<sub>7</sub> ∥ r<sub>o2</sub>. The base resistance of stage 2 seen from its emitter is the <i>previous stage’s output resistance</i> in parallel with the divider. For a specified overall f<sub>L</sub>, assign each individual pole a little below it.</p>
+  <div class="card intuition"><span class="label">Worked Problem 7 (notes): all five capacitors for 10 Hz poles</span>
+  <p>Same amplifier as Problem 6, R<sub>4</sub> = R<sub>8</sub> = 1 kΩ.</p>
+  <p>C<sub>1</sub> = 1/[2π(10)(0.6k + 1.918k)] = <b>6.32 µF</b>. C<sub>3</sub> = 1/[2π(10)(4.489k + 1.918k)] = <b>2.48 µF</b>. C<sub>5</sub> = 1/[2π(10)(4.489k + 10k)] = <b>1.10 µF</b>.</p>
+  <p>R<sub>E1,seen</sub> = 29.4 Ω → C<sub>2</sub> = <b>541 µF</b>. R<sub>B2</sub> = 47k ∥ 10k ∥ 4.489k = 2.907 kΩ, R<sub>E2,seen</sub> = 1k ∥ (2.5k + 2.907k)/101 = 50.8 Ω → C<sub>4</sub> = <b>313 µF</b>.</p>
+  <p>Standard choices: C<sub>1</sub> = 10 µF, C<sub>3</sub> = 3.3 µF, C<sub>5</sub> = 1.5 µF, C<sub>2</sub> = 560 µF, C<sub>4</sub> = 330 µF. A larger standard value moves the pole lower.</p></div>
+  <div class="widget" data-w="rcamp"></div>
+
+  <h3>6.4 Design procedure</h3>
+  <ol class="steps">
+    <li>Decide the total gain and split it between the stages.</li>
+    <li>Choose I<sub>C</sub> of each stage and put V<sub>CE</sub> near mid-swing.</li>
+    <li>Choose R<sub>C</sub> and R<sub>E</sub> to establish the Q-points.</li>
+    <li>Choose the base divider of each stage.</li>
+    <li>Check interstage loading and revise the gain.</li>
+    <li>Choose coupling and bypass capacitors for the required f<sub>L</sub>.</li>
+    <li>Check the transistor’s high-frequency capability (f<sub>T</sub>, Miller effect) if a wide f<sub>H</sub> is needed.</li>
+  </ol>
+  <div class="card watch"><span class="label">Summer 2019 numerical: how to attack it with h-parameters</span>
+  <p>The paper’s Q1 OR (b) gives h<sub>fe</sub> = 50, h<sub>ie</sub> = 1200 Ω, g<sub>m</sub> = 40 mS, R<sub>1</sub> = 110 kΩ, R<sub>2</sub> = 10 kΩ. A route that fits the notes: R<sub>b</sub> = R<sub>1</sub> ∥ R<sub>2</sub> = 9.17 kΩ; r<sub>b′e</sub> = h<sub>fe</sub>/g<sub>m</sub> = 50/0.04 = 1.25 kΩ; R<sub>i</sub> = R<sub>b</sub> ∥ h<sub>ie</sub> = 9.17k ∥ 1.2k = 1.06 kΩ; R<sub>o</sub> = R<sub>C</sub> ∥ 1/h<sub>oe</sub> (the h<sub>oe</sub> exponent and R<sub>C</sub> value are unreadable in my scan, so substitute them from your paper).</p></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Derive the mid-band voltage gain of an RC-coupled amplifier”</span>
+  <ol>
+    <li>Circuit of the two-stage amplifier with all components named (2).</li>
+    <li>Mid-band assumptions: coupling and bypass capacitors short, junction capacitors open; mid-band hybrid-π equivalent (2).</li>
+    <li>R<sub>i2</sub>, R<sub>C1</sub>′, A<sub>v1</sub> with loading; then R<sub>C2</sub>′, A<sub>v2</sub> (3).</li>
+    <li>A<sub>v</sub> = A<sub>v1</sub>A<sub>v2</sub> and A<sub>vs</sub> with the input divider (1).</li>
+    <li>R<sub>i</sub>, R<sub>o</sub> and one comment on the frequency response (2).</li>
+  </ol></div>
+  <details><summary>Quick check 1: why is each stage biased independently?</summary><p>C<sub>3</sub> blocks DC, so stage 1’s collector voltage does not change stage 2’s base bias. Each stage has its own divider and R<sub>E</sub>.</p></details>
+  <details><summary>Quick check 2: two CE stages: phase between v<sub>o</sub> and v<sub>b1</sub>?</summary><p>Each inverts 180°, so the product is positive: <b>in phase</b>.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s6"> Mark topic 6 as done</label>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="sec" id="s7">
+  <div class="sechead"><span class="secno">Topic 7</span></div>
+  <h2>Direct-coupled amplifier</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q1 OR (a) “How is the direct-coupled amplifier developed?” (6)</span><span class="tag">Notes: Section 7; Worked Problem 8</span></div>
+
+  <h3>7.1 How it develops from the RC-coupled amplifier</h3>
+  <div class="card intuition"><span class="label">Intuition (use this as the “development” story)</span>
+  <ol class="steps">
+    <li>Start with the two-stage RC-coupled amplifier. The interstage capacitor C<sub>3</sub> blocks DC, so the lower cut-off is non-zero, and DC or very slow signals cannot pass.</li>
+    <li>Remove C<sub>3</sub> and the stage-2 divider (R<sub>5</sub>, R<sub>6</sub> in Figure 9) and connect <b>collector of Q1 directly to base of Q2</b>. Now the collector DC level of Q1 <i>is</i> the base bias of Q2.</li>
+    <li>Q2’s base current is drawn through Q1’s collector resistor, so it must be included in the R<sub>3</sub> current.</li>
+    <li>Result: the interstage path passes both AC and DC. The price is that bias and temperature drift now propagate from stage to stage.</li>
+  </ol></div>
+  <figure><div data-dg="dcCkt"></div><figcaption>Two-stage direct-coupled amplifier (Figure 10). Only the interstage connection is direct. C<sub>1</sub>, C<sub>4</sub> still block external DC; C<sub>2</sub>, C<sub>3</sub> bypass the emitter resistors.</figcaption></figure>
+
+  <h3>7.2 DC design equations</h3>
+  <div class="eq">V_{B1} ≈ V_{CC}[[R_{2}|R_{1}+R_{2}]], &nbsp; V_{E1} = V_{B1} − V_{BE1}, &nbsp; I_{E1} ≈ [[V_{E1}|R_{4}]], &nbsp; I_{C1} ≈ α_{1}I_{E1}</div>
+  <div class="eq key">V_{B2} = V_{C1} = V_{CC} − R_{3}(I_{C1} + I_{B2}), &nbsp; V_{E2} = V_{B2} − V_{BE2}, &nbsp; I_{E2} ≈ [[V_{E2}|R_{6}]], &nbsp; I_{B2} ≈ [[I_{E2}|β_{2}+1]]</div>
+  <div class="eq">V_{C2} = V_{CC} − I_{C2}R_{5}</div>
+  <p>Because I<sub>B2</sub> depends on V<sub>B2</sub>, which depends on I<sub>B2</sub>, solve it once as one linear equation. A first pass may neglect I<sub>B2</sub> (V<sub>C1</sub> ≈ V<sub>CC</sub> − I<sub>C1</sub>R<sub>3</sub>), then correct it.</p>
+  <h3>7.3 Mid-band small-signal analysis</h3>
+  <p>With C<sub>2</sub>, C<sub>3</sub> bypassing R<sub>4</sub>, R<sub>6</sub>, and no divider on Q2, r<sub>π2</sub> alone loads the collector of Q1:</p>
+  <div class="eq key">R_{C1}′ = R_{3} ∥ r_{o1} ∥ r_{π2}, &nbsp; R_{C2}′ = R_{5} ∥ r_{o2} ∥ R_{L}, &nbsp; A_{v} ≈ (−g_{m1}R_{C1}′)(−g_{m2}R_{C2}′)</div>
+  <div class="card intuition"><span class="label">Worked Problem 8 (notes): DC analysis of Figure 10</span>
+  <p>V<sub>CC</sub> = 12 V, R<sub>1</sub> = 82 kΩ, R<sub>2</sub> = 18 kΩ, R<sub>3</sub> = 3.3 kΩ, R<sub>4</sub> = 1 kΩ, R<sub>5</sub> = 680 Ω, R<sub>6</sub> = 1.5 kΩ, β<sub>1</sub> = β<sub>2</sub> = 100.</p>
+  <p>V<sub>B1</sub> ≈ 12 × 18/100 = 2.16 V → V<sub>E1</sub> = 1.46 V → I<sub>C1</sub> ≈ (100/101)(1.46 mA) = <b>1.446 mA</b>.</p>
+  <p>V<sub>B2</sub> = 12 − 3.3k[I<sub>C1</sub> + (V<sub>B2</sub> − 0.7)/(1.5k × 101)] ≈ <b>7.09 V</b>, V<sub>E2</sub> ≈ 6.39 V → I<sub>E2</sub> ≈ 4.26 mA, I<sub>C2</sub> ≈ <b>4.22 mA</b>.</p>
+  <p>V<sub>C2</sub> = 12 − (4.22 mA)(680) = <b>9.13 V</b>, V<sub>CE2</sub> ≈ <b>2.74 V</b>. Both transistors keep V<sub>CE</sub> headroom (V<sub>CE1</sub> = V<sub>B2</sub> − V<sub>E1</sub> ≈ 5.6 V).</p></div>
+  <div class="widget" data-w="dcamp"></div>
+
+  <div class="card watch"><span class="label">Drift and the f<sub>L</sub> statement (the notes are careful here)</span><ul>
+  <li><b>Drift:</b> a small change in V<sub>BE</sub> or I<sub>C</sub> in stage 1 is amplified by stage 2 and looks like a signal. Treat the circuit as <i>one DC system</i>.</li>
+  <li><b>Lower cut-off:</b> the direct connection adds no interstage pole. But the circuit in Figure 10 still has C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub>, C<sub>4</sub>, so f<sub>L</sub> is not zero. f<sub>L</sub> = 0 only for a <b>fully</b> DC-coupled amplifier with the external coupling capacitors also removed.</li></ul></div>
+
+  <div class="card exam"><span class="label">6–10 mark answer skeleton: “Direct-coupled amplifier”</span>
+  <ol><li>Development from the RC-coupled amplifier (what is removed, what is joined) (2).</li><li>Circuit (Figure 10) (2).</li><li>DC bias equations including I<sub>B2</sub> in R<sub>3</sub> (2).</li><li>Mid-band gain with r<sub>π2</sub> as the load of stage 1 (2).</li><li>Merits: response to DC, fewer parts. Demerits: drift, bias interdependence (2).</li></ol></div>
+  <details><summary>Quick check: why must I<sub>B2</sub> be included in the R<sub>3</sub> current?</summary><p>Q2’s base is connected straight to Q1’s collector node, so Q2’s base current is drawn from the supply through R<sub>3</sub>, together with I<sub>C1</sub>.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s7"> Mark topic 7 as done</label>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="sec" id="s8">
+  <div class="sechead"><span class="secno">Topic 8</span></div>
+  <h2>Transformer-coupled amplifier</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q3 (b) reflected load for 150 Ω and a 5 : 2 transformer</span><span class="tag">Notes: Section 8; Worked Problem 9</span></div>
+
+  <h3>8.1 Why a transformer?</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>A transistor delivers its best power into a load of some kΩ (a few hundred ohms to a few kΩ for a typical power stage). A loudspeaker is 4–16 Ω. Connect them directly and almost no power transfers. A transformer is a “gearbox” for impedance: it <b>reflects</b> the 8 Ω speaker to look like a few kΩ at the collector. It also gives DC isolation between the collector circuit and the load.</p></div>
+  <figure><div data-dg="xfmrCkt"></div><figcaption>CE power stage with an output transformer. The collector sees the reflected load R<sub>L</sub>′ = n²R<sub>L</sub>.</figcaption></figure>
+
+  <h3>8.2 Reflected load and turns ratio</h3>
+  <p>For an ideal transformer with n = N<sub>1</sub>/N<sub>2</sub>: voltages scale as V<sub>1</sub>/V<sub>2</sub> = n, currents inversely, I<sub>2</sub>/I<sub>1</sub> = n.</p>
+  <div class="card intuition"><span class="label">Derivation</span>
+  <p>The primary sees R′ = V<sub>1</sub>/I<sub>1</sub>. Substitute V<sub>1</sub> = nV<sub>2</sub> and I<sub>1</sub> = I<sub>2</sub>/n:</p>
+  <div class="eq">R_{L}′ = [[V_{1}|I_{1}]] = [[nV_{2}|I_{2}/n]] = n²[[V_{2}|I_{2}]] = n²R_{L}</div></div>
+  <div class="eq key l">R_{L}′ = n²R_{L} = (N_{1}/N_{2})²R_{L}, &nbsp;&nbsp; n = √[[R_{L}′|R_{L}]]</div>
+  <p>With the emitter at AC ground and an ideal transformer in mid-band, the collector load is R<sub>C</sub>′ ≈ R<sub>L</sub>′ ∥ r<sub>o</sub>, so</p>
+  <div class="eq">A_{v,p} ≈ −g_{m}R_{C}′ (at the primary), &nbsp;&nbsp; A_{v,sec} ≈ [[A_{v,p}|n]] (at the secondary)</div>
+  <p>The secondary voltage is smaller than the primary by n when n &gt; 1 (a step-down). The power transfer, not the voltage, is the goal.</p>
+
+  <h3>8.3 Frequency limits of the transformer</h3>
+  <ul>
+    <li><b>Low frequency:</b> the magnetizing inductance L<sub>m</sub> sits in parallel with the reflected load and shunts the signal. First-order corner: f<sub>L</sub> ≈ R<sub>L</sub>′/(2πL<sub>m</sub>).</li>
+    <li><b>High frequency:</b> leakage inductance and winding capacitance limit the response.</li>
+  </ul>
+  <figure><div data-dg="xfmrResp"></div><figcaption>Typical response of a transformer-coupled amplifier: a narrow band between the L<sub>m</sub> corner and the leakage/winding-capacitance corner.</figcaption></figure>
+  <div class="card intuition"><span class="label">Worked Problem 9 (notes)</span>
+  <p>An 8 Ω load is to appear as 2 kΩ at the collector. Required f<sub>L</sub> = 50 Hz, g<sub>m</sub> = 40 mS, r<sub>o</sub> = 100 kΩ.</p>
+  <p>n = √(2000/8) = 15.8 ≈ <b>16 : 1</b>. L<sub>m</sub> = 2000/(2π × 50) = <b>6.37 H</b>. R<sub>C</sub>′ = 2k ∥ 100k = 1.961 kΩ, A<sub>v,p</sub> = −(0.04)(1961) = <b>−78.4</b>, A<sub>v,sec</sub> = −78.4/15.8 = <b>−4.96</b>.</p>
+  <p>A practical transformer would have a turns ratio near 16 : 1 and at least about 6.4 H of magnetizing inductance.</p></div>
+  <div class="card intuition"><span class="label">Summer 2019 question</span>
+  <p>R<sub>L</sub> = 150 Ω, turns ratio 5 : 2, so n = 2.5 and R<sub>L</sub>′ = (2.5)²(150) = 6.25 × 150 = <b>937.5 Ω</b> (reflected to the primary).</p></div>
+  <div class="widget" data-w="xfmr"></div>
+  <p>Transformer coupling is most attractive when power transfer and impedance matching matter more than size, cost or very wide bandwidth.</p>
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Transformer-coupled amplifier”</span>
+  <ol><li>Circuit with the output transformer (2).</li><li>Need: impedance matching, DC isolation, power transfer (2).</li><li>Derivation R<sub>L</sub>′ = n²R<sub>L</sub> (2).</li><li>Gain, turns ratio selection (2).</li><li>Frequency response curve with L<sub>m</sub> and leakage/capacitance limits; merits and demerits (2).</li></ol></div>
+  <details><summary>Quick check: what does a 10 : 1 transformer do to a 16 Ω load?</summary><p>R<sub>L</sub>′ = 10² × 16 = <b>1.6 kΩ</b>.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s8"> Mark topic 8 as done</label>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="sec" id="s9">
+  <div class="sechead"><span class="secno">Topic 9</span></div>
+  <h2>Darlington amplifier</h2>
+  <div class="tags"><span class="tag">Notes: Section 9; Worked Problem 10</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Take two transistors and let the <b>emitter of the first drive the base of the second</b>. The tiny base current of Q2 is multiplied by β<sub>2</sub> in its emitter, and that whole emitter current becomes the base current of Q1, which multiplies it again by β<sub>1</sub>. Total current gain is roughly β<sub>1</sub>β<sub>2</sub>. With β = 100 each, one base electron controls 10 000 collector electrons.</p></div>
+  <figure><div data-dg="darl"></div><figcaption>Darlington emitter follower (Figure 13). Q2 is the input transistor and Q1 the output transistor; both collectors go to V<sub>CC</sub>.</figcaption></figure>
+  <h3>9.1 Compound current gain</h3>
+  <div class="eq">I_{B1} = I_{E2} = (β_{2}+1)I_{B2}, &nbsp;&nbsp; I_{E1} = (β_{1}+1)I_{B1} = (β_{1}+1)(β_{2}+1)I_{B2}</div>
+  <div class="eq key">β_{D} ≡ [[I_{C1}+I_{C2}|I_{B2}]] = β_{1}β_{2} + β_{1} + β_{2} ≈ β_{1}β_{2}</div>
+  <p>The product approximation is adequate when both β are large. The base–emitter voltage of the pair is about two diode drops (1.2–1.4 V for silicon), so the output emitter sits two V<sub>BE</sub> below the input base:</p>
+  <div class="eq">V_{E1} ≈ V_{B2} − V_{BE2} − V_{BE1}, &nbsp;&nbsp; I_{E1,Q} ≈ [[V_{E1}|R_{3}]]</div>
+
+  <h3>9.2 Input resistance and gain</h3>
+  <p>At mid-band C<sub>2</sub> is a short, so the emitter of Q1 sees R<sub>E</sub>′ = R<sub>3</sub> ∥ R<sub>L</sub>. Work backwards from the output along the signal path:</p>
+  <ol class="steps">
+    <li><b>Into the base of Q1:</b> R<sub>in,B1</sub> = r<sub>π1</sub> + (β<sub>1</sub> + 1)R<sub>E</sub>′. This is the load on the emitter of Q2.</li>
+    <li><b>Into the base of Q2:</b> R<sub>in,B2</sub> = r<sub>π2</sub> + (β<sub>2</sub> + 1)R<sub>in,B1</sub>. A follower multiplies whatever is at its emitter by (β + 1).</li>
+    <li><b>With the bias divider in parallel:</b> R<sub>i</sub> = (R<sub>1</sub> ∥ R<sub>2</sub>) ∥ R<sub>in,B2</sub>.</li>
+  </ol>
+  <div class="eq key l">A_{v1} ≈ [[(β_{1}+1)R_{E}′|r_{π1}+(β_{1}+1)R_{E}′]], &nbsp; A_{v2} ≈ [[(β_{2}+1)R_{in,B1}|r_{π2}+(β_{2}+1)R_{in,B1}]], &nbsp; A_{v} = A_{v1}A_{v2} ≈ 1⁻</div>
+  <div class="card intuition"><span class="label">Worked Problem 10 (notes)</span>
+  <p>V<sub>CC</sub> = 12 V, R<sub>1</sub> = 100 kΩ, R<sub>2</sub> = 33 kΩ, R<sub>3</sub> = 470 Ω, R<sub>L</sub> = 1 kΩ, β<sub>2</sub> = 80 (input transistor), β<sub>1</sub> = 100 (output transistor). r<sub>π1</sub> ≈ 0.752 kΩ, r<sub>π2</sub> ≈ 60.9 kΩ.</p>
+  <p>V<sub>B2</sub> ≈ 12 × 33/133 = 2.98 V → V<sub>E1</sub> ≈ 2.98 − 1.40 = 1.58 V → I<sub>E1</sub> ≈ 1.58/470 = <b>3.36 mA</b>.</p>
+  <p>R<sub>E</sub>′ = 470 ∥ 1k = 319.7 Ω. R<sub>in,B1</sub> = 0.752k + 101(319.7) = <b>33.0 kΩ</b>. R<sub>in,B2</sub> = 60.9k + 81(33.0k) = <b>2.74 MΩ</b>.</p>
+  <p>R<sub>i</sub> = (100k ∥ 33k) ∥ 2.74M = <b>24.6 kΩ</b>. A<sub>v</sub> ≈ (0.977)(0.978) = <b>0.955</b>.</p>
+  <p>The intrinsic input resistance is megohms, but the bias divider caps the actual R<sub>i</sub> at 24.6 kΩ. That is the classic Darlington design lesson: bias resistors waste the high R<sub>i</sub>, so bootstrap or use a large R<sub>1</sub>∥R<sub>2</sub> (standard remark, not in the notes).</p></div>
+  <div class="widget" data-w="darl"></div>
+  <ul>
+    <li>Very high current gain and high input resistance; low output resistance; voltage gain just below 1.</li>
+    <li>Needs about 2V<sub>BE</sub> of drive; slower than a single transistor (from the comparison table in the notes).</li>
+    <li>Check the power in Q1: it carries almost all the load current.</li>
+  </ul>
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Darlington amplifier”</span>
+  <ol><li>Circuit (2).</li><li>Derivation of β<sub>D</sub> = β<sub>1</sub>β<sub>2</sub> + β<sub>1</sub> + β<sub>2</sub> (3).</li><li>R<sub>i</sub> by successive reflection, A<sub>v</sub> ≈ 1 (3).</li><li>Features and uses; V<sub>BE</sub> drop of ≈ 1.2–1.4 V (2).</li></ol></div>
+  <details><summary>Quick check: β<sub>1</sub> = β<sub>2</sub> = 50. Exact β<sub>D</sub>?</summary><p>50 × 50 + 50 + 50 = <b>2600</b> (the approximation gives 2500, only 4% less).</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s9"> Mark topic 9 as done</label>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="sec" id="s10">
+  <div class="sechead"><span class="secno">Topic 10</span></div>
+  <h2>Cascode amplifier</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q1 (b) “What is a cascode amplifier?” (4)</span><span class="tag">Notes: Section 10; Worked Problem 11</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>The problem with a CE stage is Miller: its collector swings a lot, and that big swing multiplies C<sub>μ</sub> at the input. The cure: let the collector of the input transistor <b>not move</b>. Put a second transistor in common-base on top. Its emitter is a very low impedance (1/g<sub>m</sub>), so Q1’s collector is almost a short to AC ground and barely swings. Q1 still turns input voltage into current (g<sub>m1</sub>v<sub>π</sub>), Q2 passes that current to the collector load R<sub>4</sub>, and the big voltage swing happens up at Q2’s collector, away from the input.</p></div>
+  <figure><div data-dg="cascode"></div><figcaption>BJT cascode (Figure 14): Q1 common-emitter below, Q2 common-base above. C<sub>b</sub> holds the Q2 base at AC ground.</figcaption></figure>
+  <div class="card watch"><span class="label">Important AC condition (the notes stress this)</span><p>For Q2 to be a true common-base transistor its <b>base must be at AC ground</b>: bypass the Q2 base node with a large capacitor to ground (or hold it with a low-impedance bias source). All the gain, output-resistance and Miller expressions below assume this. If the Q2 base moves with the signal, the simple cascode equations no longer apply.</p></div>
+
+  <h3>10.1 DC bias</h3>
+  <p>The series divider R<sub>1</sub>–R<sub>2</sub>–R<sub>3</sub> sets both base voltages (neglecting base current for a first pass):</p>
+  <div class="eq">V_{B1} ≈ V_{CC}[[R_{3}|R_{1}+R_{2}+R_{3}]], &nbsp; V_{B2} ≈ V_{CC}[[R_{2}+R_{3}|R_{1}+R_{2}+R_{3}]], &nbsp; I ≈ I_{C1} ≈ I_{C2} ≈ [[V_{B1}−V_{BE1}|R_{5}]]</div>
+  <div class="eq">V_{C1} = V_{E2} ≈ V_{B2} − V_{BE2}, &nbsp; V_{CE1} ≈ V_{C1} − V_{E1}, &nbsp; V_{C2} = V_{CC} − IR_{4}, &nbsp; V_{CE2} = V_{C2} − V_{E2}</div>
+  <p>Both V<sub>CE</sub> values must stay in the forward-active region over the whole swing. Two stacked transistors need <b>more supply headroom</b> than one CE stage.</p>
+
+  <h3>10.2 Gain, output resistance and Miller effect</h3>
+  <div class="eq key">A_{v} ≈ −g_{m1}R_{C}′, &nbsp; R_{C}′ = R_{4} ∥ R_{L} ∥ R_{out,casc}</div>
+  <div class="eq key">R_{out,casc} ≈ r_{o1} + r_{o2} + g_{m2}r_{o1}r_{o2} ≈ g_{m}r_{o}² &nbsp; (matched devices)</div>
+  <div class="card intuition"><span class="label">Why R<sub>out</sub> is so large (added reasoning)</span>
+  <p>Look into the collector of Q2. A change v<sub>x</sub> there makes a small change in Q2’s emitter voltage. Because Q1’s collector current is held constant by its fixed base voltage, that emitter voltage change is only i<sub>x</sub>r<sub>o1</sub>. Q2’s own g<sub>m2</sub> then amplifies the effect of r<sub>o1</sub>, so r<sub>o1</sub> appears <b>multiplied by (1 + g<sub>m2</sub>r<sub>o2</sub>)</b> in series with r<sub>o2</sub>: R<sub>out</sub> ≈ r<sub>o2</sub> + r<sub>o1</sub>(1 + g<sub>m2</sub>r<sub>o2</sub>), the notes’ result. The practical effect: the transistor behaves almost like an ideal current source, so R<sub>C</sub>′ is set by R<sub>4</sub> and R<sub>L</sub>.</p></div>
+  <div class="eq key">A_{vb1} ≡ [[v_{c1}|v_{π1}]] ≈ −[[g_{m1}|g_{m2}]] ≈ −1, &nbsp;&nbsp; C_{in} ≈ C_{π1} + 2C_{μ1} + C_{stray}</div>
+  <p>The gain from Q1’s base-emitter voltage to Q1’s collector is only about −1. So Miller multiplies C<sub>μ1</sub> by 1 − (−1) = <b>2</b>, not by 1 + |A<sub>v</sub>| ≈ 100.</p>
+  <div class="card intuition"><span class="label">Worked Problem 11 (notes): bias, gain and Miller reduction</span>
+  <p>V<sub>CC</sub> = 12 V, R<sub>1</sub> = 47 kΩ, R<sub>2</sub> = R<sub>3</sub> = 22 kΩ, R<sub>4</sub> = 3.3 kΩ, R<sub>5</sub> = 2.2 kΩ, R<sub>L</sub> = 10 kΩ. V<sub>BE</sub> = 0.7 V, g<sub>m1</sub> = g<sub>m2</sub> = 40 mS, r<sub>o</sub> = 100 kΩ, C<sub>π1</sub> = 25 pF, C<sub>μ1</sub> = 4 pF, C<sub>stray</sub> = 3 pF.</p>
+  <p>V<sub>B1</sub> = 12 × 22/91 = 2.90 V, V<sub>B2</sub> = 12 × 44/91 = 5.80 V, V<sub>E1</sub> = 2.20 V → I = 2.20/2.2k = <b>1.00 mA</b>.</p>
+  <p>V<sub>C1</sub> = V<sub>E2</sub> = 5.80 − 0.70 = 5.10 V → V<sub>CE1</sub> = <b>2.90 V</b>. V<sub>C2</sub> = 12 − 3.3 = 8.70 V → V<sub>CE2</sub> = <b>3.60 V</b>.</p>
+  <p>R<sub>out,casc</sub> ≈ 100k + 100k + (0.04)(100k)² ≈ <b>400 MΩ</b>. R<sub>C</sub>′ = 3.3k ∥ 10k ∥ 400M = 2.48 kΩ → A<sub>v</sub> ≈ −(0.04)(2480) = <b>−99.2</b>.</p>
+  <p>C<sub>in,casc</sub> ≈ 25 + 2(4) + 3 = <b>36 pF</b>. For a plain CE stage with the same gain, C<sub>in,CE</sub> ≈ 25 + 4(1 + 99.2) + 3 ≈ <b>429 pF</b>. Same gain, about 12 times less input capacitance, so f<sub>H</sub> improves by roughly the same factor.</p></div>
+  <div class="widget" data-w="cascode"></div>
+
+  <h3>10.3 Design steps and when to choose a cascode</h3>
+  <ol class="steps">
+    <li>Choose I<sub>C</sub> from the gain, noise and power considerations; bias Q1 for it.</li>
+    <li>Choose V<sub>B2</sub> so that Q1’s collector sits at a nearly constant voltage with enough V<sub>CE1</sub>.</li>
+    <li>Choose R<sub>4</sub> for the gain and swing.</li>
+    <li>Check both transistors stay in forward-active over the swing, and check the supply headroom.</li>
+  </ol>
+  <p><b>CE or cascode?</b> Choose a plain CE stage when simplicity and gain are the aims. Choose a cascode when the <i>same</i> gain is needed with a better high-frequency response and less input–output feedback.</p>
+  <ul><li>High voltage gain like a good CE stage; very high output resistance; reduced Miller effect; better isolation between input and output; more supply voltage and more components needed.</li></ul>
+
+  <div class="card exam"><span class="label">4-mark and 10-mark answer skeletons: “What is a cascode amplifier?”</span>
+  <ol><li><b>4 marks:</b> a CE transistor driving a CB transistor (draw it); the CB device keeps the CE collector nearly fixed, so Miller multiplication of C<sub>μ</sub> is about 2 instead of (1 + |A<sub>v</sub>|); result: high gain and wide bandwidth, with a high output resistance.</li>
+  <li><b>10 marks, add:</b> circuit with bias ladder and AC-grounded Q2 base (2), DC equations (2), A<sub>v</sub> ≈ −g<sub>m1</sub>R<sub>C</sub>′ and R<sub>out</sub> ≈ g<sub>m</sub>r<sub>o</sub>² (3), Miller reduction with numbers (2), merits and demerits (1).</li></ol></div>
+  <details><summary>Quick check 1: gain of the Q1 stage alone in a matched cascode?</summary><p>About −g<sub>m1</sub>/g<sub>m2</sub> = <b>−1</b>, because Q2’s emitter resistance 1/g<sub>m2</sub> is the load.</p></details>
+  <details><summary>Quick check 2: why the extra supply voltage?</summary><p>Two transistors are stacked in series, so V<sub>CC</sub> must cover two V<sub>CE</sub> values, the emitter resistor drop and the collector resistor drop.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s10"> Mark topic 10 as done</label>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="sec" id="s11">
+  <div class="sechead"><span class="secno">Topic 11</span></div>
+  <h2>Comparison and design workflow</h2>
+  <div class="tags"><span class="tag">Notes: Sections 11 and 13 · 4–6 mark “compare” questions</span></div>
+  <div class="tw"><table><thead><tr><th>Circuit / method</th><th>Main strength</th><th>Main weakness</th><th>Best suited for</th></tr></thead><tbody>
+  <tr><td><b>RC-coupled CE cascade</b></td><td>High voltage gain with simple, independent biasing</td><td>Low-frequency roll-off from capacitors; interstage loading</td><td>General voltage amplification</td></tr>
+  <tr><td><b>Direct coupled</b></td><td>Response extends to DC</td><td>Bias drift and stage-to-stage DC dependence</td><td>DC and very-low-frequency signals</td></tr>
+  <tr><td><b>Transformer coupled</b></td><td>Impedance matching and power transfer</td><td>Size, cost and limited bandwidth</td><td>Power/output stage</td></tr>
+  <tr><td><b>Darlington</b></td><td>Very high current gain and input resistance</td><td>About two V<sub>BE</sub> drops; slower than a single transistor</td><td>Buffer and current driver</td></tr>
+  <tr><td><b>Cascode</b></td><td>High gain with wide bandwidth and low Miller effect</td><td>More components and supply headroom</td><td>Wideband / high-frequency voltage amplifier</td></tr>
+  </tbody></table></div>
+
+  <h3>Seven-step design workflow</h3>
+  <ol class="steps">
+    <li>Start from the required gain, input resistance, output resistance, bandwidth and signal swing.</li>
+    <li>Select stage configurations by the function of each stage.</li>
+    <li>Complete the DC bias design first.</li>
+    <li>Calculate the loaded mid-band gains and verify the total gain.</li>
+    <li>Choose coupling and bypass components and check the low-frequency response.</li>
+    <li>Check high-frequency limits, especially Miller effect in high-gain CE stages.</li>
+    <li>Check signal swing, power dissipation, tolerances and temperature stability.</li>
+  </ol>
+  <div class="card intuition"><span class="label">Final design perspective (notes)</span><p>A good multistage amplifier is not simply a collection of high-gain stages. Source loading, interstage loading, output drive, DC bias, frequency response and signal swing must all be satisfactory at the same time.</p></div>
+  <label class="done-row"><input type="checkbox" data-done="s11"> Mark topic 11 as done</label>
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="sec" id="s12">
+  <div class="sechead"><span class="secno">Exam map</span></div>
+  <h2>Exam map and formula sheet</h2>
+  <h3>Where past questions live</h3>
+  <div class="tw"><table><thead><tr><th>Question (Applied Electronic Circuits, Summer 2019)</th><th>Marks</th><th>Topic</th></tr></thead><tbody>
+  <tr><td>Q1 (a) Derive mid-band voltage gain of RC-coupled amplifier</td><td>6</td><td>Topic 6, §6.2</td></tr>
+  <tr><td>Q1 (b) What is a cascode amplifier?</td><td>4</td><td>Topic 10</td></tr>
+  <tr><td>Q1 OR (a) How is the direct-coupled amplifier developed?</td><td>6</td><td>Topic 7, §7.1</td></tr>
+  <tr><td>Q1 OR (b) CE RC-coupled numerical: R<sub>b</sub>, R<sub>i</sub>, r<sub>b′e</sub> (h-parameters)</td><td>4</td><td>Topic 6, h-parameter box</td></tr>
+  <tr><td>Q3 (b) Transformer-coupled: reflected load for 150 Ω, turns ratio 5 : 2</td><td>2</td><td>Topic 8: 937.5 Ω</td></tr>
+  </tbody></table></div>
+  <p style="font-size:.88rem;color:var(--muted)">Your question-paper scans only include this one paper with Unit 3 material; frequency response, Miller effect, Darlington and the general parameter evaluation are not asked in it but are in the notes and are standard 10-mark topics.</p>
+
+  <h3>Formula sheet</h3>
+  <div class="tw"><table><thead><tr><th>Topic</th><th>Formulas</th></tr></thead><tbody>
+  <tr><td>Mid-band CE</td><td>g<sub>m</sub> = I<sub>C</sub>/V<sub>T</sub> · r<sub>π</sub> = β/g<sub>m</sub> · r<sub>e</sub> ≈ 1/g<sub>m</sub> · r<sub>o</sub> ≈ V<sub>A</sub>/I<sub>C</sub> · A<sub>v</sub> ≈ −g<sub>m</sub>R<sub>C</sub>′ (bypassed) or −g<sub>m</sub>R<sub>C</sub>′/(1 + g<sub>m</sub>R<sub>E</sub>)</td></tr>
+  <tr><td>Low-frequency C</td><td>C<sub>1</sub> ≥ 1/[2πf(r<sub>s</sub> + R<sub>i</sub>)] · C<sub>2</sub> ≥ 1/[2πf(R<sub>o</sub> + R<sub>L</sub>)] · C<sub>E</sub> ≥ 1/(2πfR<sub>E,seen</sub>), R<sub>E,seen</sub> = R<sub>E</sub> ∥ (r<sub>π</sub> + R<sub>B</sub>)/(β + 1)</td></tr>
+  <tr><td>High frequency</td><td>Z<sub>1</sub> = Z/(1 − K) · Z<sub>2</sub> = ZK/(K − 1) · C<sub>Mi</sub> = C<sub>μ</sub>(1 + |A<sub>v</sub>|) · C<sub>in</sub> = C<sub>π</sub> + C<sub>Mi</sub> · f<sub>Hi</sub> = 1/(2πR<sub>Hi</sub>C<sub>in</sub>) · f<sub>T</sub> = g<sub>m</sub>/[2π(C<sub>π</sub> + C<sub>μ</sub>)]</td></tr>
+  <tr><td>Cascade</td><td>R<sub>C1</sub>′ = R<sub>C1</sub> ∥ r<sub>o1</sub> ∥ R<sub>i2</sub> · A<sub>v</sub> = A<sub>v1</sub>A<sub>v2</sub> · A<sub>vs</sub> = A<sub>v</sub>R<sub>i</sub>/(R<sub>s</sub> + R<sub>i</sub>) · A<sub>i</sub> = A<sub>v</sub>R<sub>i</sub>/R<sub>L</sub> · BW = f<sub>H</sub> − f<sub>L</sub></td></tr>
+  <tr><td>Bandwidth of n stages</td><td>f<sub>H</sub> = f<sub>H,s</sub>√(2<sup>1/n</sup> − 1) · f<sub>L</sub> = f<sub>L,s</sub>/√(2<sup>1/n</sup> − 1)</td></tr>
+  <tr><td>Direct coupled</td><td>V<sub>B2</sub> = V<sub>C1</sub> = V<sub>CC</sub> − R<sub>3</sub>(I<sub>C1</sub> + I<sub>B2</sub>) · R<sub>C1</sub>′ = R<sub>3</sub> ∥ r<sub>o1</sub> ∥ r<sub>π2</sub></td></tr>
+  <tr><td>Transformer</td><td>R<sub>L</sub>′ = (N<sub>1</sub>/N<sub>2</sub>)²R<sub>L</sub> · n = √(R<sub>L</sub>′/R<sub>L</sub>) · f<sub>L</sub> ≈ R<sub>L</sub>′/(2πL<sub>m</sub>) · A<sub>v,sec</sub> ≈ A<sub>v,p</sub>/n</td></tr>
+  <tr><td>Darlington</td><td>β<sub>D</sub> = β<sub>1</sub>β<sub>2</sub> + β<sub>1</sub> + β<sub>2</sub> · R<sub>in,B1</sub> = r<sub>π1</sub> + (β<sub>1</sub> + 1)R<sub>E</sub>′ · R<sub>in,B2</sub> = r<sub>π2</sub> + (β<sub>2</sub> + 1)R<sub>in,B1</sub> · V<sub>BE,pair</sub> ≈ 1.2–1.4 V</td></tr>
+  <tr><td>Cascode</td><td>A<sub>v</sub> ≈ −g<sub>m1</sub>(R<sub>4</sub> ∥ R<sub>L</sub> ∥ R<sub>out</sub>) · R<sub>out</sub> ≈ r<sub>o1</sub> + r<sub>o2</sub> + g<sub>m2</sub>r<sub>o1</sub>r<sub>o2</sub> · C<sub>in</sub> ≈ C<sub>π1</sub> + 2C<sub>μ1</sub> + C<sub>stray</sub></td></tr>
+  </tbody></table></div>
+  <footer>Built from Prof. Dr R. B. Ghongade’s Unit 3 notes (all 11 worked problems verified numerically) and your Summer 2019 Applied Electronic Circuits paper. Items marked “added” are standard textbook reasoning included to explain a result the notes only state. Send Unit 4 topics and notes and the same format continues.</footer>
+</section>
+</main>
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const par=(a,b)=>a*b/(a+b);
+const F=n=>Math.round(n*10)/10;
+const LOG=Math.log10;
+
+/* ---------- number / text helpers ---------- */
+function fmt3(x){return String(parseFloat(Number(x).toPrecision(3)));}
+function eng(v,u){
+  u=u||'';
+  if(!isFinite(v))return '—';
+  if(v===0)return '0 '+u;
+  const a=Math.abs(v),P=[[1e9,'G'],[1e6,'M'],[1e3,'k'],[1,''],[1e-3,'m'],[1e-6,'µ'],[1e-9,'n'],[1e-12,'p']];
+  for(const [m,s] of P){if(a>=m*0.9995)return fmt3(v/m)+' '+s+u;}
+  return v.toExponential(2)+' '+u;
+}
+function mk(s){
+  s=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function rBraced(str,cmd,f){
+    const p='\\'+cmd+'{';let idx;
+    while((idx=str.indexOf(p))!==-1){
+      const st=idx+p.length;let c=1,i=st;
+      while(i<str.length&&c>0){if(str[i]==='{')c++;else if(str[i]==='}')c--;i++;}
+      if(c===0){str=str.slice(0,idx)+f(str.slice(st,i-1))+str.slice(i);}else break;
+    }
+    return str;
+  }
+  s=rBraced(s,'text',x=>x);
+  s=rBraced(s,'mathbf',x=>'<b>'+x+'</b>');
+  s=rBraced(s,'sqrt',x=>'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">'+x+'</span></span>');
+  s=s.replace(/\\sqrt\s*(\d+)/g,'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">$1</span></span>');
+  
+  // Frac
+  let prev;
+  do{prev=s;s=s.replace(/_\{([^{}]+)\}/g,'<sub>$1</sub>').replace(/\^\{([^{}]+)\}/g,'<sup>$1</sup>');}while(s!==prev);
+  do{prev=s;s=s.replace(/\[\[([^\[\]|]+)\|([^\[\]]+)\]\]/g,'<span class="frac"><span>$1</span><span>$2</span></span>');}while(s!==prev);
+  s=s.replace(/\\left\s*([(\[{|])/g,'$1').replace(/\\right\s*([)\]}|])/g,'$1')
+     .replace(/\\left\b/g,'').replace(/\\right\b/g,'')
+     .replace(/\\implies\b/g,'&rArr;')
+     .replace(/\\approx\b/g,'&approx;')
+     .replace(/\\times\b/g,'&times;')
+     .replace(/\\cdot\b/g,'&middot;')
+     .replace(/\\Omega\b/g,'&Omega;')
+     .replace(/\\mu\b/g,'&mu;')
+     .replace(/\\pi\b/g,'&pi;')
+     .replace(/\\theta\b/g,'&theta;')
+     .replace(/\\eta\b/g,'&eta;')
+     .replace(/\\omega\b/g,'&omega;')
+     .replace(/\\ge\b/g,'&ge;')
+     .replace(/\\le\b/g,'&le;')
+     .replace(/\\pm\b/g,'&plusmn;')
+     .replace(/\\circ\b/g,'&deg;')
+     .replace(/\\dots\b/g,'&hellip;')
+     .replace(/\\quad\b/g,' ')
+     .replace(/\\qquad\b/g,'  ')
+     .replace(/\\parallel\b/g,'||')
+     .replace(/\\%/g,'%');
+  return s;
+}
+function mathify(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    if(!/_\{|\^\{|\[\[|\\sqrt|\\frac|\\implies|\\times|\\approx|\\mathbf|\\text|\\Omega|\\mu|\\le|\\ge|\\pi|&radic;|√/.test(n.nodeValue))return NodeFilter.FILTER_REJECT;
+    for(let p=n.parentNode;p&&p!==root;p=p.parentNode){const t=p.nodeName.toLowerCase();
+      if(t==='svg'||t==='script'||t==='style'||t==='textarea'||t==='input'||t==='option')return NodeFilter.FILTER_REJECT;}
+    return NodeFilter.FILTER_ACCEPT;}});
+  const list=[];while(w.nextNode())list.push(w.currentNode);
+  list.forEach(n=>{const sp=document.createElement('span');sp.innerHTML=mk(n.nodeValue);n.replaceWith(...sp.childNodes);});
+}
+
+/* ---------- SVG symbol library ---------- */
+const tx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/_\{([^{}]+)\}/g,'<tspan dy="3" font-size="9">$1</tspan><tspan dy="-3">​</tspan>');
+const W=(d,c)=>`<path${c?` class="${c}"`:''} d="${d}"/>`;
+const T=(x,y,s,c,a)=>`<text x="${x}" y="${y}" text-anchor="${a||'middle'}"${c?` class="${c}"`:''}>${tx(s)}</text>`;
+const dot=(x,y)=>`<circle class="dot" cx="${x}" cy="${y}" r="3"/>`;
+const term=(x,y)=>`<circle class="node" cx="${x}" cy="${y}" r="3.6"/>`;
+const G=(x,y,rot,inner)=>`<g transform="translate(${x} ${y})${rot?` rotate(${rot})`:''}">${inner}</g>`;
+function zig(len){const lead=8,n=3,seg=(len-2*lead)/(2*n);let d=`M0,0H${lead}`;for(let k=1;k<2*n;k++)d+=`L${F(lead+k*seg)},${k%2?-6:6}`;return d+`L${F(len-lead)},0H${len}`;}
+const R=(x,y,len,rot,c)=>G(x,y,rot||0,W(zig(len),c));
+const C=(x,y,len,rot,c)=>G(x,y,rot||0,W(`M0,0H${len/2-3}M${len/2-3},-10V10M${len/2+3},-10V10M${len/2+3},0H${len}`,c));
+const ACS=(x,y)=>`<circle class="sym" cx="${x}" cy="${y}" r="13"/>`+G(x,y,0,W('M-7,0q3.5,-8 7,0t7,0'));
+const VSRC=(x,y)=>`<polygon points="${x},${y-15} ${x+15},${y} ${x},${y+15} ${x-15},${y}"/>`+T(x,y-2,'+','s')+T(x,y+11,'−','s');
+const ISRC=(x,y,dir)=>`<polygon points="${x},${y-15} ${x+15},${y} ${x},${y+15} ${x-15},${y}"/>`+G(x,y,dir==='up'?180:0,W('M0,-8V8M-3.5,3L0,8L3.5,3'));
+const CSRC=(x,y,right)=>`<circle class="sym" cx="${x}" cy="${y}" r="14"/>`+G(x,y,0,W(right?'M-7,0H7M2,-4L7,0L2,4':'M7,0H-7M-2,-4L-7,0L-2,4'));
+const GND=(x,y)=>G(x,y,0,W('M0,0V6M-9,6H9M-5,10H5M-2,14H2'));
+const NPN=(x,y)=>G(x,y,0,W('M-30,0H0M0,-16V16M0,-8L18,-20V-40M0,8L18,20V40')+W('M17,19.4L8.4,17.9L12.3,12Z','fl'));
+function ARW(x1,y1,x2,y2,c){const a=Math.atan2(y2-y1,x2-x1),h=7;
+  const p1=[x2-h*Math.cos(a-0.4),y2-h*Math.sin(a-0.4)],p2=[x2-h*Math.cos(a+0.4),y2-h*Math.sin(a+0.4)];
+  return W(`M${x1},${y1}L${x2},${y2}M${F(p1[0])},${F(p1[1])}L${x2},${y2}L${F(p2[0])},${F(p2[1])}`,c);}
+const SVG=(w,h,inner,label)=>`<svg class="dg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${inner}</svg>`;
+function sine(x0,x1,yc,amp,phase,cycles,cls){let d='';for(let i=0;i<=160;i++){const x=x0+(x1-x0)*i/160,y=yc-amp*Math.sin(2*Math.PI*cycles*(x-x0)/(x1-x0)+phase);d+=(i?'L':'M')+F(x)+','+F(y);}return W(d,cls);}
+
+/* ---------- diagrams ---------- */
+const DG={};
+const WID={};
+function niceStep(max,n){const raw=max/n,m=Math.pow(10,Math.floor(LOG(raw))),f=raw/m;return (f<1.5?1:f<3?2:f<7?5:10)*m;}
+function freqPlot(Am,fL,fH){
+  const W0=620,H0=320,L=54,Rr=16,Tp=18,B=48,pw=W0-L-Rr,ph=H0-Tp-B,ymax=Am+8,ymin=Am-46;
+  const X=f=>L+LOG(f)/8*pw,Y=g=>Tp+ph-(g-ymin)/(ymax-ymin)*ph,gain=f=>Am-10*LOG(1+Math.pow(fL/f,2))-10*LOG(1+Math.pow(f/fH,2));
+  let s='';const lab=['1','10','100','1k','10k','100k','1M','10M','100M'];
+  for(let k=0;k<=8;k++)s+=W(`M${F(L+k*pw/8)},${Tp}V${Tp+ph}`,'thin')+T(F(L+k*pw/8),Tp+ph+16,lab[k],'s');
+  for(let g=Math.ceil(ymin/10)*10;g<=ymax;g+=10)s+=W(`M${L},${F(Y(g))}H${L+pw}`,'thin')+T(L-6,F(Y(g))+4,g,'s','end');
+  s+=W(`M${F(X(fL))},${F(Y(Am-3))}H${F(X(fH))}V${Tp+ph}H${F(X(fL))}Z`,'shade');
+  s+=W(`M${L},${F(Y(Am))}H${L+pw}`,'dc dash');
+  let d='';for(let k=0;k<=320;k++){const f=Math.pow(10,k/40);d+=(k?'L':'M')+F(X(f))+','+F(Math.min(Tp+ph,Math.max(Tp,Y(gain(f)))));}
+  s+=W(d,'ac2');
+  s+=W(`M${L},${F(Y(Am-3))}H${L+pw}`,'thin dash')+`<circle class="q" cx="${F(X(fL))}" cy="${F(Y(Am-3))}" r="4.5"/><circle class="q" cx="${F(X(fH))}" cy="${F(Y(Am-3))}" r="4.5"/>`;
+  s+=T(F(X(fL)),Tp+ph-8,'f_{1}','b')+T(F(X(fH)),Tp+ph-8,'f_{2}','b');
+  s+=T(F((X(fL)+X(fH))/2),F(Y(Am))-8,'mid-band A_{v(max)}','dc')+T(F((X(fL)+X(fH))/2),F(Y(Am-3))+16,'bandwidth','s')+T(L+pw-4,F(Y(Am-3))-6,'−3 dB','s','end');
+  s+=T(F(X(1))+6,Tp+14,'dashed orange: ideal amplifier','s','start');
+  s+=W(`M${L},${Tp}V${Tp+ph}H${L+pw}`)+T(L+pw/2,Tp+ph+36,'frequency (Hz, log scale)')+`<text transform="rotate(-90)" x="${-(Tp+ph/2)}" y="14" text-anchor="middle">gain (dB)</text>`;
+  return SVG(W0,H0,s,'Frequency response curve');
+}
+/* ---------- widget builder ---------- */
+const cells=a=>a.map(x=>x.warn?`<div class="warn">${mk(x.warn)}</div>`:x.note?`<div class="note">${mk(x.note)}</div>`:`<div><small>${mk(x.k)}</small><b>${x.v}</b></div>`).join('');
+function widget(host,o){
+  host.className='widget';
+  host.innerHTML=`<span class="wlabel">Try it</span> <b>${mk(o.title)}</b>${o.intro?`<p style="margin:.3rem 0;font-size:.88rem;color:var(--muted)">${mk(o.intro)}</p>`:''}<div class="wgrid"></div><div class="wfig"></div><div class="res"></div>`;
+  const g=$('.wgrid',host),fig=$('.wfig',host),res=$('.res',host),els={};
+  o.fields.forEach(f=>{
+    const id=host.dataset.w+'_'+f.id,d=document.createElement('div');d.className='fld';let ctl;
+    if(f.type==='sel')ctl=`<select id="${id}">${f.opts.map(([v,l])=>`<option value="${v}"${String(v)===String(f.val)?' selected':''}>${l}</option>`).join('')}</select>`;
+    else if(f.type==='range'||f.type==='log')ctl=`<input id="${id}" type="range" min="${f.min}" max="${f.max}" step="${f.step||'any'}" value="${f.type==='log'?LOG(f.val):f.val}"><output id="${id}_o"></output>`;
+    else ctl=`<input id="${id}" type="number" inputmode="decimal" min="0" step="any" value="${f.val}"><span class="u">${mk(f.unit||'')}</span>`;
+    d.innerHTML=`<label for="${id}">${mk(f.label)}</label><div class="row">${ctl}</div>`;g.appendChild(d);els[f.id]=$('#'+id,d);
+  });
+  function update(){
+    const v={};
+    o.fields.forEach(f=>{const e=els[f.id];let x;
+      if(f.type==='sel'){x=e.value;if(x!==''&&!isNaN(+x))x=+x;}
+      else if(f.type==='log')x=Math.pow(10,+e.value);
+      else{x=parseFloat(e.value);if(isNaN(x))x=0;x*=(f.scale||1);}
+      v[f.id]=x;
+      if(f.type==='range'||f.type==='log'){$('#'+e.id+'_o',host).textContent=f.fmt?f.fmt(x):x;}
+    });
+    if(o.figure)fig.innerHTML=o.figure(v);
+    res.innerHTML=cells(o.run(v));
+  }
+  host.addEventListener('input',update);update();
+}
+const YN=[[1,'Yes, bypassed'],[0,'No, not bypassed']];
+const pill=(t,c)=>`<span class="pill" style="background:${c}">${t}</span>`;
+function xy(o){
+  const W0=o.w||560,H0=o.h||300,L=60,Rr=18,Tp=16,B=46,pw=W0-L-Rr,ph=H0-Tp-B,x0=o.x0||0,x1=o.x1,y0=o.y0||0,y1=o.y1;
+  const X=v=>L+(v-x0)/(x1-x0)*pw,Y=v=>Tp+ph-(v-y0)/(y1-y0)*ph,sx=o.sx||niceStep(x1-x0,7),sy=o.sy||niceStep(y1-y0,6);let s='';
+  for(let v=Math.ceil(x0/sx-1e-9)*sx;v<=x1+1e-9;v+=sx)s+=W(`M${F(X(v))},${Tp}V${Tp+ph}`,'thin')+T(F(X(v)),Tp+ph+16,fmt3(v),'s');
+  for(let v=Math.ceil(y0/sy-1e-9)*sy;v<=y1+1e-9;v+=sy)s+=W(`M${L},${F(Y(v))}H${L+pw}`,'thin')+T(L-8,F(Y(v))+4,fmt3(v),'s','end');
+  (o.curves||[]).forEach(c=>{let d='';c.pts.forEach((p,i)=>{d+=(i?'L':'M')+F(X(p[0]))+','+F(Y(p[1]));});s+=W(d,c.cls||'ac');});
+  (o.marks||[]).forEach(m=>{s+=`<circle class="${m.cls||'q'}" cx="${F(X(m.x))}" cy="${F(Y(m.y))}" r="5"/>`;});
+  (o.texts||[]).forEach(t=>{s+=T(F(X(t.x))+(t.dx||0),F(Y(t.y))+(t.dy||0),t.s,t.cls,t.a);});
+  s+=W(`M${L},${Tp}V${Tp+ph}H${L+pw}`)+T(L+pw/2,H0-8,o.xl||'')+`<text transform="rotate(-90)" x="${-(Tp+ph/2)}" y="16" text-anchor="middle">${tx(o.yl||'')}</text>`;
+  return SVG(W0,H0,s,o.label||'plot');
+}
+const sweep=(a,b,n,f)=>{const r=[];for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;r.push([x,f(x)]);}return r;};
+/* ================= UNIT 3 : multistage amplifiers ================= */
+const TWOPI=2*Math.PI;
+const par2=(...a)=>1/a.reduce((s,x)=>s+1/x,0);
+const dB=x=>20*LOG(Math.abs(x));
+const fmtF=f=>f>=1e9?(f/1e9)+'G':f>=1e6?(f/1e6)+'M':f>=1e3?(f/1e3)+'k':String(f);
+const NUM=(x,u,d)=>eng(x,u);
+
+/* log-frequency response plot; curves are functions f -> dB */
+function bode(o){
+  const W0=o.w||560,H0=o.h||290,L=50,Rr=16,Tp=16,B=46,pw=W0-L-Rr,ph=H0-Tp-B,lo=LOG(o.fmin),hi=LOG(o.fmax);
+  const X=f=>L+(LOG(f)-lo)/(hi-lo)*pw,Y=g=>Tp+ph-(g-o.ymin)/(o.ymax-o.ymin)*ph;let s='';
+  for(let k=Math.ceil(lo-1e-9);k<=hi+1e-9;k++){const f=Math.pow(10,k);s+=W(`M${F(X(f))},${Tp}V${Tp+ph}`,'thin')+T(F(X(f)),Tp+ph+16,fmtF(f),'s');}
+  const sy=o.sy||10;for(let g=Math.ceil(o.ymin/sy)*sy;g<=o.ymax+1e-9;g+=sy)s+=W(`M${L},${F(Y(g))}H${L+pw}`,'thin')+T(L-6,F(Y(g))+4,g,'s','end');
+  if(o.pre)s+=o.pre(X,Y,Tp+ph);
+  (o.curves||[]).forEach(c=>{let d='';for(let k=0;k<=260;k++){const f=Math.pow(10,lo+(hi-lo)*k/260),g=Math.min(o.ymax,Math.max(o.ymin,c.fn(f)));d+=(k?'L':'M')+F(X(f))+','+F(Y(g));}s+=W(d,c.cls||'ac2');});
+  if(o.post)s+=o.post(X,Y,Tp+ph);
+  s+=W(`M${L},${Tp}V${Tp+ph}H${L+pw}`)+T(L+pw/2,H0-8,'frequency (Hz, log scale)')+`<text transform="rotate(-90)" x="${-(Tp+ph/2)}" y="14" text-anchor="middle">${o.yl||'gain (dB)'}</text>`;
+  return SVG(W0,H0,s,o.label||'frequency response');
+}
+const lowp=(f,fc)=>-10*LOG(1+Math.pow(fc/f,2)),highp=(f,fc)=>-10*LOG(1+Math.pow(f/fc,2));
+
+/* ---- diagrams ---- */
+DG.regions=()=>bode({fmin:1,fmax:1e8,ymin:0,ymax:50,label:'Frequency response with three regions',
+  curves:[{fn:f=>40+lowp(f,100)+highp(f,1e5),cls:'ac2'}],
+  pre:(X,Y,yb)=>W(`M${F(X(100))},${F(Y(37))}H${F(X(1e5))}V${yb}H${F(X(100))}Z`,'shade')+W(`M${F(X(1))},${F(Y(40))}H${F(X(1e8))}`,'dc dash'),
+  post:(X,Y,yb)=>T(F(X(10)),F(Y(8)),'LOW','b')+T(F(X(10)),F(Y(3)),'C_{1}, C_{E}, C_{2} act','s')+T(F(X(3e3)),F(Y(8)),'MID-BAND','b')+T(F(X(3e3)),F(Y(3)),'gain constant','s')+T(F(X(3e6)),F(Y(8)),'HIGH','b')+T(F(X(3e6)),F(Y(3)),'C_{π}, C_{μ} act','s')
+   +`<circle class="q" cx="${F(X(100))}" cy="${F(Y(37))}" r="4.5"/><circle class="q" cx="${F(X(1e5))}" cy="${F(Y(37))}" r="4.5"/>`
+   +T(F(X(100)),F(Y(37))-9,'f_{L}','b')+T(F(X(1e5)),F(Y(37))-9,'f_{H}','b')+T(F(X(1e3)),F(Y(40))-7,'A_{v(mid)}','dc')+T(F(X(3e3)),F(Y(37))+16,'bandwidth','s')});
+
+DG.ceCkt=()=>{let s='';
+  s+=W('M120,30H440')+T(452,34,'+V_{CC}','b','start')+dot(170,30)+dot(318,30);
+  s+=R(170,30,80,90)+W('M170,110V150')+dot(170,150)+R(170,150,80,90)+W('M170,230V300');
+  s+=W('M40,150H90')+C(90,150,40,0)+W('M130,150H270');
+  s+=R(40,190,40,270)+W('M40,190V217')+ACS(40,230)+W('M40,243V300');
+  s+=NPN(300,150);
+  s+=R(318,30,60,90)+W('M318,90V110')+dot(318,100)+W('M318,100H360')+C(360,100,40,0)+W('M400,100H480')+dot(450,100)+term(480,100);
+  s+=R(450,100,100,90)+W('M450,200V300');
+  s+=W('M318,190V210')+dot(318,210)+R(318,210,70,90)+W('M318,280V300')+W('M318,210H360')+C(360,210,40,90)+W('M360,250V300');
+  s+=W('M40,300H450')+GND(245,300)+dot(170,300)+dot(318,300)+dot(360,300)+dot(450,300);
+  s+=T(188,74,'R_{1}','','start')+T(188,198,'R_{2}','','start')+T(336,66,'R_{C}','','start')+T(300,254,'R_{E}','','end')+T(374,234,'C_{E}','s','start')
+    +T(110,134,'C_{1}')+T(380,82,'C_{2}')+T(466,158,'R_{L}','','start')+T(56,174,'r_{s}','','start')+T(24,234,'V_{s}','','end')+T(494,104,'V_{o}','b','start')+T(268,188,'Q','b');
+  return SVG(560,330,s,'CE amplifier with voltage divider bias');};
+
+DG.hybridHF=()=>{let s='';
+  s+=term(30,60)+W('M33.6,60H60')+R(60,60,100,0)+W('M160,60H190')+dot(190,60)+W('M190,60H290')+dot(230,60)+dot(290,60);
+  s+=R(230,60,140,90)+C(290,60,140,90);
+  s+=W('M190,60V34H240')+C(240,34,60,0)+W('M300,34H400V60')+dot(400,60);
+  s+=W('M400,60V115')+ISRC(400,130,'down')+W('M400,145V200');
+  s+=W('M400,60H470')+dot(470,60)+R(470,60,140,90)+W('M470,60H520')+term(520,60);
+  s+=W('M33.6,200H520')+term(30,200)+term(520,200)+dot(230,200)+dot(290,200)+dot(400,200)+dot(470,200);
+  s+=T(30,46,'B','b')+T(190,46,'B′','b')+T(520,46,'C','b')+T(30,222,'E','b')+T(110,48,'r_{bb′}')+T(216,134,'r_{π}','','end')+T(304,134,'C_{π}','','start')+T(270,16,'C_{μ}','b')
+    +T(386,134,'g_{m}v_{b′e}','s','end')+T(486,134,'r_{ce}','','start')+T(260,222,'v_{b′e} across r_{π} ∥ C_{π}','s');
+  return SVG(550,236,s,'High-frequency hybrid-pi model');};
+
+DG.miller=()=>{let s='';
+  s+=term(20,110)+W('M23.6,110H80')+`<polygon points="80,80 80,140 140,110"/>`+W('M140,110H236')+term(240,110)+dot(50,110)+dot(220,110);
+  s+=W('M50,110V40H100')+C(100,40,40,0)+W('M140,40H220V110')+T(120,28,'Z (= C_{μ})','s');
+  s+=T(36,132,'v_{1}','s')+T(214,132,'v_{2} = Kv_{1}','s','end')+T(100,114,'K','b','start')+T(130,176,'before','s');
+  s+=T(272,104,'≡','b');
+  s+=term(300,110)+W('M303.6,110H360')+`<polygon points="360,80 360,140 420,110"/>`+W('M420,110H516')+term(520,110)+dot(330,110)+dot(490,110);
+  s+=W('M330,110V120')+C(330,120,40,90)+GND(330,160)+W('M490,110V120')+C(490,120,40,90)+GND(490,160);
+  s+=T(330,190,'Z_{1} = Z/(1−K)','s')+T(490,190,'Z_{2} = ZK/(K−1)','s')+T(410,176,'after','s');
+  return SVG(560,200,s,'Miller theorem equivalent');};
+
+DG.coupling3=()=>{let s='';
+  const box=(x,a,b)=>`<rect class="box" x="${x}" y="40" width="46" height="80" rx="6"/>`+T(x+23,76,a,'b')+T(x+23,94,b,'s');
+  const coil=(x,dir)=>W(`M${x},60`+`a8,8 0 0 ${dir} 0,16`.repeat(3));
+  [[8,'RC coupling','capacitor blocks DC','passes the AC signal'],[195,'Direct coupling','wire passes DC and AC','bias is shared'],[382,'Transformer','magnetic link, DC isolation','matches impedances']].forEach((p,i)=>{
+    const ox=p[0];s+=T(ox+80,24,p[1],'b')+box(ox,'stage','1')+box(ox+114,'stage','2')+T(ox+80,148,p[2],'s')+T(ox+80,164,p[3],'s');
+    if(i===0)s+=W(`M${ox+46},80H${ox+63}`)+C(ox+63,80,34,0)+W(`M${ox+97},80H${ox+114}`);
+    if(i===1)s+=W(`M${ox+46},80H${ox+114}`);
+    if(i===2)s+=W(`M${ox+46},60H${ox+58}`)+coil(ox+58,1)+W(`M${ox+58},108H${ox+46}`)+W(`M${ox+74},56V112M${ox+78},56V112`)+coil(ox+94,0)+W(`M${ox+94},60H${ox+114}`)+W(`M${ox+94},108H${ox+114}`);
+  });
+  return SVG(560,176,s,'Three interstage coupling methods');};
+
+DG.loading=()=>{let s='';
+  const box=(x,t)=>`<rect class="box" x="${x}" y="28" width="130" height="112" rx="6"/>`+T(x+65,48,t,'b')+T(x+65,74,'R_{i} (in)','s')+T(x+65,96,'A_{v} = −g_{m}R_{C}′','s')+T(x+65,118,'R_{o} (out)','s');
+  s+=ACS(24,120)+W('M24,107V60H50')+R(50,60,50,0)+W('M100,60H130')+T(75,46,'r_{s}')+T(36,150,'V_{s}','','start');
+  s+=box(130,'Stage 1')+box(320,'Stage 2');
+  s+=W('M260,60H320')+ARW(300,60,320,60)+W('M450,60H505')+dot(480,60)+R(480,60,80,90)+W('M480,140V170')+T(494,106,'R_{L}','','start')+T(512,64,'v_{o}','b','start');
+  s+=W('M24,133V170H480')+GND(250,170);
+  s+=T(285,194,'stage 1 sees R_{i2} as its load: R_{C1}′ = R_{C1} ∥ r_{o1} ∥ R_{i2}','s');
+  s+=T(195,160,'R_{i} seen by source','s')+T(385,160,'R_{o} seen by load','s');
+  return SVG(560,204,s,'Interstage loading in a two-stage cascade');};
+
+DG.bwshrink=()=>{
+  const cls=['ac2','ac','dc','bad'],fn=n=>f=>n*(lowp(f,50)+highp(f,1e5));
+  return bode({fmin:1,fmax:1e7,ymin:-30,ymax:3,label:'Bandwidth shrinkage with number of stages',
+    curves:[1,2,3,4].map((n,i)=>({fn:fn(n),cls:cls[i]})),
+    pre:(X,Y)=>W(`M50,${F(Y(-3))}H544`,'thin dash'),
+    post:(X,Y)=>[1,2,3,4].map((n,i)=>T(62,34+i*15,'n = '+n,i===0?'ac2':i===1?'ac':i===2?'dc':'bad','start')).join('')+T(530,F(Y(-3))-5,'−3 dB','s','end')});};
+
+DG.rcCkt=()=>{let s='';
+  s+=W('M130,30H450')+T(462,34,'+V_{CC}','b','start')+dot(130,30)+dot(208,30)+dot(350,30)+dot(428,30);
+  s+=R(130,30,80,90)+dot(130,110)+R(130,110,80,90)+W('M130,190V260');
+  s+=ACS(20,215)+W('M20,202V110')+R(20,110,45,0)+C(65,110,40,0)+W('M105,110H160');
+  s+=NPN(190,110)+R(208,30,40,90)+R(208,150,70,90)+W('M208,220V260')+dot(208,160)+W('M208,160H250')+C(250,160,60,90)+W('M250,220V260');
+  s+=dot(208,70)+W('M208,70H270V110H290')+C(290,110,40,0)+W('M330,110H380');
+  s+=R(350,30,80,90)+dot(350,110)+R(350,110,80,90)+W('M350,190V260');
+  s+=NPN(410,110)+R(428,30,40,90)+R(428,150,70,90)+W('M428,220V260')+dot(428,160)+W('M428,160H470')+C(470,160,60,90)+W('M470,220V260');
+  s+=dot(428,70)+W('M428,70H490')+C(490,70,40,0)+W('M530,70H585')+dot(560,70)+R(560,70,120,90)+W('M560,190V260')+term(585,70);
+  s+=W('M20,260H560')+GND(300,260)+[130,208,250,350,428,470,560].map(x=>dot(x,260)).join('');
+  s+=T(146,74,'R_{1}','','start')+T(146,154,'R_{2}','','start')+T(224,56,'R_{3}','','start')+T(224,196,'R_{4}','','start')+T(266,196,'C_{2}','','start')
+    +T(85,98,'C_{1}')+T(42,98,'r_{s}')+T(36,219,'V_{s}','','start')+T(310,98,'C_{3}')+T(366,74,'R_{5}','','start')+T(366,154,'R_{6}','','start')
+    +T(444,56,'R_{7}','','start')+T(444,196,'R_{8}','','start')+T(486,196,'C_{4}','','start')+T(510,58,'C_{5}')+T(572,134,'R_{L}','','start')+T(592,66,'v_{o}','b','start')
+    +T(172,168,'Q_{1}','b')+T(392,168,'Q_{2}','b')+T(168,282,'stage 1','s')+T(390,282,'stage 2','s');
+  return SVG(620,292,s,'Two-stage RC-coupled CE amplifier');};
+
+DG.dcCkt=()=>{let s='';
+  s+=W('M130,30H340')+T(352,34,'+V_{CC}','b','start')+dot(130,30)+dot(208,30)+dot(318,30);
+  s+=R(130,30,80,90)+dot(130,110)+R(130,110,80,90)+W('M130,190V260');
+  s+=ACS(20,215)+W('M20,202V110')+R(20,110,45,0)+C(65,110,40,0)+W('M105,110H160');
+  s+=NPN(190,110)+R(208,30,40,90)+R(208,150,70,90)+W('M208,220V260')+dot(208,160)+W('M208,160H250')+C(250,160,60,90)+W('M250,220V260');
+  s+=dot(208,70)+W('M208,70H240V110H270');
+  s+=NPN(300,110)+R(318,30,40,90)+R(318,150,70,90)+W('M318,220V260')+dot(318,160)+W('M318,160H360')+C(360,160,60,90)+W('M360,220V260');
+  s+=dot(318,70)+W('M318,70H400')+C(400,70,40,0)+W('M440,70H490')+term(490,70);
+  s+=W('M20,260H360')+GND(200,260)+[130,208,250,318,360].map(x=>dot(x,260)).join('');
+  s+=T(146,74,'R_{1}','','start')+T(146,154,'R_{2}','','start')+T(224,56,'R_{3}','','start')+T(224,196,'R_{4}','','start')+T(266,196,'C_{2}','','start')
+    +T(85,98,'C_{1}')+T(42,98,'r_{s}')+T(36,219,'V_{s}','','start')+T(334,56,'R_{5}','','start')+T(334,196,'R_{6}','','start')+T(376,196,'C_{3}','','start')+T(420,58,'C_{4}')+T(500,74,'v_{o}','b','start')
+    +T(172,168,'Q_{1}','b')+T(282,168,'Q_{2}','b')+T(244,46,'direct','s','start')+T(244,59,'link','s','start');
+  return SVG(540,282,s,'Two-stage direct-coupled amplifier');};
+
+DG.xfmrCkt=()=>{let s='';
+  const coil=(x,dir)=>W(`M${x},40`+`a8,8 0 0 ${dir} 0,16`.repeat(3));
+  s+=W('M110,30H300')+T(150,22,'+V_{CC}','b','start')+dot(110,30);
+  s+=R(110,30,120,90)+dot(110,150)+R(110,150,80,90)+W('M110,230V260');
+  s+=ACS(24,225)+W('M24,212V150')+C(24,150,40,0)+W('M64,150H160');
+  s+=NPN(190,150)+W('M208,110V88H300')+W('M300,40V30')+coil(300,1)+W('M320,36V92M326,36V92')+coil(346,0);
+  s+=W('M346,40H420')+R(420,40,48,90)+W('M420,88H346');
+  s+=R(208,190,50,90)+W('M208,240V260')+dot(208,200)+W('M208,200H250')+C(250,200,40,90)+W('M250,240V260');
+  s+=W('M24,260H260')+GND(160,260)+dot(110,260)+dot(208,260)+dot(250,260);
+  s+=T(126,94,'R_{1}','','start')+T(126,194,'R_{2}','','start')+T(224,226,'R_{E}','','start')+T(266,226,'C_{E}','','start')+T(44,138,'C_{1}')+T(36,246,'V_{s}','','start')
+    +T(290,66,'N_{1}','','end')+T(356,66,'N_{2}','','start')+T(436,68,'R_{L}','','start')+T(334,116,'T_{r}','b')+T(168,188,'Q','b')+T(330,150,'collector sees','s','start')+T(330,166,'R_{L}′ = n²R_{L}','s','start');
+  return SVG(520,276,s,'Transformer-coupled CE power stage');};
+
+DG.xfmrResp=()=>bode({fmin:10,fmax:1e6,ymin:-30,ymax:3,label:'Transformer-coupled amplifier response',
+  curves:[{fn:f=>lowp(f,60)+highp(f,15e3)+ (-3*Math.exp(-Math.pow(LOG(f/8e3)/0.6,2)) * 0),cls:'ac2'}],
+  pre:(X,Y,yb)=>W(`M${F(X(60))},${F(Y(-3))}H${F(X(15e3))}V${yb}H${F(X(60))}Z`,'shade'),
+  post:(X,Y)=>T(F(X(14)),F(Y(-14)),'L_{m} shunts','s','start')+T(F(X(14)),F(Y(-20)),'the signal','s','start')+T(F(X(7e5)),F(Y(-14)),'leakage L,','s','end')+T(F(X(7e5)),F(Y(-20)),'winding C','s','end')+T(F(X(1e3)),F(Y(0))-8,'usable band','b')});
+
+DG.darl=()=>{let s='';
+  s+=W('M90,30H258')+T(270,34,'+V_{CC}','b','start')+dot(90,30)+dot(168,30);
+  s+=NPN(150,90)+W('M168,50V30')+NPN(240,130)+W('M258,90V30')+W('M168,130H210');
+  s+=R(90,30,60,90)+dot(90,90)+R(90,90,100,90)+W('M90,190V260');
+  s+=ACS(24,225)+W('M24,212V90')+C(24,90,40,0)+W('M64,90H120');
+  s+=R(258,170,70,90)+W('M258,240V260')+dot(258,195)+W('M258,195H320')+C(320,195,40,0)+W('M360,195H430')+dot(410,195)+R(410,195,65,90)+term(430,195);
+  s+=W('M24,260H410')+GND(160,260)+dot(90,260)+dot(258,260)+dot(410,260);
+  s+=T(106,64,'R_{1}','','start')+T(106,150,'R_{2}','','start')+T(44,78,'C_{1}')+T(36,246,'V_{s}','','start')+T(274,222,'R_{3}','','start')+T(340,183,'C_{2}')+T(426,236,'R_{L}','','start')
+    +T(190,76,'Q_{2}','b','start')+T(222,176,'Q_{1}','b','end')+T(440,199,'v_{o}','b','start')+T(190,112,'I_{E2} = I_{B1}','s','start');
+  return SVG(520,276,s,'Darlington emitter follower');};
+
+DG.cascode=()=>{let s='';
+  s+=W('M100,30H260')+T(272,34,'+V_{CC}','b','start')+dot(100,30)+dot(228,30);
+  s+=R(100,30,80,90)+dot(100,110)+W('M100,110H180')+R(100,110,120,90)+dot(100,230)+W('M100,230H180')+R(100,230,110,90);
+  s+=dot(140,110)+W('M140,110V135')+C(140,135,34,90)+GND(140,169);
+  s+=NPN(210,110)+NPN(210,230)+W('M228,150V190')+R(228,30,40,90);
+  s+=dot(228,70)+W('M228,70H300')+C(300,70,40,0)+W('M340,70H430')+dot(400,70)+R(400,70,120,90)+W('M400,190V340')+term(430,70);
+  s+=R(228,270,60,90)+W('M228,330V340')+dot(228,285)+W('M228,285H280')+C(280,285,40,90)+W('M280,325V340');
+  s+=ACS(24,305)+W('M24,292V230')+C(24,230,40,0)+W('M64,230H100');
+  s+=W('M24,340H400')+GND(310,340)+dot(100,340)+dot(228,340)+dot(280,340)+dot(400,340);
+  s+=T(116,74,'R_{1}','','start')+T(84,176,'R_{2}','','end')+T(116,300,'R_{3}','','start')+T(244,56,'R_{4}','','start')+T(244,306,'R_{5}','','start')+T(296,310,'C_{E}','','start')
+    +T(154,150,'C_{b}','','start')+T(154,170,'(AC ground)','s','start')+T(44,218,'C_{1}')+T(36,328,'V_{s}','','start')+T(320,58,'C_{2}')+T(416,134,'R_{L}','','start')+T(440,74,'v_{o}','b','start')
+    +T(176,104,'Q_{2}','b','end')+T(176,224,'Q_{1}','b','end')+T(244,172,'CB on top','s','start')+T(244,252,'CE below','s','start');
+  return SVG(560,356,s,'BJT cascode amplifier');};
+
+/* ---- widgets ---- */
+WID.lfcaps=h=>widget(h,{title:'Low-frequency capacitor designer (Worked Problem 2)',intro:'Defaults reproduce the notes: 20 Hz individual poles.',
+  fields:[{id:'rs',label:'r_{s}',val:600,unit:'Ω'},{id:'R1',label:'R_{1}',val:47,unit:'kΩ',scale:1e3},{id:'R2',label:'R_{2}',val:10,unit:'kΩ',scale:1e3},{id:'rpi',label:'r_{π}',val:2.5,unit:'kΩ',scale:1e3},{id:'b',label:'β',val:100,unit:''},{id:'RE',label:'R_{E}',val:1,unit:'kΩ',scale:1e3},{id:'RC',label:'R_{C}',val:4.7,unit:'kΩ',scale:1e3},{id:'ro',label:'r_{o}',val:100,unit:'kΩ',scale:1e3},{id:'RL',label:'R_{L}',val:10,unit:'kΩ',scale:1e3},{id:'fp',label:'pole frequency each',val:20,unit:'Hz'}],
+  run(v){const Ri=par2(v.R1,v.R2,v.rpi),RB=par2(v.rs,v.R1,v.R2),Res=par2(v.RE,(v.rpi+RB)/(v.b+1)),Ro=par2(v.RC,v.ro),w=TWOPI*v.fp;
+    return [{k:'R_{i}',v:eng(Ri,'Ω')},{k:'C_{1}',v:eng(1/(w*(v.rs+Ri)),'F')},{k:'R_{E,seen}',v:eng(Res,'Ω')},{k:'C_{E}',v:eng(1/(w*Res),'F')},{k:'R_{o}',v:eng(Ro,'Ω')},{k:'C_{2}',v:eng(1/(w*(Ro+v.RL)),'F')},
+      {note:'C_{E} is the biggest because it sees only a few tens of ohms. Round each up to the next standard value (that moves the pole lower).'}];}});
+
+WID.hfmiller=h=>widget(h,{title:'Miller effect and the upper cut-off (Worked Problem 3)',intro:'Raise the gain and watch the input pole collapse. Defaults are the notes’ numbers.',
+  fields:[{id:'gm',label:'g_{m}',val:40,unit:'mS',scale:1e-3},{id:'Cp',label:'C_{π}',val:25,unit:'pF',scale:1e-12},{id:'Cm',label:'C_{μ}',val:4,unit:'pF',scale:1e-12},{id:'A',label:'|A_{vbc}|',val:40,unit:''},{id:'RHi',label:'R_{Hi}',val:5,unit:'kΩ',scale:1e3},{id:'RHo',label:'R_{Ho}',val:3,unit:'kΩ',scale:1e3}],
+  figure(v){const Cin=v.Cp+v.Cm*(1+v.A),CMo=v.Cm*(1+1/Math.max(v.A,1e-9)),fi=1/(TWOPI*v.RHi*Cin),fo=1/(TWOPI*v.RHo*CMo),lo=Math.pow(10,Math.floor(LOG(Math.min(fi,fo))-1.3)),hi=Math.pow(10,Math.ceil(LOG(Math.max(fi,fo))+1.3));
+    return bode({fmin:lo,fmax:hi,ymin:-40,ymax:3,w:560,h:250,label:'High-frequency poles',curves:[{fn:f=>highp(f,fi)+highp(f,fo),cls:'ac2'},{fn:f=>highp(f,fi),cls:'dc dash'}],
+      post:(X,Y)=>T(F(X(fi)),F(Y(-3))-10,'f_{Hi}','b')+T(F(X(fo)),F(Y(-3))-10,'f_{Ho}','b')+`<circle class="q" cx="${F(X(fi))}" cy="${F(Y(-3))}" r="4"/><circle class="q" cx="${F(X(fo))}" cy="${F(Y(-3))}" r="4"/>`});},
+  run(v){const Cin=v.Cp+v.Cm*(1+v.A),CMo=v.Cm*(1+1/Math.max(v.A,1e-9)),fi=1/(TWOPI*v.RHi*Cin),fo=1/(TWOPI*v.RHo*CMo),fT=v.gm/(TWOPI*(v.Cp+v.Cm));
+    return [{k:'C_{in} = C_{π}+C_{μ}(1+|A|)',v:eng(Cin,'F')},{k:'f_{Hi}',v:eng(fi,'Hz')},{k:'C_{Mo}',v:eng(CMo,'F')},{k:'f_{Ho}',v:eng(fo,'Hz')},{k:'f_{H} (lower pole)',v:eng(Math.min(fi,fo),'Hz')},{k:'f_{T}',v:eng(fT,'Hz')},
+      {note:fi<fo?'The input (Miller) pole is the lower one, so it sets f_{H}: reduce the gain or use a cascode to push it up.':'The output pole is the lower one here.'}];}});
+
+WID.cascade2=h=>widget(h,{title:'Two-stage CE cascade: loading, gain, R_{o}, A_{i} (Worked Problem 4)',intro:'Switch the loading off to see the mistake the notes warn about.',
+  fields:[{id:'ld',label:'Include interstage loading?',type:'sel',opts:[[1,'Yes (correct)'],[0,'No (wrong)']],val:1},{id:'gm1',label:'g_{m1}',val:40,unit:'mS',scale:1e-3},{id:'RC1',label:'R_{C1}',val:4.7,unit:'kΩ',scale:1e3},{id:'ro1',label:'r_{o1}',val:80,unit:'kΩ',scale:1e3},{id:'Ri2',label:'R_{i2}',val:3,unit:'kΩ',scale:1e3},
+    {id:'gm2',label:'g_{m2}',val:35,unit:'mS',scale:1e-3},{id:'RC2',label:'R_{C2}',val:3.3,unit:'kΩ',scale:1e3},{id:'ro2',label:'r_{o2}',val:60,unit:'kΩ',scale:1e3},{id:'RL',label:'R_{L}',val:10,unit:'kΩ',scale:1e3},{id:'Ri',label:'R_{i} (amplifier)',val:4,unit:'kΩ',scale:1e3},{id:'rs',label:'R_{s}',val:1,unit:'kΩ',scale:1e3}],
+  run(v){const R1=v.ld?par2(v.RC1,v.ro1,v.Ri2):par2(v.RC1,v.ro1),A1=-v.gm1*R1,R2=par2(v.RC2,v.ro2,v.RL),A2=-v.gm2*R2,A=A1*A2,Ac=(-v.gm1*par2(v.RC1,v.ro1,v.Ri2))*A2,Ro=par2(v.RC2,v.ro2);
+    const o=[{k:'R_{C1}′',v:eng(R1,'Ω')},{k:'A_{v1}',v:fmt3(A1)},{k:'R_{C2}′',v:eng(R2,'Ω')},{k:'A_{v2}',v:fmt3(A2)},{k:'A_{v}',v:fmt3(A)},{k:'A_{vs}',v:fmt3(A*v.Ri/(v.rs+v.Ri))},{k:'R_{o}',v:eng(Ro,'Ω')},{k:'A_{i} = A_{v}R_{i}/R_{L}',v:fmt3(A*v.Ri/v.RL)}];
+    if(!v.ld)o.push({warn:'Loading ignored: this over-states the gain. The correct A_{v} is '+fmt3(Ac)+' ('+fmt3(A/Ac)+' times smaller).'});return o;}});
+
+WID.bwn=h=>widget(h,{title:'Bandwidth of n identical stages (Worked Problem 5)',intro:'Compare one stage (dashed) with the cascade (solid).',
+  fields:[{id:'n',label:'number of stages n',type:'sel',opts:[[1,'1'],[2,'2'],[3,'3'],[4,'4'],[5,'5'],[6,'6']],val:2},{id:'fl',label:'f_{L,s} (one stage)',val:50,unit:'Hz'},{id:'fh',label:'f_{H,s} (one stage)',val:100,unit:'kHz',scale:1e3}],
+  figure(v){const lo=Math.pow(10,Math.floor(LOG(v.fl)-1)),hi=Math.pow(10,Math.ceil(LOG(v.fh)+1));
+    return bode({fmin:lo,fmax:hi,ymin:-30,ymax:3,h:250,label:'Cascade bandwidth',curves:[{fn:f=>lowp(f,v.fl)+highp(f,v.fh),cls:'dc dash'},{fn:f=>v.n*(lowp(f,v.fl)+highp(f,v.fh)),cls:'ac2'}],pre:(X,Y)=>W(`M50,${F(Y(-3))}H544`,'thin dash')});},
+  run(v){const k=Math.sqrt(Math.pow(2,1/v.n)-1),fH=v.fh*k,fL=v.fl/k;
+    return [{k:'shrinkage factor √(2^{1/n}−1)',v:fmt3(k)},{k:'overall f_{L}',v:eng(fL,'Hz')},{k:'overall f_{H}',v:eng(fH,'Hz')},{k:'BW',v:eng(fH-fL,'Hz')},{k:'gain (n stages of 20 dB)',v:20*v.n+' dB'},
+      fH<=fL?{warn:'f_{H} has fallen below f_{L}: the cascade no longer has a pass band.'}:{note:'Exact for identical first-order stages.'}];}});
+
+WID.rcamp=h=>widget(h,{title:'Two-stage RC-coupled amplifier: gain and all five capacitors (Worked Problems 6 and 7)',intro:'Both stages identical, as in the notes. Defaults: I_{C} = 1 mA, V_{A} = 100 V, poles at 10 Hz.',
+  fields:[{id:'IC',label:'I_{C} (each)',val:1,unit:'mA',scale:1e-3},{id:'b',label:'β',val:100,unit:''},{id:'VA',label:'V_{A}',val:100,unit:'V'},{id:'R1',label:'R_{1} = R_{5}',val:47,unit:'kΩ',scale:1e3},{id:'R2',label:'R_{2} = R_{6}',val:10,unit:'kΩ',scale:1e3},{id:'RC',label:'R_{3} = R_{7}',val:4.7,unit:'kΩ',scale:1e3},{id:'RE',label:'R_{4} = R_{8}',val:1,unit:'kΩ',scale:1e3},{id:'rs',label:'r_{s}',val:600,unit:'Ω'},{id:'RL',label:'R_{L}',val:10,unit:'kΩ',scale:1e3},{id:'fp',label:'each pole at',val:10,unit:'Hz'}],
+  run(v){const gm=v.IC/0.025,rpi=v.b/gm,ro=v.VA/v.IC,Ri=par2(v.R1,v.R2,rpi),R1p=par2(v.RC,ro,Ri),R2p=par2(v.RC,ro,v.RL),A1=-gm*R1p,A2=-gm*R2p,A=A1*A2,Ro=par2(v.RC,ro),w=TWOPI*v.fp;
+    const RB1=par2(v.rs,v.R1,v.R2),Re1=par2(v.RE,(rpi+RB1)/(v.b+1)),RB2=par2(v.R1,v.R2,Ro),Re2=par2(v.RE,(rpi+RB2)/(v.b+1));
+    return [{k:'g_{m}, r_{π}, r_{o}',v:eng(gm,'S')+', '+eng(rpi,'Ω')+', '+eng(ro,'Ω')},{k:'R_{i1} = R_{i2}',v:eng(Ri,'Ω')},{k:'A_{v1}',v:fmt3(A1)},{k:'A_{v2}',v:fmt3(A2)},{k:'A_{v}',v:fmt3(A)},{k:'v_{o}/v_{s}',v:fmt3(A*Ri/(v.rs+Ri))},{k:'R_{o}',v:eng(Ro,'Ω')},
+      {k:'C_{1}',v:eng(1/(w*(v.rs+Ri)),'F')},{k:'C_{3}',v:eng(1/(w*(Ro+Ri)),'F')},{k:'C_{5}',v:eng(1/(w*(Ro+v.RL)),'F')},{k:'C_{2} (R_{E1,seen} = '+eng(Re1,'Ω')+')',v:eng(1/(w*Re1),'F')},{k:'C_{4} (R_{E2,seen} = '+eng(Re2,'Ω')+')',v:eng(1/(w*Re2),'F')},
+      {note:'Small-signal result. In a real amplifier the available swing and bias headroom limit the usable gain.'}];}});
+
+WID.dcamp=h=>widget(h,{title:'Direct-coupled amplifier: DC bias chain (Worked Problem 8)',intro:'Q_{2} base current flows through R_{3}. Defaults are the notes’ circuit.',
+  fields:[{id:'VCC',label:'V_{CC}',val:12,unit:'V'},{id:'R1',label:'R_{1}',val:82,unit:'kΩ',scale:1e3},{id:'R2',label:'R_{2}',val:18,unit:'kΩ',scale:1e3},{id:'R3',label:'R_{3}',val:3.3,unit:'kΩ',scale:1e3},{id:'R4',label:'R_{4}',val:1,unit:'kΩ',scale:1e3},{id:'R5',label:'R_{5}',val:680,unit:'Ω'},{id:'R6',label:'R_{6}',val:1.5,unit:'kΩ',scale:1e3},{id:'b',label:'β (both)',val:100,unit:''},{id:'VBE',label:'V_{BE}',val:0.7,unit:'V'}],
+  run(v){const a=v.b/(v.b+1),VB1=v.VCC*v.R2/(v.R1+v.R2),VE1=VB1-v.VBE,IE1=VE1/v.R4,IC1=a*IE1,k=v.R3/(v.R6*(v.b+1)),VB2=(v.VCC-v.R3*IC1+k*v.VBE)/(1+k),VE2=VB2-v.VBE,IE2=VE2/v.R6,IC2=a*IE2,VC2=v.VCC-IC2*v.R5,VCE2=VC2-VE2,VCE1=VB2-VE1;
+    const o=[{k:'V_{B1}, V_{E1}',v:fmt3(VB1)+' V, '+fmt3(VE1)+' V'},{k:'I_{C1}',v:eng(IC1,'A')},{k:'V_{B2} = V_{C1}',v:fmt3(VB2)+' V'},{k:'V_{E2}',v:fmt3(VE2)+' V'},{k:'I_{C2}',v:eng(IC2,'A')},{k:'I_{B2} (through R_{3})',v:eng(IE2/(v.b+1),'A')},{k:'V_{C2}',v:fmt3(VC2)+' V'},{k:'V_{CE1}',v:fmt3(VCE1)+' V'},{k:'V_{CE2}',v:fmt3(VCE2)+' V'}];
+    if(VE1<=0||VE2<=0||VCE1<0.3||VCE2<0.3)o.push({warn:'A transistor is in saturation or cut-off (V_{CE} below about 0.3 V or no emitter voltage): re-choose the resistors.'});else o.push({note:'Both stages keep V_{CE} headroom. Change R_{3} and watch Q_{2} move: that is the bias interdependence.'});return o;}});
+
+WID.xfmr=h=>widget(h,{title:'Transformer coupling: turns ratio, L_{m}, gain (Worked Problem 9)',
+  fields:[{id:'RL',label:'R_{L} (actual load)',val:8,unit:'Ω'},{id:'RLp',label:'wanted R_{L}′ at collector',val:2,unit:'kΩ',scale:1e3},{id:'fL',label:'required f_{L}',val:50,unit:'Hz'},{id:'gm',label:'g_{m}',val:40,unit:'mS',scale:1e-3},{id:'ro',label:'r_{o}',val:100,unit:'kΩ',scale:1e3}],
+  run(v){const n=Math.sqrt(v.RLp/v.RL),Lm=v.RLp/(TWOPI*v.fL),Rc=par2(v.RLp,v.ro),Ap=-v.gm*Rc;
+    return [{k:'n = N_{1}/N_{2}',v:fmt3(n)+' : 1'},{k:'L_{m} (at least)',v:eng(Lm,'H')},{k:'R_{C}′ = R_{L}′ ∥ r_{o}',v:eng(Rc,'Ω')},{k:'A_{v,p}',v:fmt3(Ap)},{k:'A_{v,sec} = A_{v,p}/n',v:fmt3(Ap/n)},{k:'check: n²R_{L}',v:eng(n*n*v.RL,'Ω')}];}});
+
+WID.darl=h=>widget(h,{title:'Darlington follower: bias, R_{i}, A_{v} (Worked Problem 10)',intro:'r_{π1}, r_{π2} are computed from the Q-point (the notes quote 0.752 kΩ and 60.9 kΩ).',
+  fields:[{id:'VCC',label:'V_{CC}',val:12,unit:'V'},{id:'R1',label:'R_{1}',val:100,unit:'kΩ',scale:1e3},{id:'R2',label:'R_{2}',val:33,unit:'kΩ',scale:1e3},{id:'R3',label:'R_{3}',val:470,unit:'Ω'},{id:'RL',label:'R_{L}',val:1,unit:'kΩ',scale:1e3},{id:'b1',label:'β_{1} (output Q_{1})',val:100,unit:''},{id:'b2',label:'β_{2} (input Q_{2})',val:80,unit:''},{id:'VBE',label:'V_{BE} each',val:0.7,unit:'V'}],
+  run(v){const VB2=v.VCC*v.R2/(v.R1+v.R2),VE1=VB2-2*v.VBE,IE1=VE1/v.R3,IC1=v.b1/(v.b1+1)*IE1,gm1=IC1/0.025,rp1=v.b1/gm1,IE2=IE1/(v.b1+1),IC2=v.b2/(v.b2+1)*IE2,gm2=IC2/0.025,rp2=v.b2/gm2,Re=par2(v.R3,v.RL),Rb1=rp1+(v.b1+1)*Re,Rb2=rp2+(v.b2+1)*Rb1,Ri=par2(par2(v.R1,v.R2),Rb2),A1=(v.b1+1)*Re/Rb1,A2=(v.b2+1)*Rb1/Rb2;
+    if(VE1<=0)return [{warn:'V_{B2} is too low for two V_{BE} drops: increase V_{CC} or R_{2}.'}];
+    return [{k:'V_{B2}, V_{E1}',v:fmt3(VB2)+' V, '+fmt3(VE1)+' V'},{k:'I_{E1}',v:eng(IE1,'A')},{k:'r_{π1}, r_{π2}',v:eng(rp1,'Ω')+', '+eng(rp2,'Ω')},{k:'R_{in,B1}',v:eng(Rb1,'Ω')},{k:'R_{in,B2}',v:eng(Rb2,'Ω')},{k:'R_{i} (with divider)',v:eng(Ri,'Ω')},{k:'A_{v1}, A_{v2}',v:fmt3(A1)+', '+fmt3(A2)},{k:'A_{v}',v:fmt3(A1*A2)},{k:'β_{D}',v:fmt3(v.b1*v.b2+v.b1+v.b2)},
+      {note:'The divider R_{1}∥R_{2} caps R_{i}: increase R_{1} and R_{2} (or bootstrap) to use the megohm Darlington input.'}];}});
+
+WID.cascode=h=>widget(h,{title:'Cascode versus plain CE: gain and input capacitance (Worked Problem 11)',intro:'g_{m} = I/25 mV and r_{o} = V_{A}/I are computed from the bias. R_{Hi} is an assumed source-side resistance for the pole estimate (not in the notes).',
+  fields:[{id:'VCC',label:'V_{CC}',val:12,unit:'V'},{id:'R1',label:'R_{1}',val:47,unit:'kΩ',scale:1e3},{id:'R2',label:'R_{2}',val:22,unit:'kΩ',scale:1e3},{id:'R3',label:'R_{3}',val:22,unit:'kΩ',scale:1e3},{id:'R4',label:'R_{4}',val:3.3,unit:'kΩ',scale:1e3},{id:'R5',label:'R_{5}',val:2.2,unit:'kΩ',scale:1e3},{id:'RL',label:'R_{L}',val:10,unit:'kΩ',scale:1e3},{id:'VA',label:'V_{A}',val:100,unit:'V'},
+    {id:'Cp',label:'C_{π1}',val:25,unit:'pF',scale:1e-12},{id:'Cm',label:'C_{μ1}',val:4,unit:'pF',scale:1e-12},{id:'Cs',label:'C_{stray}',val:3,unit:'pF',scale:1e-12},{id:'RHi',label:'R_{Hi} (assumed)',val:1,unit:'kΩ',scale:1e3}],
+  run(v){const S=v.R1+v.R2+v.R3,VB1=v.VCC*v.R3/S,VB2=v.VCC*(v.R2+v.R3)/S,VE1=VB1-0.7,I=VE1/v.R5,VC1=VB2-0.7,VCE1=VC1-VE1,VC2=v.VCC-I*v.R4,VCE2=VC2-VC1;
+    if(VE1<=0)return [{warn:'Q_{1} is off: V_{B1} is below one V_{BE}.'}];
+    const gm=I/0.025,ro=v.VA/I,Rout=2*ro+gm*ro*ro,Rc=par2(v.R4,v.RL,Rout),Av=-gm*Rc,Rce=par2(v.R4,v.RL,ro),Avce=-gm*Rce,Cc=v.Cp+2*v.Cm+v.Cs,Cce=v.Cp+v.Cm*(1+Math.abs(Avce))+v.Cs,fc=1/(TWOPI*v.RHi*Cc),fce=1/(TWOPI*v.RHi*Cce);
+    const o=[{k:'V_{B1}, V_{B2}',v:fmt3(VB1)+' V, '+fmt3(VB2)+' V'},{k:'I',v:eng(I,'A')},{k:'V_{CE1}, V_{CE2}',v:fmt3(VCE1)+' V, '+fmt3(VCE2)+' V'},{k:'g_{m}, r_{o}',v:eng(gm,'S')+', '+eng(ro,'Ω')},{k:'R_{out,casc}',v:eng(Rout,'Ω')},{k:'A_{v} cascode',v:fmt3(Av)},{k:'A_{v} plain CE (same R_{4}, R_{L})',v:fmt3(Avce)},
+      {k:'C_{in} cascode',v:eng(Cc,'F')},{k:'C_{in} plain CE',v:eng(Cce,'F')},{k:'f_{Hi} cascode',v:eng(fc,'Hz')},{k:'f_{Hi} plain CE',v:eng(fce,'Hz')},{k:'f_{Hi} improvement',v:fmt3(fc/fce)+' ×'}];
+    if(VCE1<0.3||VCE2<0.3)o.push({warn:'A transistor has V_{CE} below about 0.3 V: it is near saturation. Raise V_{CC} or lower R_{4}/R_{5}.'});else o.push({note:'Both transistors are in the active region. The cascode needs more headroom than one CE stage.'});return o;}});
+
+/* ---------- page wiring ---------- */
+function init(){
+  document.querySelectorAll('[data-dg]').forEach(el=>{const f=DG[el.dataset.dg];if(f)el.innerHTML=f();else el.textContent='diagram: '+el.dataset.dg;});
+  document.querySelectorAll('[data-w]').forEach(el=>{const f=WID[el.dataset.w];if(f)f(el);});
+  const main=$('main');
+  /* the diagram helper already formatted its own text; widget text is formatted; format the rest of the page */
+  mathify(main);
+
+  /* theme toggle */
+  $('#themeBtn').addEventListener('click',()=>{const r=document.documentElement,cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';});
+
+  /* chips + progress */
+  const chips=[...document.querySelectorAll('#chips a')];let done=[];
+  try{done=JSON.parse(localStorage.getItem('multistage-guide-done')||'[]');}catch(e){}
+  const paint=()=>{chips.forEach(a=>{const id=a.getAttribute('href').slice(1);a.classList.toggle('done',done.includes(id));});
+    document.querySelectorAll('input[data-done]').forEach(i=>{i.checked=done.includes(i.dataset.done);});};
+  document.querySelectorAll('input[data-done]').forEach(i=>i.addEventListener('change',()=>{const id=i.dataset.done;done=done.filter(x=>x!==id);if(i.checked)done.push(id);try{localStorage.setItem('multistage-guide-done',JSON.stringify(done));}catch(e){}paint();}));
+  paint();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>

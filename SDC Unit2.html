@@ -1,0 +1,1427 @@
+<title>FET Amplifiers Study Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout concept: engineer's graph-paper notebook. Sticky chip bar, single reading column, every topic = intuition > diagram > mechanism > derivation > example > try-it > exam skeleton. */
+:root{
+  --bg:#EEF2F5; --grid:rgba(18,32,41,.045); --surface:#FFFFFF; --surface2:#E7EDF2; --fg:#112029; --muted:#4A5E6C; --line:#C6D2DA;
+  --accent:#0B5FD3; --accent-ink:#FFFFFF; --dc:#B84E06; --ac:#087A5A; --bad:#B82633; --wire:#1B2B36; --fill:#DCE8F6;
+  --display:"Space Grotesk","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{margin:0;font:16px/1.65 var(--body);color:var(--fg);background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;background-attachment:fixed;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 4rem}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,3.6vw,2rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:600;margin:2rem 0 .5rem}
+p{margin:.6rem 0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,.mono{font-family:var(--mono);font-size:.9em}
+sub,sup{line-height:0}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);
+  margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.bar .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:.75rem;min-height:52px}
+.brand{font:700 .95rem var(--display);color:var(--fg);text-decoration:none;white-space:nowrap}
+.chips{display:flex;gap:.35rem;overflow-x:auto;flex:1;min-width:0;scrollbar-width:thin;padding:.4rem 0}
+.chips a{white-space:nowrap;font:500 .8rem var(--body);text-decoration:none;color:var(--muted);padding:.25rem .6rem;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.chips a:hover{color:var(--fg);border-color:var(--accent)}
+.chips a.done::before{content:"✓ ";color:var(--ac)}
+.chips a.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#themeBtn{font:500 .8rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:.3rem .6rem;cursor:pointer}
+
+/* hero */
+.hero{padding:2.6rem 0 1.2rem}
+.kicker{font:500 .75rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:1.08rem;color:var(--muted);max-width:62ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.6rem;margin:1.2rem 0}
+.topic{display:block;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.7rem .85rem}
+.topic:hover{border-color:var(--accent)}
+.topic b{display:block;font:600 .95rem var(--display)}
+.topic span{font-size:.8rem;color:var(--muted)}
+.topic .q{display:inline-block;margin-top:.3rem;font:500 .68rem var(--mono);color:var(--dc)}
+
+/* sections */
+section.sec{padding:2.8rem 0 .5rem;border-top:2px solid var(--fg);margin-top:2.4rem;}
+.sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem .8rem;margin-bottom:.4rem}
+.secno{font:500 .8rem var(--mono);color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0 1rem}
+.tag{font:500 .72rem var(--mono);padding:.15rem .5rem;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--muted)}
+.tag.hot{color:var(--dc);border-color:var(--dc)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:1rem 0}
+.card>:first-child{margin-top:0}.card>:last-child{margin-bottom:0}
+.label{display:inline-block;font:600 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.1rem .5rem;border-radius:4px;margin-bottom:.4rem;background:var(--surface2);color:var(--muted)}
+.intuition .label{background:var(--ac);color:var(--bg)}
+.exam .label{background:var(--accent);color:var(--accent-ink)}
+.watch .label{background:var(--bad);color:var(--bg)}
+.try .label{background:var(--dc);color:var(--bg)}
+.exam ol,.exam ul{margin:.3rem 0;padding-left:1.2rem}
+.exam li{margin:.2rem 0}
+ul,ol{padding-left:1.25rem}
+li{margin:.25rem 0}
+
+/* equations */
+.eq{font:500 1rem/1.9 var(--mono);background:var(--surface2);border-radius:8px;padding:.6rem 1rem;margin:.7rem 0;overflow-x:auto;text-align:center;white-space:nowrap}
+.eq.l{text-align:left}
+.eq.key{background:var(--fill);outline:1.5px solid var(--accent)}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;line-height:1.35}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .35em}
+.frac>span:last-child{padding:0 .35em}
+.steps{counter-reset:s;list-style:none;padding:0;margin:.8rem 0}
+.steps>li{counter-increment:s;position:relative;padding-left:2.2rem;margin:.7rem 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:.05rem;width:1.55rem;height:1.55rem;border-radius:50%;background:var(--fg);color:var(--bg);font:600 .78rem/1.55rem var(--mono);text-align:center}
+
+/* tables */
+.tw{overflow-x:auto;margin:.9rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface2);font:600 .78rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+
+/* diagrams */
+figure{margin:1.1rem 0}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:.35rem}
+svg.dg{display:block;width:100%;height:auto;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+svg.dg path{fill:none;stroke:var(--wire);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+svg.dg path.fl{fill:var(--wire);stroke:none}
+svg.dg path.dc{stroke:var(--dc)}svg.dg path.ac{stroke:var(--ac)}svg.dg path.ac2{stroke:var(--accent)}svg.dg path.bad{stroke:var(--bad)}
+svg.dg path.dash{stroke-dasharray:5 4}
+svg.dg path.thin{stroke-width:1;stroke:var(--line)}
+svg.dg path.shade{fill:var(--fill);stroke:none;opacity:.85}
+svg.dg path.shadeb{fill:var(--bad);stroke:none;opacity:.14}
+svg.dg path.shadeg{fill:var(--ac);stroke:none;opacity:.14}
+svg.dg circle.dot{fill:var(--wire);stroke:none}
+svg.dg circle.node{fill:var(--surface);stroke:var(--wire);stroke-width:1.6}
+svg.dg circle.sym{fill:var(--surface);stroke:var(--wire);stroke-width:1.7}
+svg.dg circle.q{fill:var(--bad);stroke:none}
+svg.dg polygon{stroke:var(--wire);stroke-width:1.7;fill:var(--surface)}
+svg.dg rect.box{fill:var(--surface2);stroke:var(--wire);stroke-width:1.7}
+svg.dg text{fill:var(--fg);font:12.5px var(--mono)}
+svg.dg text.s{font-size:11px;fill:var(--muted)}
+svg.dg text.b{font-weight:600;font-size:13px}
+svg.dg text.dc{fill:var(--dc)}svg.dg text.ac{fill:var(--ac)}svg.dg text.ac2{fill:var(--accent)}svg.dg text.bad{fill:var(--bad)}
+
+/* widgets */
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:1.2rem 0}
+.wlabel{display:inline-block;font:600 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.1rem .5rem;border-radius:4px;background:var(--dc);color:var(--bg);margin-bottom:.5rem}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem .9rem;margin:.6rem 0}
+.fld{display:flex;flex-direction:column;gap:.15rem;font-size:.82rem;color:var(--muted);min-width:0}
+.fld .row{display:flex;gap:.4rem;align-items:center}
+.fld input[type=number],.fld select{font:500 .95rem var(--mono);width:100%;min-width:0;padding:.3rem .45rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.fld input[type=range]{width:100%;accent-color:var(--accent)}
+.fld .u{font:.8rem var(--mono);white-space:nowrap}
+.fld output{font:600 .85rem var(--mono);color:var(--fg)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem;margin-top:.8rem}
+.res div{background:var(--surface2);border-radius:8px;padding:.5rem .7rem;min-width:0}
+.res small{display:block;font:500 .7rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.res b{font:600 1.05rem var(--mono);overflow-wrap:anywhere}
+.res .note{grid-column:1/-1;background:none;padding:0;font-size:.85rem;color:var(--muted)}
+.res .warn{grid-column:1/-1;background:var(--bad);color:var(--bg);font-size:.85rem;border-radius:8px;padding:.5rem .7rem}
+.pill{display:inline-block;font:600 .8rem var(--mono);padding:.15rem .6rem;border-radius:999px;color:var(--bg)}
+details{margin:.5rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:.1rem .8rem}
+summary{cursor:pointer;padding:.5rem 0;font-weight:500}
+details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:.4rem}
+.done-row{display:flex;align-items:center;gap:.5rem;margin:1.6rem 0 .5rem;font-size:.9rem;color:var(--muted)}
+.done-row input{width:1.1rem;height:1.1rem;accent-color:var(--ac)}
+footer{margin-top:3rem;font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.brand{display:none}.eq{font-size:.88rem}}
+
+
+.sqrt{display:inline-flex;align-items:baseline;vertical-align:middle;margin:0 .15em;line-height:1}
+.radic{font-size:1.25em;line-height:.9;padding-right:1px;font-family:var(--display),serif;transform:translateY(1px)}
+.radicand{border-top:1.6px solid currentColor;padding:.05em .25em 0 .15em;display:inline-block;line-height:1.25}
+</style>
+
+<header class="bar"><div class="in">
+  <a class="brand" href="#top">FET Study Guide</a>
+  <nav class="chips" id="chips" aria-label="Topics">
+    <a href="#s0">Start</a><a href="#s1">JFET basics</a><a href="#s2">JFET models</a><a href="#s3">JFET CS·CD·CG</a><a href="#s4">JFET frequency</a><a href="#s5">JFET design</a><a href="#s6">FET switch</a><a href="#s7">MOSFET basics</a><a href="#s8">MOSFET models</a><a href="#s9">MOSFET amps</a><a href="#s10">MOSFET frequency</a><a href="#s11">MOSFET design</a><a href="#s12">MOSFET switch</a><a href="#s13">Power MOSFET</a><a href="#s14">Exam map</a>
+  </nav>
+  <button id="themeBtn" type="button" aria-label="Switch light or dark theme">Theme</button>
+</div></header>
+
+<main class="wrap" id="top">
+<div class="hero">
+  <div class="kicker">Semiconductor Devices &amp; Circuits · Unit 2</div>
+  <h1>JFET and MOSFET amplifiers, explained from the ground up</h1>
+  <p class="lead">Same format as Unit 1: picture in your head → circuit → what physically happens → derivation → solved example → a calculator → a 10-mark answer skeleton. Built from Prof. Ghongade’s Unit 2 notes (Part 1 JFET, Part 2 MOSFET) and your Summer 2019 paper. Your notes do not cover FET frequency response, the JFET as a switch or the depletion MOSFET. Those parts are standard textbook theory and are marked <b>“not in your notes”</b>.</p>
+  <div class="grid">
+    <a class="topic" href="#s1"><b>1 · JFET basics</b><span>Structure, pinch-off, characteristics, Shockley, bias</span><span class="q">Summer 2019 · Q3 OR, EOEE Q3</span></a>
+    <a class="topic" href="#s2"><b>2 · JFET models</b><span>g<sub>m</sub>, r<sub>d</sub>, μ and the small-signal circuit</span><span class="q">Summer 2019 Q3 OR</span></a>
+    <a class="topic" href="#s3"><b>3 · JFET CS, CD, CG</b><span>Z<sub>i</sub>, Z<sub>o</sub>, A<sub>v</sub> with worked examples</span></a>
+    <a class="topic" href="#s4"><b>4 · JFET frequency response</b><span>C<sub>gs</sub>, C<sub>gd</sub>, Miller, f<sub>1</sub>, f<sub>2</sub></span><span class="q">not in notes</span></a>
+    <a class="topic" href="#s5"><b>5 · JFET CS design</b><span>Q-point, quadratic for R<sub>D</sub>, divider</span><span class="q">Summer 2019 Q3</span></a>
+    <a class="topic" href="#s6"><b>6 · FET as a switch</b><span>Ohmic-region resistor, series and shunt</span><span class="q">not in notes</span></a>
+    <a class="topic" href="#s7"><b>7 · MOSFET basics</b><span>E-MOSFET, D-MOSFET, regions, characteristics</span><span class="q">Summer 2019 Q4 OR</span></a>
+    <a class="topic" href="#s8"><b>8 · MOSFET models</b><span>Large-signal and small-signal</span></a>
+    <a class="topic" href="#s9"><b>9 · MOSFET amplifiers</b><span>CS, CD, CG and the voltage amplifier</span><span class="q">Summer 2019 Q4</span></a>
+    <a class="topic" href="#s10"><b>10 · MOSFET frequency response</b><span>Same ideas, f<sub>T</sub></span><span class="q">not in notes</span></a>
+    <a class="topic" href="#s11"><b>11 · MOSFET CS design</b><span>The 2N7000 design from your notes</span></a>
+    <a class="topic" href="#s12"><b>12 · MOSFET as a switch</b><span>Triode ON, cutoff OFF, NOT gates, CMOS</span></a>
+    <a class="topic" href="#s13"><b>13 · Power MOSFET</b><span>Structure, ratings, gate charge, losses</span></a>
+    <a class="topic" href="#s14"><b>Exam map &amp; formulas</b><span>Which past question lives where</span></a>
+  </div>
+  <p class="mono" style="font-size:.8rem;color:var(--muted)">Tick “Mark as done” at the end of each topic. Equations in a blue box are the ones to memorise. Unit 1 (BJT) page is separate.</p>
+</div>
+
+<!-- ============ 0 ============ -->
+<section class="sec" id="s0">
+  <div class="sechead"><span class="secno">Start here</span></div>
+  <h2>Five ideas behind everything in this unit</h2>
+  <p>If you finished Unit 1, 80% of this unit is “the BJT story again with a new control knob”. These five ideas show what is the same and what is different.</p>
+
+  <div class="card intuition"><span class="label">Idea 1 · A voltage-controlled valve</span>
+  <p>A BJT is a <b>current-controlled</b> valve: base current I<sub>B</sub> controls collector current. A FET is a <b>voltage-controlled</b> valve: the gate <i>voltage</i> V<sub>GS</sub> controls the drain current I<sub>D</sub>, and almost <b>no current flows into the gate</b>. Think of a garden hose with a clamp. You change the flow by squeezing (a voltage-like push on the clamp), and the clamp itself takes no water. That is why FET amplifiers have a huge input impedance.</p></div>
+
+  <div class="card intuition"><span class="label">Idea 2 · One word: transconductance</span>
+  <p>The BJT had β (current gain). The FET has <b>g<sub>m</sub></b> (transconductance): how many mA of drain current you get per volt of gate voltage.</p>
+  <div class="eq key">g_{m} = [[Δi_{D}|Δv_{GS}]] &nbsp;&nbsp;(unit: siemens, mS = mA/V)</div>
+  <p>Every FET amplifier gain is just g<sub>m</sub> times a resistance. For a CS stage: A<sub>v</sub> = −g<sub>m</sub>R<sub>D</sub>′. If you remember only one formula in this unit, remember this one.</p></div>
+
+  <div class="card intuition"><span class="label">Idea 3 · Same four steps as Unit 1</span>
+  <ol class="steps">
+    <li><b>DC:</b> find the Q-point (I<sub>DQ</sub>, V<sub>GSQ</sub>, V<sub>DSQ</sub>).</li>
+    <li><b>Parameters at Q:</b> compute g<sub>m</sub> (and r<sub>d</sub> or r<sub>o</sub>).</li>
+    <li><b>AC equivalent:</b> V<sub>DD</sub> → ground, capacitors → wires, transistor → small-signal model.</li>
+    <li><b>Solve</b> for Z<sub>i</sub>, Z<sub>o</sub>, A<sub>v</sub>.</li>
+  </ol></div>
+
+  <div class="card intuition"><span class="label">Idea 4 · BJT ↔ FET dictionary</span>
+  <div class="tw"><table><thead><tr><th>BJT</th><th>FET</th><th>Remember</th></tr></thead><tbody>
+  <tr><td>Base, Collector, Emitter</td><td>Gate, Drain, Source</td><td>B→G, C→D, E→S</td></tr>
+  <tr><td>CE, CC, CB</td><td>CS, CD, CG</td><td>Same behaviour: CS inverts with gain; CD follows (gain &lt; 1); CG non-inverting with low Z<sub>i</sub></td></tr>
+  <tr><td>I<sub>C</sub> = βI<sub>B</sub></td><td>I<sub>D</sub> = g<sub>m</sub>V<sub>GS</sub></td><td>Gate current ≈ 0</td></tr>
+  <tr><td>h<sub>ie</sub> (finite)</td><td>R<sub>GS</sub> (huge) or ∞</td><td>So Z<sub>i</sub> ≈ R<sub>G</sub> = R<sub>1</sub>∥R<sub>2</sub></td></tr>
+  <tr><td>Z<sub>i</sub> ≈ kΩ</td><td>Z<sub>i</sub> ≈ MΩ</td><td>FETs load the source far less</td></tr>
+  </tbody></table></div></div>
+
+  <div class="card intuition"><span class="label">Idea 5 · What is different from a BJT</span>
+  <ul>
+    <li>The FET is a <b>majority-carrier</b> device (only electrons in an n-channel). Less noise, no minority-carrier storage, very good as a switch.</li>
+    <li>The current law is a <b>square law</b>: I<sub>D</sub> ∝ (V<sub>GS</sub> − V<sub>x</sub>)². A BJT is exponential. So FET g<sub>m</sub> is smaller than a BJT’s at the same current, and so is the gain. Trade: much higher input impedance.</li>
+    <li>FET parameters vary a lot from one device to another (I<sub>DSS</sub>, V<sub>P</sub>, V<sub>T</sub>), so the Q-point must be set by <b>circuit design</b>, not by trusting data-sheet numbers.</li>
+  </ul></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="sec" id="s1">
+  <div class="sechead"><span class="secno">Topic 1</span></div>
+  <h2>JFET: structure, working and characteristics</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q3 OR (characteristics, 10 marks) · Elements of Electronics (construction, 7 marks)</span><span class="tag">Prerequisite for JFET models and amplifiers</span></div>
+
+  <h3>1.1 What is a JFET and how is it built?</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Take a bar of n-type silicon. Current can flow along it from <b>source</b> (S) to <b>drain</b> (D) like water along a pipe. Now diffuse p-type regions on the two sides and join them: this is the <b>gate</b> (G). The p–n junction between each gate and the bar is kept <b>reverse biased</b>. A reverse-biased junction grows an insulating <b>depletion region</b>. The more negative V<sub>GS</sub>, the thicker that insulating layer, and the narrower the n-channel left for current. The gate is a <b>pinch valve</b> on the pipe, and it draws only the tiny reverse leakage current of a diode.</p></div>
+  <figure><div data-dg="jfetStruct"></div><figcaption>n-channel JFET. Shaded regions are the depletion layers. They are wider near the drain because the drain end of the gate junction has the larger reverse bias.</figcaption></figure>
+
+  <h3>1.2 Why the drain curve flattens: pinch-off</h3>
+  <p>Hold V<sub>GS</sub> = 0 and raise V<sub>DS</sub> from zero. Two things happen at once:</p>
+  <ol class="steps">
+    <li><b>Ohmic region (small V<sub>DS</sub>):</b> the channel is wide, so I<sub>D</sub> rises almost linearly with V<sub>DS</sub>. The JFET behaves like a <i>resistor</i> whose value is set by V<sub>GS</sub>. This is the region used when the JFET works as a switch (Topic 6).</li>
+    <li><b>Pinch-off:</b> V<sub>DS</sub> also reverse-biases the gate junction, more at the drain end. The depletion layers thicken there and the channel narrows towards the drain. At V<sub>DS</sub> = |V<sub>P</sub>| (for V<sub>GS</sub> = 0) the channel nearly closes at the drain end.</li>
+    <li><b>Active (saturation) region:</b> beyond pinch-off, the extra V<sub>DS</sub> is dropped across the short pinched section. The current is fixed by how narrow the channel is, which only V<sub>GS</sub> controls. So I<sub>D</sub> stays nearly constant when V<sub>DS</sub> rises. This flat region is the <b>amplifier region</b>: the JFET acts as a gate-controlled current source.</li>
+    <li><b>Breakdown:</b> at a large V<sub>DS</sub> the gate–drain junction avalanches and I<sub>D</sub> shoots up. Never operate there.</li>
+  </ol>
+  <figure><div data-dg="jfetChar"></div><figcaption>Left: drain characteristics of an n-channel JFET (I<sub>DSS</sub> = 8 mA, V<sub>P</sub> = −4 V). Right: the transfer curve at one V<sub>DS</sub> in the active region.</figcaption></figure>
+
+  <p><b>Key points on the curves.</b> I<sub>DSS</sub> is the drain current with V<sub>GS</sub> = 0 in the active region (the maximum I<sub>D</sub>). V<sub>P</sub> = V<sub>GS(off)</sub> is the gate voltage that turns the channel completely off (negative for n-channel, positive for p-channel). The pinch-off locus V<sub>DS</sub> = V<sub>GS</sub> − V<sub>P</sub> separates ohmic from active.</p>
+  <div class="card watch"><span class="label">n-channel vs p-channel</span><p>A p-channel JFET is the mirror image: all voltages and currents reverse sign. V<sub>GS</sub> is positive, V<sub>P</sub> is positive, V<sub>DD</sub> is negative, and I<sub>D</sub> flows from source to drain. The curves look the same when drawn with magnitudes. Say this in one line; the exam question on “N-channel and P-channel” wants both sketches.</p></div>
+
+  <h3>1.3 The Shockley equation</h3>
+  <div class="eq key l">I_{D} = I_{DSS}(1 − [[V_{GS}|V_{GS(off)}]])^{2} &nbsp;&nbsp; for V_{GS(off)} ≤ V_{GS} ≤ 0</div>
+  <div class="eq">Inverse form: V_{GS} = V_{GS(off)}(1 − √[[I_{D}|I_{DSS}]]) &nbsp;&nbsp;(use this when you choose a Q-point)</div>
+  <p>The transfer curve is a half parabola. Check three points to sketch it fast: V<sub>GS</sub> = 0 gives I<sub>DSS</sub>; V<sub>GS</sub> = V<sub>P</sub>/2 gives I<sub>DSS</sub>/4; V<sub>GS</sub> = V<sub>P</sub> gives 0.</p>
+
+  <h3>1.4 Biasing and the Q-point</h3>
+  <p>An amplifier needs a Q-point in the active region with room to swing. With voltage-divider bias (the circuit your notes use), the gate is held at V<sub>G</sub> and the source resistor creates V<sub>S</sub>:</p>
+  <div class="eq">V_{G} = V_{DD}[[R_{2}|R_{1}+R_{2}]] &nbsp;&nbsp; V_{S} = I_{D}R_{S} &nbsp;&nbsp; V_{GS} = V_{G} − I_{D}R_{S} &nbsp;&nbsp; V_{DS} = V_{DD} − I_{D}(R_{D}+R_{S})</div>
+  <p>Combine the bias line (V<sub>GS</sub> = V<sub>G</sub> − I<sub>D</sub>R<sub>S</sub>) with the Shockley curve. Their intersection is the Q-point. A bigger R<sub>S</sub> gives a flatter bias line and a <b>more stable</b> Q-point (negative feedback), exactly like R<sub>E</sub> in a BJT.</p>
+  <div class="card intuition"><span class="label">Why the gate voltage can be negative-looking</span><p>For an n-channel JFET we need V<sub>GS</sub> ≤ 0. In the divider circuit V<sub>G</sub> is positive, but V<sub>S</sub> = I<sub>D</sub>R<sub>S</sub> is <i>more</i> positive, so V<sub>GS</sub> = V<sub>G</sub> − V<sub>S</sub> comes out negative. That is the trick: the source is lifted above the gate.</p></div>
+
+  <div class="widget" data-w="jfetq"></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Explain the characteristics of N-channel and P-channel JFET”</span>
+  <ol>
+    <li>Neat constructional sketch of n-channel JFET with labels S, D, G, depletion regions (2).</li>
+    <li>Drain characteristics sketch: several V<sub>GS</sub> curves, ohmic region, pinch-off locus, active region, breakdown. Mark I<sub>DSS</sub> and V<sub>P</sub> (3).</li>
+    <li>Explain each region in two lines (2).</li>
+    <li>Transfer characteristic and Shockley equation (1).</li>
+    <li>P-channel: same curves with all polarities reversed (1). Short definition of g<sub>m</sub>, r<sub>d</sub>, μ (1, full treatment in Topic 2).</li>
+  </ol></div>
+  <details><summary>Quick check 1: I<sub>DSS</sub> = 12 mA, V<sub>P</sub> = −6 V. I<sub>D</sub> at V<sub>GS</sub> = −3 V?</summary><p>I<sub>D</sub> = 12(1 − (−3/−6))² = 12(0.5)² = <b>3 mA</b> (one quarter of I<sub>DSS</sub>, as expected at V<sub>P</sub>/2).</p></details>
+  <details><summary>Quick check 2: Why is the input impedance of a JFET so large?</summary><p>The gate–channel junction is reverse biased, so only a tiny leakage current flows. That gives a resistance of 10⁸–10¹⁰ Ω.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s1"> Mark topic 1 as done</label>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="sec" id="s2">
+  <div class="sechead"><span class="secno">Topic 2</span></div>
+  <h2>JFET parameters and small-signal model</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q3 OR — “define the terms g<sub>m</sub>, r<sub>d</sub> and μ”</span></div>
+
+  <h3>2.1 The three parameters</h3>
+  <div class="tw"><table><thead><tr><th>Parameter</th><th>Definition</th><th>Meaning</th></tr></thead><tbody>
+  <tr><td><b>g<sub>m</sub></b> transconductance</td><td>Δi<sub>D</sub>/Δv<sub>GS</sub> at constant V<sub>DS</sub></td><td>Slope of the <b>transfer</b> curve. Control strength of the gate. Unit: S (mS = mA/V).</td></tr>
+  <tr><td><b>r<sub>d</sub></b> drain resistance</td><td>Δv<sub>DS</sub>/Δi<sub>D</sub> at constant V<sub>GS</sub></td><td>Inverse slope of the <b>drain</b> curve in the active region. Large (tens of kΩ) because curves are nearly flat.</td></tr>
+  <tr><td><b>μ</b> amplification factor</td><td>|Δv<sub>DS</sub>/Δv<sub>GS</sub>| at constant I<sub>D</sub></td><td>How many volts of drain voltage one volt of gate voltage can cancel. Dimensionless.</td></tr>
+  </tbody></table></div>
+  <div class="eq key">μ = g_{m} · r_{d}</div>
+  <p><b>Why μ = g<sub>m</sub>r<sub>d</sub>.</b> A change Δv<sub>GS</sub> changes the current by g<sub>m</sub>Δv<sub>GS</sub>. To bring the current back we must change v<sub>DS</sub> so that Δv<sub>DS</sub>/r<sub>d</sub> cancels it: Δv<sub>DS</sub> = −g<sub>m</sub>r<sub>d</sub>Δv<sub>GS</sub>. Hence |Δv<sub>DS</sub>/Δv<sub>GS</sub>| = g<sub>m</sub>r<sub>d</sub>.</p>
+
+  <h3>2.2 Getting g<sub>m</sub> from the Shockley equation</h3>
+  <p>Differentiate I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)² with respect to V<sub>GS</sub>:</p>
+  <div class="eq">g_{m} = [[dI_{D}|dV_{GS}]] = [[2I_{DSS}|−V_{P}]](1 − [[V_{GS}|V_{P}]]) = g_{m0}(1 − [[V_{GS}|V_{P}]])</div>
+  <div class="eq key l">g_{m0} = [[2I_{DSS}||V_{GS(off)}|]] &nbsp;&nbsp; g_{m} = g_{m0}√[[I_{D}|I_{DSS}]]</div>
+  <p>So g<sub>m</sub> is largest at V<sub>GS</sub> = 0 and shrinks to zero at pinch-off. A JFET biased at a smaller current has less gain.</p>
+  <div class="card intuition"><span class="label">Worked check (from your notes)</span>
+  <p>I<sub>DSS</sub> = 20 mA, V<sub>GS(off)</sub> = −5 V. Find I<sub>D</sub> and g<sub>m</sub> at V<sub>GS</sub> = −4 V.</p>
+  <p>g<sub>m0</sub> = 2(20 mA)/5 V = <b>8 mS</b>. I<sub>D</sub> = 20(1 − 4/5)² = 20(0.2)² = <b>0.8 mA</b>. g<sub>m</sub> = 8(1 − 4/5) = <b>1.6 mS</b>. Check: 8√(0.8/20) = 8(0.2) = 1.6 mS ✓. Near pinch-off the JFET gives only a fifth of its maximum g<sub>m</sub>.</p></div>
+
+  <h3>2.3 Why a voltage change becomes a voltage gain (physical picture)</h3>
+  <p>Your notes use this example: I<sub>D</sub> = 2 mA, V<sub>DD</sub> = 20 V, R<sub>D</sub> = 6 kΩ, g<sub>m</sub> = 2 mS.</p>
+  <ol class="steps">
+    <li>No signal: V<sub>DS</sub> = 20 − 2 mA × 6 kΩ = <b>8 V</b>.</li>
+    <li>Add +50 mV at the gate: ΔI<sub>D</sub> = g<sub>m</sub>ΔV<sub>GS</sub> = 2 mS × 50 mV = <b>0.1 mA</b>.</li>
+    <li>That extra current drops more voltage in R<sub>D</sub>: ΔV<sub>o</sub> = −0.1 mA × 6 kΩ = <b>−0.6 V</b>. Drain falls from 8 V to 7.4 V.</li>
+    <li>−50 mV at the gate: drain rises to 8.6 V. So A<sub>v</sub> = −0.6/0.05 = <b>−12</b>. The minus sign means the output is inverted.</li>
+  </ol>
+  <div class="eq key">A_{v} = −g_{m}R_{D}  (= −2 mS × 6 kΩ = −12)</div>
+
+  <h3>2.4 Small-signal equivalent circuit</h3>
+  <p>Replace the JFET by (a) a very large resistance R<sub>GS</sub> between gate and source (the reverse-biased junction), (b) a current source g<sub>m</sub>v<sub>gs</sub> from drain to source, and (c) r<sub>d</sub> across drain–source.</p>
+  <figure><div data-dg="jfetModel"></div><figcaption>Low-frequency JFET model. In most exam problems R<sub>GS</sub> is treated as infinite and r<sub>d</sub> is either given or neglected.</figcaption></figure>
+  <p>Compare with the BJT hybrid-π: the input resistor r<sub>π</sub> (a few kΩ) became R<sub>GS</sub> (hundreds of MΩ), g<sub>m</sub> has the same role, and r<sub>d</sub> is the same as r<sub>o</sub>.</p>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Define g<sub>m</sub>, r<sub>d</sub>, μ with the “constant” condition and unit (3).</li>
+    <li>Show μ = g<sub>m</sub>r<sub>d</sub> (1).</li>
+    <li>Graphical interpretation: g<sub>m</sub> on transfer curve, r<sub>d</sub> on drain curve (2).</li>
+    <li>Equation for g<sub>m</sub> from Shockley, g<sub>m0</sub> (2).</li>
+    <li>Small-signal circuit with R<sub>GS</sub>, g<sub>m</sub>v<sub>gs</sub>, r<sub>d</sub> (2).</li>
+  </ol></div>
+  <details><summary>Quick check: g<sub>m</sub> = 4 mS and r<sub>d</sub> = 50 kΩ. What is μ?</summary><p>μ = 4 mS × 50 kΩ = <b>200</b>.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s2"> Mark topic 2 as done</label>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="sec" id="s3">
+  <div class="sechead"><span class="secno">Topic 3</span></div>
+  <h2>Analysis of JFET CS, CD and CG amplifiers</h2>
+  <div class="tags"><span class="tag hot">Derive Z<sub>i</sub>, Z<sub>o</sub>, A<sub>v</sub> · 10 marks each</span><span class="tag">Same method as Unit 1: AC equivalent, then solve</span></div>
+
+  <h3>3.0 The common recipe</h3>
+  <ol class="steps">
+    <li>Draw the circuit with voltage-divider bias. R<sub>G</sub> = R<sub>1</sub>∥R<sub>2</sub> is what the source sees at the gate.</li>
+    <li>V<sub>DD</sub> → AC ground. Capacitors → short circuits.</li>
+    <li>Replace the JFET by the model: R<sub>GS</sub>, g<sub>m</sub>v<sub>gs</sub>, r<sub>d</sub>.</li>
+    <li>Find Z<sub>i</sub> (looking into the input), Z<sub>o</sub> (looking into the output with the source off and R<sub>L</sub> removed), A<sub>v</sub> = v<sub>o</sub>/v<sub>i</sub>.</li>
+  </ol>
+
+  <h3>3.1 Common-source (CS)</h3>
+  <div class="card intuition"><span class="label">Intuition</span><p>Input at the gate, output at the drain, source is the common terminal. It is the FET version of the CE amplifier: big voltage gain, inversion, very high input impedance, medium output impedance. It is the “main” FET voltage amplifier.</p></div>
+  <figure><div data-dg="csJfet"></div><figcaption>Voltage-divider-biased CS JFET amplifier. C<sub>1</sub>, C<sub>3</sub> couple the signal, C<sub>S</sub> bypasses R<sub>S</sub>.</figcaption></figure>
+  <figure><div data-dg="csAC1"></div><figcaption>(a) AC equivalent with R<sub>S</sub> bypassed.</figcaption></figure>
+  <figure><div data-dg="csAC2"></div><figcaption>(b) AC equivalent with R<sub>S</sub> not bypassed.</figcaption></figure>
+
+  <p><b>(a) R<sub>S</sub> bypassed.</b> The source is at AC ground.</p>
+  <div class="eq">Z_{g} = R_{GS} &nbsp;⇒&nbsp; Z_{i} = R_{G}∥R_{GS} ≈ R_{G}</div>
+  <div class="eq">Z_{d} = r_{d} &nbsp;⇒&nbsp; Z_{o} = R_{D}∥r_{d} &nbsp;(R_{L} removed)</div>
+  <div class="eq">v_{o} = i_{d}(r_{d}∥R_{D}∥R_{L}), i_{d} = −g_{m}v_{i} &nbsp;⇒&nbsp; A_{v} = −g_{m}(r_{d}∥R_{D}∥R_{L}) ≈ −g_{m}(R_{D}∥R_{L})</div>
+  <p><b>(b) R<sub>S</sub> not bypassed.</b> Now the drain current flows through R<sub>S</sub>, so the source voltage rises and cancels part of the input. This is <b>negative feedback</b> (source degeneration).</p>
+  <div class="eq">v_{i} = v_{gs} + i_{d}R_{S} = v_{gs}(1 + g_{m}R_{S}) &nbsp;⇒&nbsp; v_{gs} = [[v_{i}|1 + g_{m}R_{S}]]</div>
+  <div class="eq">Z_{g} = [[v_{i}|i_{g}]] = R_{GS}(1 + g_{m}R_{S}) &nbsp;⇒&nbsp; Z_{i} = R_{G}∥Z_{g}</div>
+  <div class="eq">Z_{d} = r_{d}(1 + g_{m}R_{S}) + R_{S} &nbsp;⇒&nbsp; Z_{o} = R_{D}∥Z_{d}</div>
+  <div class="eq key l">A_{v} ≈ −[[g_{m}(R_{D}∥R_{L})|1 + g_{m}R_{S}]] = −[[R_{D}∥R_{L}|R_{S} + 1/g_{m}]] ≈ −[[R_{D}∥R_{L}|R_{S}]] (if g_{m}R_{S} ≫ 1)</div>
+  <div class="card watch"><span class="label">What the degeneration buys</span><p>Gain drops by the factor (1 + g<sub>m</sub>R<sub>S</sub>), but the gain becomes almost independent of g<sub>m</sub>, which varies a lot between devices. It also stabilises the bias, reduces distortion and raises Z<sub>o</sub> and the bandwidth. “Lose gain, gain stability” is the one-line summary.</p></div>
+
+  <div class="card intuition"><span class="label">Worked example 1 (notes): CS, R<sub>S</sub> not bypassed</span>
+  <p>g<sub>m</sub> = 2.5 mS, r<sub>d</sub> = 50 kΩ, R<sub>D</sub> = 6 kΩ, R<sub>S</sub> = 1 kΩ, R<sub>L</sub> = 12 kΩ, R<sub>G</sub> = 1 MΩ.</p>
+  <ol class="steps">
+    <li><b>Z<sub>i</sub></b> ≈ R<sub>G</sub> = <b>1 MΩ</b> (R<sub>GS</sub> is far larger).</li>
+    <li><b>Z<sub>d</sub></b> = r<sub>d</sub> + R<sub>S</sub> + g<sub>m</sub>R<sub>S</sub>r<sub>d</sub> = 50 + 1 + (2.5)(1)(50) = 176 kΩ. <b>Z<sub>o</sub></b> = 6k ∥ 176k = <b>5.80 kΩ</b>.</li>
+    <li>R<sub>D</sub>∥R<sub>L</sub> = 6k ∥ 12k = 4 kΩ.</li>
+    <li><b>A<sub>v</sub></b> = −(2.5)(4)/(1 + 2.5×1) = −10/3.5 = <b>−2.86</b>.</li>
+  </ol></div>
+
+  <h3>3.2 Common-drain (CD), the source follower</h3>
+  <div class="card intuition"><span class="label">Intuition</span><p>Input at the gate, output at the source, drain at AC ground (the supply). The output copies the input, only about 0.7 to 0.99 of it. If the gate rises 1 V, the source rises almost 1 V and V<sub>GS</sub> barely changes. The device acts as a <b>buffer</b>: it presents a huge impedance to the source and a small one to the load.</p></div>
+  <figure><div data-dg="cdJfet"></div><figcaption>CD (source follower). No drain resistor.</figcaption></figure>
+  <figure><div data-dg="cdAC"></div><figcaption>AC equivalent: v<sub>gs</sub> = v<sub>i</sub> − v<sub>o</sub>.</figcaption></figure>
+  <p>Let R<sub>S</sub>′ = r<sub>d</sub>∥R<sub>S</sub>∥R<sub>L</sub>. The controlled current g<sub>m</sub>v<sub>gs</sub> flows into the source node through R<sub>S</sub>′:</p>
+  <div class="eq">v_{o} = g_{m}v_{gs}R_{S}′ &nbsp;&nbsp; v_{i} = v_{gs} + v_{o} = v_{gs}(1 + g_{m}R_{S}′)</div>
+  <div class="eq key l">A_{v} = [[g_{m}R_{S}′|1 + g_{m}R_{S}′]] &nbsp;(0 &lt; A_{v} &lt; 1, in phase) &nbsp;&nbsp; Z_{i} = R_{G}∥Z_{g} ≈ R_{G}, Z_{g} ≈ R_{GS}(1 + g_{m}R_{S}′)</div>
+  <p><b>Output impedance.</b> Set v<sub>i</sub> = 0 and look into the source. Any rise in the source voltage reduces v<sub>gs</sub>, so the device “fights back” like a resistor 1/g<sub>m</sub>:</p>
+  <div class="eq key l">Z_{s} ≈ [[1|g_{m}]] &nbsp;&nbsp; Z_{o} = R_{S}∥Z_{s} ≈ R_{S}∥[[1|g_{m}]]</div>
+  <div class="card intuition"><span class="label">Worked example 2 (notes): CD</span>
+  <p>g<sub>m</sub> = 4 mS, r<sub>d</sub> = 40 kΩ, R<sub>S</sub> = 2.2 kΩ, R<sub>L</sub> = 4.7 kΩ, R<sub>G</sub> = 1 MΩ.</p>
+  <ol class="steps">
+    <li>Z<sub>i</sub> ≈ <b>1 MΩ</b>.</li>
+    <li>Z<sub>s</sub> ≈ 1/g<sub>m</sub> = 250 Ω. Z<sub>o</sub> = 2.2k ∥ 250 Ω = <b>224.5 Ω</b>.</li>
+    <li>R<sub>S</sub>′ = 40k ∥ 2.2k ∥ 4.7k = 1.444 kΩ.</li>
+    <li>A<sub>v</sub> = (4)(1.444)/(1 + 4×1.444) = 5.78/6.78 = <b>+0.85</b>.</li>
+  </ol></div>
+
+  <h3>3.3 Common-gate (CG)</h3>
+  <div class="card intuition"><span class="label">Intuition</span><p>Input at the source, output at the drain, gate at AC ground through a bypass capacitor. The signal pushes straight into the source, where the resistance is only about 1/g<sub>m</sub>, so Z<sub>i</sub> is <b>low</b>. When the source goes up, V<sub>GS</sub> goes down, the drain current falls, and the drain voltage <i>rises</i>. So there is no inversion. Used where a low input impedance or a wide bandwidth is needed (like the CB stage).</p></div>
+  <figure><div data-dg="cgJfet"></div><figcaption>CG amplifier. C<sub>2</sub> (shown at the gate) holds the gate at AC ground.</figcaption></figure>
+  <figure><div data-dg="cgAC"></div><figcaption>AC equivalent: v<sub>gs</sub> = −v<sub>i</sub>.</figcaption></figure>
+  <div class="eq key l">Z_{i} = R_{S}∥[[1|g_{m}]] ≈ [[1|g_{m}]] &nbsp;&nbsp; Z_{o} = R_{D}∥r_{d} &nbsp;&nbsp; A_{v} = g_{m}(r_{d}∥R_{D}∥R_{L}) ≈ g_{m}(R_{D}∥R_{L})</div>
+  <p><b>If the gate bypass capacitor is missing</b> the gate follows the source through R<sub>G</sub> and R<sub>GS</sub>, so v<sub>gs</sub> = −v<sub>i</sub>R<sub>GS</sub>/(R<sub>G</sub>+R<sub>GS</sub>) and the gain falls by that same fraction; Z<sub>i</sub> ≈ (1/g<sub>m</sub>)(R<sub>G</sub>+R<sub>GS</sub>)/R<sub>GS</sub>.</p>
+  <div class="card intuition"><span class="label">Worked example 3 (notes): CG</span>
+  <p>g<sub>m</sub> = 5 mS, r<sub>d</sub> = 60 kΩ, R<sub>S</sub> = 1 kΩ, R<sub>D</sub> = 4.7 kΩ, R<sub>L</sub> = 10 kΩ.</p>
+  <ol class="steps">
+    <li>Z<sub>s</sub> = 1/g<sub>m</sub> = 200 Ω. Z<sub>i</sub> = 1k ∥ 200 = <b>166.7 Ω</b>.</li>
+    <li>Z<sub>o</sub> = 4.7k ∥ 60k = <b>4.36 kΩ</b>.</li>
+    <li>R<sub>D(ac)</sub> = 60k ∥ 4.7k ∥ 10k = 3.036 kΩ. A<sub>v</sub> = 5 mS × 3.036 kΩ = <b>+15.18</b>.</li>
+  </ol></div>
+
+  <h3>3.4 Comparison (the table to memorise)</h3>
+  <div class="tw"><table><thead><tr><th></th><th>CS</th><th>CD</th><th>CG</th></tr></thead><tbody>
+  <tr><td>Input / output</td><td>gate / drain</td><td>gate / source</td><td>source / drain</td></tr>
+  <tr><td>Z<sub>i</sub></td><td>High (R<sub>G</sub>)</td><td>Very high (R<sub>G</sub>)</td><td><b>Low</b> (≈ 1/g<sub>m</sub>)</td></tr>
+  <tr><td>Z<sub>o</sub></td><td>Medium (R<sub>D</sub>∥r<sub>d</sub>)</td><td><b>Low</b> (≈ 1/g<sub>m</sub>)</td><td>Medium-high (R<sub>D</sub>∥r<sub>d</sub>)</td></tr>
+  <tr><td>A<sub>v</sub></td><td>−g<sub>m</sub>(R<sub>D</sub>∥R<sub>L</sub>), <b>high, inverting</b></td><td>&lt; 1, in phase</td><td>+g<sub>m</sub>(R<sub>D</sub>∥R<sub>L</sub>), in phase</td></tr>
+  <tr><td>Use</td><td>Voltage amplifier</td><td>Buffer, impedance matching</td><td>Wideband / high-frequency, current buffer</td></tr>
+  <tr><td>BJT twin</td><td>CE</td><td>CC</td><td>CB</td></tr>
+  </tbody></table></div>
+
+  <div class="widget" data-w="jfetamp"></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton: “Analyse the CS JFET amplifier”</span>
+  <ol>
+    <li>Circuit with divider bias, C<sub>1</sub>, C<sub>S</sub>, C<sub>3</sub>, R<sub>L</sub> (2).</li>
+    <li>AC equivalent using the small-signal model (2).</li>
+    <li>Z<sub>i</sub> and Z<sub>o</sub> derivation (bypassed or unbypassed, as the question says) (3).</li>
+    <li>A<sub>v</sub> derivation and note on the 180° phase (2).</li>
+    <li>One-line conclusion with typical values (1).</li>
+  </ol>
+  <p style="font-size:.88rem;color:var(--muted)">For CD and CG use the same layout. The key sentence for CD is v<sub>gs</sub> = v<sub>i</sub> − v<sub>o</sub>. For CG it is v<sub>gs</sub> = −v<sub>i</sub>.</p></div>
+  <details><summary>Quick check 1: CS stage, g<sub>m</sub> = 3 mS, R<sub>D</sub> = 4 kΩ, R<sub>L</sub> = 4 kΩ, R<sub>S</sub> bypassed. A<sub>v</sub>?</summary><p>R<sub>D</sub>∥R<sub>L</sub> = 2 kΩ, so A<sub>v</sub> = −3 × 2 = <b>−6</b>.</p></details>
+  <details><summary>Quick check 2: same stage but R<sub>S</sub> = 500 Ω unbypassed.</summary><p>A<sub>v</sub> = −6/(1 + 3 × 0.5) = −6/2.5 = <b>−2.4</b>.</p></details>
+  <details><summary>Quick check 3: why can’t a source follower have gain above 1?</summary><p>v<sub>o</sub> = g<sub>m</sub>R<sub>S</sub>′ v<sub>gs</sub> and v<sub>i</sub> = v<sub>gs</sub> + v<sub>o</sub> = v<sub>gs</sub>(1 + g<sub>m</sub>R<sub>S</sub>′). The denominator is always larger than the numerator.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s3"> Mark topic 3 as done</label>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="sec" id="s4">
+  <div class="sechead"><span class="secno">Topic 4</span></div>
+  <h2>Frequency response of JFET amplifiers</h2>
+  <div class="tags"><span class="tag">Not in your Unit 2 notes: standard theory, same ideas as BJT Topic 8</span></div>
+
+  <h3>4.1 Why the gain falls at both ends</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>In the mid-band, capacitors look like wires or like open circuits, and the answer is a flat gain A<sub>v</sub> = −g<sub>m</sub>R<sub>L</sub>′. Two kinds of capacitor spoil that:</p>
+  <ul>
+    <li><b>Big external capacitors</b> (C<sub>1</sub>, C<sub>S</sub>, C<sub>3</sub>) are wires only if the frequency is high enough. At low frequency they pass less signal, so the gain falls. That sets the lower cut-off f<sub>1</sub>.</li>
+    <li><b>Tiny internal capacitances</b> (C<sub>gs</sub>, C<sub>gd</sub>, C<sub>ds</sub>, plus wiring) are open circuits at low frequency but leak signal away at high frequency. That sets the upper cut-off f<sub>2</sub>.</li>
+  </ul>
+  <p>The band between f<sub>1</sub> and f<sub>2</sub>, where the gain stays within 3 dB (0.707×) of the mid-band value, is the <b>bandwidth</b>.</p></div>
+
+  <h3>4.2 High-frequency model</h3>
+  <figure><div data-dg="fetHF"></div><figcaption>Add C<sub>gs</sub> (gate–source), C<sub>gd</sub> (gate–drain) and C<sub>ds</sub> to the low-frequency model. R<sub>L</sub>′ = R<sub>D</sub>∥R<sub>L</sub>∥r<sub>d</sub>.</figcaption></figure>
+  <div class="card intuition"><span class="label">The Miller effect in one paragraph</span>
+  <p>C<sub>gd</sub> connects the input (gate) to the output (drain), and the drain moves in <i>opposite</i> direction by A times as much. So when the gate rises by 1 V, the voltage across C<sub>gd</sub> changes by (1 + A) V, and the capacitor must supply (1 + A) times the charge. From the input it looks like a capacitor (1 + A) times bigger.</p></div>
+  <div class="eq key l">C_{i} = C_{gs} + C_{gd}(1 + g_{m}R_{L}′) &nbsp;&nbsp; C_{o} = C_{ds} + C_{gd}(1 + [[1|g_{m}R_{L}′]]) ≈ C_{ds} + C_{gd}</div>
+  <div class="eq">f_{in} = [[1|2π R_{sig} C_{i}]] &nbsp;&nbsp; f_{out} = [[1|2π R_{L}′ C_{o}]] &nbsp;&nbsp; f_{2} ≈ [[1|√(1/f_{in}² + 1/f_{out}²)]]</div>
+  <p>R<sub>sig</sub> is the resistance the gate sees: r<sub>s</sub>∥R<sub>G</sub> (small, so the input pole is usually the first to bite). Higher gain → larger Miller capacitance → lower f<sub>2</sub>.</p>
+  <p><b>Unity-gain frequency:</b> f<sub>T</sub> = g<sub>m</sub> / [2π(C<sub>gs</sub> + C<sub>gd</sub>)]. It tells you where the intrinsic device stops amplifying.</p>
+
+  <h3>4.3 Low-frequency poles</h3>
+  <div class="tw"><table><thead><tr><th>Capacitor</th><th>Sees resistance</th><th>Pole</th></tr></thead><tbody>
+  <tr><td>C<sub>1</sub> (input coupling)</td><td>r<sub>s</sub> + R<sub>G</sub></td><td>f<sub>C1</sub> = 1/[2π(r<sub>s</sub>+R<sub>G</sub>)C<sub>1</sub>]</td></tr>
+  <tr><td>C<sub>S</sub> (source bypass)</td><td>R<sub>S</sub> ∥ 1/g<sub>m</sub></td><td>f<sub>CS</sub> = (1+g<sub>m</sub>R<sub>S</sub>)/(2πR<sub>S</sub>C<sub>S</sub>)</td></tr>
+  <tr><td>C<sub>3</sub> (output coupling)</td><td>R<sub>D</sub> + R<sub>L</sub></td><td>f<sub>C3</sub> = 1/[2π(R<sub>D</sub>+R<sub>L</sub>)C<sub>3</sub>]</td></tr>
+  </tbody></table></div>
+  <p>The overall f<sub>1</sub> is a little larger than the biggest of the three. A fast estimate is √(f<sub>C1</sub>² + f<sub>CS</sub>² + f<sub>C3</sub>²). The source bypass capacitor is normally the culprit because it sees a low resistance (about 1/g<sub>m</sub>). That is why design rules give C<sub>S</sub> the biggest value.</p>
+
+  <h3>4.4 Worked example</h3>
+  <p>g<sub>m</sub> = 3 mS, R<sub>L</sub>′ = 4 kΩ, source seen at gate 50 kΩ, C<sub>gs</sub> = 5 pF, C<sub>gd</sub> = 2 pF, C<sub>ds</sub> = 1 pF. C<sub>1</sub> = 0.01 µF (sees 1 MΩ), C<sub>S</sub> = 10 µF (R<sub>S</sub> = 1 kΩ), C<sub>3</sub> = 0.1 µF (sees 20 kΩ).</p>
+  <ol class="steps">
+    <li>Mid-band: A = 3 × 4 = 12 (21.6 dB).</li>
+    <li>C<sub>i</sub> = 5 + 2(1 + 12) = <b>31 pF</b>. f<sub>in</sub> = 1/(2π × 50 k × 31 p) = 102.7 kHz.</li>
+    <li>C<sub>o</sub> = 1 + 2(1 + 1/12) ≈ 3.2 pF. f<sub>out</sub> = 1/(2π × 4 k × 3.2 p) ≈ 12.6 MHz. So <b>f<sub>2</sub> ≈ 102.7 kHz</b>, set by the input Miller pole.</li>
+    <li>f<sub>C1</sub> = 15.9 Hz, f<sub>CS</sub> = (1+3×1)/(2π × 1 k × 10 µ) = 63.7 Hz, f<sub>C3</sub> = 79.6 Hz. <b>f<sub>1</sub> ≈ 103 Hz</b>.</li>
+    <li>Bandwidth ≈ 102.6 kHz. f<sub>T</sub> = 3 mS/[2π × 7 pF] ≈ 68 MHz.</li>
+  </ol>
+  <div class="widget" data-w="jfetfreq"></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>CS circuit and typical frequency-response curve: mid-band, f<sub>1</sub>, f<sub>2</sub>, −3 dB, bandwidth (3).</li>
+    <li>Low-frequency reasons and expressions for C<sub>1</sub>, C<sub>S</sub>, C<sub>3</sub> (3).</li>
+    <li>High-frequency model with C<sub>gs</sub>, C<sub>gd</sub>, C<sub>ds</sub>; Miller effect and C<sub>i</sub> expression (3).</li>
+    <li>Expressions for f<sub>2</sub>, comment on gain–bandwidth trade-off (1).</li>
+  </ol></div>
+  <details><summary>Quick check: why does a bigger gain reduce f<sub>2</sub>?</summary><p>Miller capacitance C<sub>gd</sub>(1 + g<sub>m</sub>R<sub>L</sub>′) grows with gain. A bigger capacitor makes the input pole 1/(2πR<sub>sig</sub>C<sub>i</sub>) lower.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s4"> Mark topic 4 as done</label>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="sec" id="s5">
+  <div class="sechead"><span class="secno">Topic 5</span></div>
+  <h2>Single-stage JFET CS amplifier design</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q3 (design of a gate bias circuit, 10 marks)</span><span class="tag">Method from your notes (Section 10)</span></div>
+
+  <h3>5.1 The idea</h3>
+  <p>You are given a gain, a supply and a load. You choose a Q-point and then find R<sub>D</sub>, R<sub>S</sub>, R<sub>1</sub>, R<sub>2</sub>. Three steps, in your notes’ order:</p>
+  <ol class="steps">
+    <li><b>Select the Q-point.</b> Pick I<sub>DQ</sub> (below I<sub>DSS</sub>) and V<sub>DSQ</sub>. Then V<sub>GSQ</sub> = V<sub>P</sub>(1 − √(I<sub>DQ</sub>/I<sub>DSS</sub>)) and g<sub>m</sub> = g<sub>m0</sub>√(I<sub>DQ</sub>/I<sub>DSS</sub>).</li>
+    <li><b>Find R<sub>D</sub> and R<sub>S</sub>.</b> The DC loop gives R<sub>D</sub> + R<sub>S</sub> = K<sub>1</sub> = (V<sub>DD</sub> − V<sub>DSQ</sub>)/I<sub>DQ</sub>. The gain with R<sub>S</sub> unbypassed is A<sub>v</sub> = (R<sub>D</sub>∥R<sub>L</sub>)/(R<sub>S</sub> + 1/g<sub>m</sub>). Put R<sub>S</sub> = K<sub>1</sub> − R<sub>D</sub>, let K = K<sub>1</sub> + 1/g<sub>m</sub> and A = |A<sub>v</sub>|:</li>
+  </ol>
+  <div class="eq key l">A R_{D}² − [A(K − R_{L}) − R_{L}] R_{D} − A K R_{L} = 0</div>
+  <p>Solve the quadratic. Keep the root with 0 &lt; R<sub>D</sub> &lt; K<sub>1</sub>, then R<sub>S</sub> = K<sub>1</sub> − R<sub>D</sub>. If no root fits, that gain is not possible with that Q-point.</p>
+  <ol class="steps" start="3">
+    <li><b>Gate divider.</b> V<sub>G</sub> = V<sub>GSQ</sub> + I<sub>DQ</sub>R<sub>S</sub>. With the required R<sub>G</sub> = R<sub>1</sub>∥R<sub>2</sub>:</li>
+  </ol>
+  <div class="eq key l">R_{1} = R_{G}[[V_{DD}|V_{G}]] &nbsp;&nbsp; R_{2} = R_{G}[[V_{DD}|V_{DD} − V_{G}]]</div>
+  <p>Finally round to standard values, recompute the DC point and check: active region, gain, and swing.</p>
+  <div class="card watch"><span class="label">Your notes’ formulas for R<sub>1</sub>, R<sub>2</sub> were corrected</span><p>The notes explicitly say the gate-divider formulas were corrected, so use the ones above. They follow from V<sub>G</sub> = V<sub>DD</sub>R<sub>2</sub>/(R<sub>1</sub>+R<sub>2</sub>) and R<sub>G</sub> = R<sub>1</sub>R<sub>2</sub>/(R<sub>1</sub>+R<sub>2</sub>). Divide the second by the first and you get R<sub>1</sub> = R<sub>G</sub>V<sub>DD</sub>/V<sub>G</sub>.</p></div>
+
+  <h3>5.2 Worked example (made to follow your method)</h3>
+  <p>I<sub>DSS</sub> = 10 mA, V<sub>P</sub> = −4 V, V<sub>DD</sub> = 24 V, I<sub>DQ</sub> = 4 mA, V<sub>DSQ</sub> = 8 V, |A<sub>v</sub>| = 3, R<sub>L</sub> = 10 kΩ, R<sub>G</sub> = 1 MΩ.</p>
+  <ol class="steps">
+    <li>V<sub>GSQ</sub> = −4(1 − √0.4) = <b>−1.47 V</b>. g<sub>m0</sub> = 2(10)/4 = 5 mS, g<sub>m</sub> = 5√0.4 = <b>3.16 mS</b>.</li>
+    <li>K<sub>1</sub> = (24 − 8)/4 = 4 kΩ. K = 4 + 1/3.16 = 4.316 kΩ.</li>
+    <li>Quadratic: 3R<sub>D</sub>² − [3(4.316 − 10) − 10]R<sub>D</sub> − 3(4.316)(10) = 0 → 3R<sub>D</sub>² + 27.05R<sub>D</sub> − 129.5 = 0 → <b>R<sub>D</sub> = 3.46 kΩ</b>.</li>
+    <li>R<sub>S</sub> = 4 − 3.46 = <b>0.54 kΩ</b>. Check gain: (3.46∥10)/(0.54 + 0.316) = 2.57/0.857 = 3.0 ✓.</li>
+    <li>V<sub>G</sub> = −1.47 + 4 mA × 0.54 k = <b>0.69 V</b>. R<sub>1</sub> = 1 M × 24/0.69 = <b>34.7 MΩ</b>, R<sub>2</sub> = 1 M × 24/(24 − 0.69) = <b>1.03 MΩ</b>.</li>
+  </ol>
+  <div class="card watch"><span class="label">Watch the sign of V<sub>G</sub></span><p>If V<sub>G</sub> comes out negative, a divider to ground cannot make it. That means R<sub>S</sub> is too small, so the gain you asked for is too high for this Q-point. Reduce the gain or use self-bias. The widget below shows this warning.</p></div>
+  <div class="widget" data-w="jfetdesign"></div>
+
+  <h3>5.3 The Summer 2019 question</h3>
+  <div class="card intuition"><span class="label">Q3 (10 marks): design gate bias circuit with I<sub>D(max)</sub> = 3 mA, V<sub>DS(min)</sub> = 10 V, V<sub>DD</sub> = 25 V, V<sub>GS(off)</sub> = −6 V</span>
+  <p>The question does not give I<sub>DSS</sub> or the bias type, so <b>state your assumptions</b>. A clean way to answer (fixed gate bias):</p>
+  <ol class="steps">
+    <li>The largest drain current occurs at V<sub>GS</sub> = 0, so I<sub>DSS</sub> = I<sub>D(max)</sub> = 3 mA.</li>
+    <li>The smallest V<sub>DS</sub> occurs at the largest current: V<sub>DS(min)</sub> = V<sub>DD</sub> − I<sub>D(max)</sub>R<sub>D</sub> → R<sub>D</sub> = (25 − 10)/3 mA = <b>5 kΩ</b> (use 4.7 kΩ if you want a standard value: V<sub>DS(min)</sub> = 10.9 V).</li>
+    <li>Choose the Q-point at V<sub>GS</sub> = V<sub>P</sub>/2 = <b>−3 V</b> for a good swing. I<sub>DQ</sub> = 3(1 − 0.5)² = 0.75 mA, V<sub>DSQ</sub> = 25 − 0.75 × 5 = 21.25 V (active, since V<sub>DS</sub> &gt; V<sub>GS</sub> − V<sub>P</sub> = 3 V).</li>
+    <li>Gate resistor R<sub>G</sub> = 1 MΩ (I<sub>G</sub> ≈ 0, so any large value). Gate supply V<sub>GG</sub> = −3 V.</li>
+    <li>g<sub>m0</sub> = 2(3)/6 = 1 mS; g<sub>m</sub> at Q = 0.5 mS, so A<sub>v</sub> = −g<sub>m</sub>R<sub>D</sub> ≈ −2.5.</li>
+  </ol>
+  <p style="font-size:.88rem;color:var(--muted)">If your syllabus means self-bias: R<sub>S</sub> = |V<sub>GSQ</sub>|/I<sub>DQ</sub> = 3 V/0.75 mA = 4 kΩ, and R<sub>D</sub> is then chosen so that R<sub>D</sub> + R<sub>S</sub> still satisfies V<sub>DS(min)</sub>. Write the assumption in the first line and the examiner can follow your method.</p></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Circuit diagram of the chosen bias (2).</li>
+    <li>Choice of Q-point from the transfer curve and Shockley equation (2).</li>
+    <li>R<sub>D</sub>, R<sub>S</sub> (and R<sub>1</sub>, R<sub>2</sub> for divider bias) with the DC loop equation (4).</li>
+    <li>Check: active region, gain, standard values (2).</li>
+  </ol></div>
+  <label class="done-row"><input type="checkbox" data-done="s5"> Mark topic 5 as done</label>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="sec" id="s6">
+  <div class="sechead"><span class="secno">Topic 6</span></div>
+  <h2>The FET as a switch (JFET)</h2>
+  <div class="tags"><span class="tag">Not in your Unit 2 notes: standard theory. The MOSFET version (digital and power) is in Topics 12 and 13</span></div>
+
+  <h3>6.1 Idea: a resistor you can switch</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>In the ohmic region (small V<sub>DS</sub>) the JFET channel is just a resistor r<sub>ds</sub>, and its value is set by the gate voltage. With V<sub>GS</sub> = 0 the channel is widest and r<sub>ds</sub> is smallest, <b>ON</b> (typically 50 to 500 Ω). With V<sub>GS</sub> at or below V<sub>P</sub> the channel is pinched off and r<sub>ds</sub> is enormous (10⁹ Ω or more), <b>OFF</b>. So the gate voltage is a control knob on a resistor, and the signal passes through the channel.</p></div>
+  <div class="eq key l">r_{ds} = [[r_{ds0}|1 − V_{GS}/V_{P}]], &nbsp; r_{ds0} ≈ [[1|g_{m0}]] = [[V_{P}|2I_{DSS}]] &nbsp;(V_{P} as a magnitude)</div>
+  <p><b>Derivation.</b> For small V<sub>DS</sub> the triode equation reduces to I<sub>D</sub> ≈ (2I<sub>DSS</sub>/|V<sub>P</sub>|)(1 − V<sub>GS</sub>/V<sub>P</sub>)V<sub>DS</sub>. Then r<sub>ds</sub> = V<sub>DS</sub>/I<sub>D</sub> gives the expression above.</p>
+  <figure><div data-dg="fetSwitch"></div><figcaption>Series switch passes the signal when ON. Shunt switch shorts it to ground when ON.</figcaption></figure>
+
+  <h3>6.2 Series and shunt switches</h3>
+  <div class="eq">Series: [[V_{out}|V_{in}]] = [[R_{L}|R_{L} + r_{ds}]] &nbsp;&nbsp; Shunt: [[V_{out}|V_{in}]] = [[r_{ds}|R_{s} + r_{ds}]]</div>
+  <ul>
+    <li><b>Series, ON:</b> r<sub>ds(on)</sub> ≪ R<sub>L</sub> → V<sub>out</sub> ≈ V<sub>in</sub>. <b>OFF:</b> r<sub>ds</sub> → ∞ → V<sub>out</sub> ≈ 0.</li>
+    <li><b>Shunt, ON:</b> the output is grounded, V<sub>out</sub> ≈ 0. <b>OFF:</b> V<sub>out</sub> ≈ V<sub>in</sub>.</li>
+    <li><b>Chopper:</b> a series and a shunt switch driven by opposite gate signals chop a DC input into a square wave (used in chopper amplifiers).</li>
+  </ul>
+  <h3>6.3 Why use a FET instead of a BJT as a switch?</h3>
+  <div class="tw"><table><thead><tr><th>FET switch</th><th>BJT switch</th></tr></thead><tbody>
+  <tr><td>No offset voltage across the ON switch (ideal resistor)</td><td>V<sub>CE(sat)</sub> offset (0.1–0.3 V) always present</td></tr>
+  <tr><td>Gate draws no current: simple drive, high isolation</td><td>Needs base current</td></tr>
+  <tr><td>Majority carriers only: no storage time, fast and good for analog signals</td><td>Storage time t<sub>s</sub> limits speed</td></tr>
+  <tr><td>Higher ON resistance (a few ohms to hundreds)</td><td>Lower ON resistance for power</td></tr>
+  <tr><td>Signal must stay small compared with |V<sub>P</sub>|, or r<sub>ds</sub> changes along the waveform (distortion)</td><td>—</td></tr>
+  </tbody></table></div>
+  <p><b>Applications:</b> analog multiplexers, sample-and-hold circuits, choppers, analog gates, voltage-controlled attenuators (r<sub>ds</sub> as a variable resistor).</p>
+  <div class="widget" data-w="fetswitch"></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Drain characteristics, mark the ohmic region used for switching (2).</li>
+    <li>r<sub>ds</sub> equation and its dependence on V<sub>GS</sub>, ON and OFF conditions (3).</li>
+    <li>Series and shunt switch circuits with output equations (3).</li>
+    <li>Advantages over BJT, one application (2).</li>
+  </ol></div>
+  <details><summary>Quick check: I<sub>DSS</sub> = 10 mA, V<sub>P</sub> = −4 V. r<sub>ds</sub> at V<sub>GS</sub> = 0 and at V<sub>GS</sub> = −2 V?</summary><p>r<sub>ds0</sub> = 4/(2×10 mA) = 200 Ω. At −2 V: 200/(1 − 0.5) = <b>400 Ω</b>.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s6"> Mark topic 6 as done</label>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="sec" id="s7">
+  <div class="sechead"><span class="secno">Topic 7</span></div>
+  <h2>MOSFET: structure, regions and characteristics</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q4 OR — “difference between D-MOSFET and E-MOSFET with constructional diagram” (10 marks)</span></div>
+
+  <h3>7.1 Enhancement MOSFET (E-MOSFET)</h3>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Start with a p-type slab (the body). Put two n⁺ islands in it: source and drain. Between them there is no n-type path, just p-type material, so the two junctions back-to-back block current. Now put a thin <b>oxide</b> (SiO<sub>2</sub>) over the gap and a metal <b>gate</b> on it. Apply a positive gate voltage. The gate and the body form a capacitor, and the positive gate pulls electrons up to the surface and pushes holes away. Above a certain voltage, the <b>threshold V<sub>T</sub></b>, the surface has more electrons than holes. It has been inverted into n-type: an <b>induced channel</b> joins source and drain. The more V<sub>GS</sub> exceeds V<sub>T</sub>, the more electrons, the lower the channel resistance. “Enhancement” means the channel is <i>enhanced</i> by the gate; at V<sub>GS</sub> = 0 the device is OFF.</p></div>
+  <figure><div data-dg="mosStruct"></div><figcaption>n-channel E-MOSFET (cross-section). Dashed green layer is the induced channel.</figcaption></figure>
+  <p><b>Why the gate current is zero.</b> The oxide is an insulator. The input is a capacitor, so I<sub>G</sub> ≈ 0 at DC and the DC input resistance is 10¹² Ω or more.</p>
+
+  <h3>7.2 Depletion MOSFET (D-MOSFET): not in your notes</h3>
+  <p>The D-MOSFET has a <b>built-in n-channel</b>, diffused under the oxide during manufacture. Current flows at V<sub>GS</sub> = 0 (I<sub>DSS</sub>). A <b>negative</b> V<sub>GS</sub> repels electrons and <i>depletes</i> the channel until it closes at V<sub>P</sub>. A <b>positive</b> V<sub>GS</sub> attracts more electrons, enhancing the channel beyond I<sub>DSS</sub>. So it works in both depletion and enhancement mode, and it follows the same Shockley equation as the JFET.</p>
+  <figure><div data-dg="dmosStruct"></div><figcaption>n-channel D-MOSFET: a permanent n-channel (solid) connects source and drain.</figcaption></figure>
+  <figure><div data-dg="emDm"></div><figcaption>Transfer curves. D-MOSFET conducts at V<sub>GS</sub> = 0; E-MOSFET only above V<sub>T</sub>.</figcaption></figure>
+  <div class="tw"><table><thead><tr><th></th><th>E-MOSFET</th><th>D-MOSFET</th></tr></thead><tbody>
+  <tr><td>Channel at V<sub>GS</sub> = 0</td><td>None (normally OFF)</td><td>Present (normally ON)</td></tr>
+  <tr><td>Construction</td><td>No physical channel</td><td>Channel diffused between S and D</td></tr>
+  <tr><td>n-channel gate polarity</td><td>V<sub>GS</sub> must be positive (&gt; V<sub>T</sub>)</td><td>Negative (depletion) or positive (enhancement)</td></tr>
+  <tr><td>Key parameter</td><td>V<sub>T</sub> (threshold)</td><td>V<sub>P</sub> and I<sub>DSS</sub></td></tr>
+  <tr><td>Equation</td><td>I<sub>D</sub> = ½K(V<sub>GS</sub> − V<sub>T</sub>)²</td><td>I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)²</td></tr>
+  <tr><td>Symbol</td><td>Broken (dashed) channel line</td><td>Continuous channel line</td></tr>
+  <tr><td>Use</td><td>Digital logic, CMOS, power switching, most amplifiers</td><td>Special analog, RF, gain-control stages</td></tr>
+  </tbody></table></div>
+
+  <h3>7.3 Regions of operation (E-MOSFET)</h3>
+  <div class="eq key l">V_{OV} = V_{GS} − V_{T} &nbsp;(overdrive voltage: how far the gate is above threshold)</div>
+  <div class="tw"><table><thead><tr><th>Region</th><th>Condition</th><th>Picture</th><th>Model</th></tr></thead><tbody>
+  <tr><td><b>Cutoff</b></td><td>V<sub>GS</sub> ≤ V<sub>T</sub></td><td>No channel</td><td>Open switch, I<sub>D</sub> = 0</td></tr>
+  <tr><td><b>Triode</b> (linear)</td><td>V<sub>GS</sub> &gt; V<sub>T</sub> and V<sub>DS</sub> &lt; V<sub>OV</sub></td><td>Continuous channel</td><td>Voltage-controlled resistor</td></tr>
+  <tr><td><b>Saturation</b> (active)</td><td>V<sub>GS</sub> &gt; V<sub>T</sub> and V<sub>DS</sub> ≥ V<sub>OV</sub></td><td>Channel pinched off at the drain end</td><td>Voltage-controlled current source</td></tr>
+  </tbody></table></div>
+  <div class="eq">Triode: I_{D} = K_{n}[V_{OV}V_{DS} − [[V_{DS}²|2]]] &nbsp;&nbsp; Saturation: I_{D} = [[K_{n}|2]]V_{OV}²(1 + λV_{DS}) &nbsp;&nbsp; K_{n} = μ_{n}C_{ox}(W/L)</div>
+  <div class="card watch"><span class="label">Check the K convention first</span><p>Your notes write I<sub>D</sub> = ½K(V<sub>GS</sub> − V<sub>T</sub>)² with K = μ<sub>n</sub>C<sub>ox</sub>W/L. Some books write I<sub>D</sub> = k(V<sub>GS</sub> − V<sub>T</sub>)² with k = K/2. A wrong convention doubles your answer. In the Summer 2019 numerical the symbol k′(W/L) is used, so state which equation you use. Topic 9 shows both.</p></div>
+  <p><b>Why saturation?</b> When V<sub>DS</sub> reaches V<sub>OV</sub>, the gate-to-drain voltage falls to V<sub>T</sub> and the channel pinches off at the drain. More V<sub>DS</sub> just widens the pinched section; the current is set by V<sub>GS</sub>. The small slope that remains is <b>channel-length modulation</b>: the pinched section grows and shortens the effective channel, raising I<sub>D</sub> slightly (the λ term).</p>
+  <figure><div data-dg="mosChar"></div><figcaption>Output characteristics (K<sub>n</sub> = 1 mA/V², V<sub>T</sub> = 1 V). The dashed parabola is V<sub>DS</sub> = V<sub>OV</sub>.</figcaption></figure>
+  <div class="widget" data-w="mosregion"></div>
+  <div class="card intuition"><span class="label">Worked problems from your notes</span>
+  <p><b>Problem 1.</b> V<sub>T</sub> = 2 V, K<sub>n</sub> = 4 mA/V², V<sub>GS</sub> = 3.5 V, V<sub>DS</sub> = 5 V. V<sub>OV</sub> = 1.5 V; 5 &gt; 1.5 so <b>saturation</b>; I<sub>D</sub> = (4/2)(1.5)² = <b>4.5 mA</b>.</p>
+  <p><b>Problem 2.</b> V<sub>T</sub> = 1.8 V, V<sub>GS</sub> = 3.3 V, V<sub>DS</sub> = 0.7 V, K<sub>n</sub> = 2 mA/V². V<sub>OV</sub> = 1.5 V; 0.7 &lt; 1.5 so <b>triode</b>; I<sub>D</sub> = 2[1.5(0.7) − 0.7²/2] = <b>1.61 mA</b>.</p>
+  <p><b>Problem 3.</b> V<sub>T</sub> = 1 V, K<sub>n</sub> = 1 mA/V², V<sub>GS</sub> = 4 V. Boundary V<sub>DS</sub> = 3 V; at V<sub>DS</sub> = 1 V: I<sub>D</sub> = 1[3(1) − 0.5] = <b>2.5 mA</b>; saturation current = ½(1)(9) = <b>4.5 mA</b>.</p></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton: “D-MOSFET vs E-MOSFET”</span>
+  <ol>
+    <li>Constructional diagram of E-MOSFET with S, G, D, oxide, n⁺ regions, p-substrate, induced channel (3).</li>
+    <li>Constructional diagram of D-MOSFET with the built-in channel (3).</li>
+    <li>Working of each in two or three lines: V<sub>T</sub> and induced channel vs depletion and enhancement mode (2).</li>
+    <li>Comparison table: channel at V<sub>GS</sub> = 0, polarity, equations, symbols, applications; transfer curves (2).</li>
+  </ol></div>
+  <details><summary>Quick check: why can’t an E-MOSFET with V<sub>T</sub> = 2 V conduct at V<sub>GS</sub> = 1.5 V?</summary><p>V<sub>GS</sub> is below threshold: the surface is not inverted, no channel forms. I<sub>D</sub> ≈ 0 (cutoff).</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s7"> Mark topic 7 as done</label>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="sec" id="s8">
+  <div class="sechead"><span class="secno">Topic 8</span></div>
+  <h2>MOSFET models: large-signal and small-signal</h2>
+
+  <h3>8.1 Large-signal (DC) models</h3>
+  <p>Used for the Q-point, the output swing and the switch. Choose the model by region:</p>
+  <div class="tw"><table><thead><tr><th>Region</th><th>Model between D and S</th><th>Equation</th></tr></thead><tbody>
+  <tr><td>Cutoff</td><td>Open circuit</td><td>I<sub>D</sub> = 0</td></tr>
+  <tr><td>Triode</td><td>Resistor R<sub>DS(on)</sub> set by V<sub>GS</sub></td><td>I<sub>D</sub> ≈ K<sub>n</sub>V<sub>OV</sub>V<sub>DS</sub> → R<sub>DS(on)</sub> ≈ 1/(K<sub>n</sub>V<sub>OV</sub>)</td></tr>
+  <tr><td>Saturation</td><td>Current source controlled by V<sub>GS</sub> (gate draws no current)</td><td>I<sub>D</sub> = ½K<sub>n</sub>V<sub>OV</sub>²</td></tr>
+  </tbody></table></div>
+  <p>The triode resistance comes from dropping the V<sub>DS</sub>² term, which is valid when V<sub>DS</sub> ≪ V<sub>OV</sub> (that is the “small voltage across a closed switch” case).</p>
+  <div class="card intuition"><span class="label">Worked problem 5 (notes): large-signal Q-point</span>
+  <p>V<sub>DD</sub> = 12 V, R<sub>D</sub> = 2 kΩ, V<sub>T</sub> = 1 V, K<sub>n</sub> = 2 mA/V², V<sub>GS</sub> = 3 V. V<sub>OV</sub> = 2 V. Assume saturation: I<sub>DQ</sub> = (2/2)(2)² = <b>4 mA</b>. V<sub>DSQ</sub> = 12 − 4 × 2 = <b>4 V</b>. Check: 4 V &gt; V<sub>OV</sub> = 2 V ✓ saturation valid. <i>Always check the assumption after solving.</i></p></div>
+
+  <h3>8.2 Small-signal model</h3>
+  <p><b>Where g<sub>m</sub> comes from.</b> Write v<sub>GS</sub> = V<sub>GSQ</sub> + v<sub>gs</sub> in the saturation equation:</p>
+  <div class="eq">i_{D} = [[K_{n}|2]](V_{OV} + v_{gs})² = [[K_{n}|2]]V_{OV}² + K_{n}V_{OV}v_{gs} + [[K_{n}|2]]v_{gs}²</div>
+  <p>The first term is I<sub>DQ</sub>, the DC part. The second is linear in v<sub>gs</sub>: this is the signal. The third is distortion. It is negligible if v<sub>gs</sub> ≪ 2V<sub>OV</sub>. That is the meaning of “small signal”.</p>
+  <div class="eq key l">g_{m} = [[∂I_{D}|∂V_{GS}]] = K_{n}V_{OV} = [[2I_{DQ}|V_{OV}]] = √(2K_{n}I_{DQ}) &nbsp;&nbsp; r_{o} ≈ [[1|λI_{DQ}]]</div>
+  <figure><div data-dg="mosModel"></div><figcaption>Small-signal model: g<sub>m</sub>v<sub>gs</sub> and r<sub>o</sub> between drain and source. The gate is open (i<sub>g</sub> = 0).</figcaption></figure>
+  <div class="eq">i_{d} = g_{m}v_{gs} + [[v_{ds}|r_{o}]] &nbsp;&nbsp; (if r_{o} is neglected, i_{d} ≈ g_{m}v_{gs})</div>
+  <div class="card intuition"><span class="label">MOSFET vs BJT: g<sub>m</sub></span><p>BJT g<sub>m</sub> = I<sub>C</sub>/V<sub>T</sub> = I<sub>C</sub>/25 mV. MOSFET g<sub>m</sub> = 2I<sub>D</sub>/V<sub>OV</sub>, and V<sub>OV</sub> is typically 0.2 to 1 V, so g<sub>m</sub> is several times smaller at equal current. Cost of the huge input impedance and the square law.</p></div>
+  <div class="card intuition"><span class="label">Worked problem 6 (notes)</span><p>I<sub>DQ</sub> = 2 mA, V<sub>OV</sub> = 0.5 V, λ = 0.02 V⁻¹. g<sub>m</sub> = 2(2)/0.5 = <b>8 mS</b>, r<sub>o</sub> = 1/(0.02 × 2 mA) = <b>25 kΩ</b>. For v<sub>gs</sub> = 10 mV, v<sub>ds</sub> = −0.2 V: i<sub>d</sub> = 8 mS × 10 mV + (−0.2)/25 kΩ = 80 µA − 8 µA = <b>72 µA</b>.</p></div>
+  <h3>8.3 Using the model (same four steps)</h3>
+  <ol class="steps">
+    <li>DC sources → AC ground. Large capacitors → short circuits.</li>
+    <li>Replace the MOSFET by the model. Gate current = 0.</li>
+    <li>CS gain: A<sub>v</sub> = −g<sub>m</sub>R<sub>D</sub>′ with R<sub>D</sub>′ = R<sub>D</sub>∥R<sub>L</sub>∥r<sub>o</sub>. With an unbypassed R<sub>S</sub>: A<sub>v</sub> = −g<sub>m</sub>R<sub>D</sub>′/(1 + g<sub>m</sub>R<sub>S</sub>) ≈ −R<sub>D</sub>′/R<sub>S</sub>.</li>
+  </ol>
+  <p><b>Why negative:</b> a positive v<sub>gs</sub> raises i<sub>d</sub>, more current drops more voltage across R<sub>D</sub>, so the drain voltage falls: 180° inversion.</p>
+  <div class="card intuition"><span class="label">Worked problem 7 (notes): degeneration</span><p>g<sub>m</sub> = 5 mS, R<sub>D</sub>′ = 4 kΩ, R<sub>S</sub> = 200 Ω. g<sub>m</sub>R<sub>D</sub>′ = 20, 1 + g<sub>m</sub>R<sub>S</sub> = 2 → A<sub>v</sub> = <b>−10</b>. Bypassing R<sub>S</sub> would give −20.</p></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Why a model is needed; large-signal vs small-signal (1).</li>
+    <li>Large-signal models by region with equations (3).</li>
+    <li>Derive g<sub>m</sub> (expansion above) and r<sub>o</sub> (3).</li>
+    <li>Small-signal circuit with equation i<sub>d</sub> = g<sub>m</sub>v<sub>gs</sub> + v<sub>ds</sub>/r<sub>o</sub> (2).</li>
+    <li>Small-signal condition v<sub>gs</sub> ≪ 2V<sub>OV</sub> (1).</li>
+  </ol></div>
+  <details><summary>Quick check: I<sub>DQ</sub> = 1 mA, K<sub>n</sub> = 2 mA/V². g<sub>m</sub>?</summary><p>g<sub>m</sub> = √(2 × 2 × 1) = <b>2 mS</b> (V<sub>OV</sub> = 1 V).</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s8"> Mark topic 8 as done</label>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="sec" id="s9">
+  <div class="sechead"><span class="secno">Topic 9</span></div>
+  <h2>Analysis of MOSFET amplifiers</h2>
+  <div class="tags"><span class="tag hot">Asked: Summer 2019 Q4 — Q-point of a voltage-divider-biased n-channel MOSFET (10 marks)</span></div>
+
+  <h3>9.1 The MOSFET as a voltage amplifier (the picture)</h3>
+  <p>Notes example: V<sub>DD</sub> = 12 V, R<sub>D</sub> = 8 kΩ, K = 2 mA/V², V<sub>T</sub> = 2 V, V<sub>GS</sub> = 3 V, v<sub>i</sub> = ±100 mV.</p>
+  <ol class="steps">
+    <li><b>Q:</b> I<sub>D</sub> = ½(2)(3 − 2)² = 1 mA. V<sub>DS</sub> = 12 − 1 × 8 = <b>4 V</b>.</li>
+    <li><b>+100 mV:</b> V<sub>GS</sub> = 3.1 V → I<sub>D</sub> = ½(2)(1.1)² = 1.21 mA → V<sub>DS</sub> = 12 − 1.21 × 8 = <b>2.32 V</b>.</li>
+    <li><b>−100 mV:</b> V<sub>GS</sub> = 2.9 V → I<sub>D</sub> = 0.81 mA → V<sub>DS</sub> = <b>5.52 V</b>.</li>
+    <li>ΔV<sub>o</sub> = 5.52 − 2.32 = 3.2 V for ΔV<sub>i</sub> = 0.2 V → <b>A<sub>v</sub> = −16</b> = −g<sub>m</sub>R<sub>D</sub> = −(2 mA/V)(8 kΩ) ✓.</li>
+  </ol>
+  <p>Note the small asymmetry (the rise was 0.21 mA, the fall 0.19 mA): the square-law distortion in action.</p>
+
+  <h3>9.2 Common-source</h3>
+  <figure><div data-dg="csMos"></div><figcaption>CS MOSFET amplifier with divider bias and source resistor.</figcaption></figure>
+  <p>The AC equivalent is the JFET one (Topic 3) with R<sub>GS</sub> → ∞ and r<sub>d</sub> → r<sub>o</sub>. Using v<sub>g</sub> = v<sub>gs</sub> + g<sub>m</sub>v<sub>gs</sub>R<sub>S</sub>:</p>
+  <div class="eq">A_{vt} = [[v_{o}|v_{g}]] = −[[g_{m}(R_{D}∥R_{L})|1 + g_{m}R_{S}]] &nbsp;&nbsp; v_{g} = v_{s}[[R_{G}|R_{G} + r_{s}]]</div>
+  <div class="eq key l">A_{v} = −[[g_{m}R_{D}′|1 + g_{m}R_{S}]]·[[R_{G}|R_{G} + r_{s}]] ≈ −[[R_{D}′|R_{S}]] &nbsp; Z_{i} = R_{G} &nbsp; Z_{o} = R_{D}∥r_{o}(1 + g_{m}R_{S}) ≈ R_{D}</div>
+  <div class="card intuition"><span class="label">Worked problem 9 (notes)</span>
+  <p>g<sub>m</sub> = 4 mS, R<sub>D</sub> = 6.8 kΩ, R<sub>L</sub> = 20 kΩ, R<sub>S</sub> = 470 Ω (unbypassed), R<sub>G</sub> = 100 kΩ, r<sub>s</sub> = 600 Ω.</p>
+  <p>R<sub>D</sub>′ = 5.075 kΩ. A<sub>vt</sub> = −(4)(5.075)/(1 + 4 × 0.47) = −20.3/2.88 = <b>−7.05</b>. R<sub>G</sub>/(R<sub>G</sub> + r<sub>s</sub>) = 0.994 → A<sub>v</sub> = <b>−7.01</b>. Z<sub>i</sub> = 100 kΩ, Z<sub>o</sub> ≈ <b>6.8 kΩ</b>.</p></div>
+
+  <h3>9.3 Common-drain</h3>
+  <figure><div data-dg="cdMos"></div><figcaption>MOSFET source follower.</figcaption></figure>
+  <div class="eq key l">A_{vt} = [[g_{m}(R_{S}∥R_{L})|1 + g_{m}(R_{S}∥R_{L})]] &nbsp;&nbsp; Z_{i} = R_{G} &nbsp;&nbsp; Z_{o} ≈ [[1|g_{m}]]</div>
+  <div class="card intuition"><span class="label">Worked problem 10 (notes)</span><p>g<sub>m</sub> = 5 mS, R<sub>S</sub> = 2.2 kΩ, R<sub>L</sub> = 10 kΩ, R<sub>G</sub> = 220 kΩ. R<sub>S</sub>′ = 1.803 kΩ → A<sub>v</sub> = 9.015/10.015 = <b>0.90</b>. Z<sub>i</sub> = 220 kΩ. Z<sub>o</sub> ≈ 1/g<sub>m</sub> = <b>200 Ω</b>.</p></div>
+
+  <h3>9.4 Common-gate</h3>
+  <figure><div data-dg="cgMos"></div><figcaption>MOSFET CG amplifier. Input at the source.</figcaption></figure>
+  <div class="eq key l">A_{v} = [[g_{m}(R_{D}∥R_{L})|1 + g_{m}(r_{s}∥R_{S})]] &nbsp;&nbsp; Z_{i} ≈ [[1|g_{m}]] &nbsp;&nbsp; Z_{D} = r_{o}[1 + g_{m}(R_{S}∥r_{s})], Z_{o} ≈ R_{D}∥Z_{D}</div>
+  <div class="card intuition"><span class="label">Worked problem 11 (notes)</span><p>g<sub>m</sub> = 6 mS, R<sub>D</sub> = 4.7 kΩ, R<sub>L</sub> = 10 kΩ, r<sub>s</sub> = 50 Ω, R<sub>S</sub> = 1 kΩ, r<sub>o</sub> = 50 kΩ. R<sub>D</sub>′ = 3.197 kΩ, r<sub>s</sub>∥R<sub>S</sub> = 47.62 Ω → A<sub>v</sub> = 19.18/(1 + 0.2857) = <b>+14.92</b>. Z<sub>i</sub> ≈ 1/g<sub>m</sub> = <b>166.7 Ω</b>. Z<sub>D</sub> = 50k(1.2857) = 64.29 kΩ, Z<sub>o</sub> = 4.7k ∥ 64.29k = <b>4.38 kΩ</b>.</p></div>
+  <div class="tw"><table><thead><tr><th></th><th>A<sub>v</sub></th><th>Z<sub>i</sub></th><th>Z<sub>o</sub></th></tr></thead><tbody>
+  <tr><td>CS</td><td>−g<sub>m</sub>R<sub>D</sub>′/(1+g<sub>m</sub>R<sub>S</sub>)</td><td>R<sub>G</sub></td><td>R<sub>D</sub>∥r<sub>o</sub>(1+g<sub>m</sub>R<sub>S</sub>) ≈ R<sub>D</sub></td></tr>
+  <tr><td>CD</td><td>g<sub>m</sub>(R<sub>S</sub>∥R<sub>L</sub>)/(1+g<sub>m</sub>(R<sub>S</sub>∥R<sub>L</sub>))</td><td>R<sub>G</sub></td><td>≈ 1/g<sub>m</sub></td></tr>
+  <tr><td>CG</td><td>+g<sub>m</sub>R<sub>D</sub>′/(1+g<sub>m</sub>(r<sub>s</sub>∥R<sub>S</sub>))</td><td>1/g<sub>m</sub></td><td>≈ r<sub>o</sub>[1+g<sub>m</sub>(R<sub>S</sub>∥r<sub>s</sub>)]</td></tr>
+  </tbody></table></div>
+
+  <h3>9.5 Finding the Q-point of the divider-biased MOSFET (the exam numerical)</h3>
+  <div class="card intuition"><span class="label">Summer 2019 Q4: R<sub>1</sub> = 90 kΩ, R<sub>2</sub> = 45 kΩ, R<sub>D</sub> = 5 kΩ, R<sub>S</sub> = 2 kΩ, V<sub>T</sub> = 1 V, k′(W/L) = 2 mA/V²</span>
+  <p><b>The paper does not print V<sub>DD</sub>.</b> I used 12 V: it gives clean numbers and the paper’s R values sum to a 2:1 divider. If your copy shows another V<sub>DD</sub>, redo with the widget.</p>
+  <ol class="steps">
+    <li>V<sub>G</sub> = 12 × 45/135 = <b>4 V</b>. I<sub>G</sub> = 0, so no loading of the divider.</li>
+    <li>Bias line: V<sub>GS</sub> = V<sub>G</sub> − I<sub>D</sub>R<sub>S</sub> = 4 − 2I<sub>D</sub> (I<sub>D</sub> in mA).</li>
+    <li>Device: I<sub>D</sub> = ½(2)(V<sub>GS</sub> − 1)² = (V<sub>GS</sub> − 1)².</li>
+    <li>Put x = V<sub>GS</sub> − 1. Then x + 1 = 4 − 2x² → 2x² + x − 3 = 0 → x = 1 or x = −1.5. Reject −1.5 (it would put V<sub>GS</sub> below V<sub>T</sub>). So <b>V<sub>GSQ</sub> = 2 V, I<sub>DQ</sub> = 1 mA</b>.</li>
+    <li>V<sub>DSQ</sub> = 12 − 1 mA × (5 + 2) kΩ = <b>5 V</b>.</li>
+    <li>Check: V<sub>OV</sub> = 1 V and V<sub>DS</sub> = 5 V &gt; 1 V → saturation ✓.</li>
+  </ol>
+  <p style="font-size:.88rem;color:var(--muted)">If your course defines I<sub>D</sub> = k′(W/L)(V<sub>GS</sub> − V<sub>T</sub>)² (no ½), the same method gives I<sub>DQ</sub> = 1.125 mA and V<sub>DSQ</sub> = 4.125 V. Write the equation you use in the first line.</p></div>
+  <div class="widget" data-w="mosq"></div>
+  <div class="widget" data-w="mosamp"></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Circuit (1) and DC equivalent with V<sub>G</sub> from the divider (1).</li>
+    <li>KVL on the gate–source loop and the saturation equation; solve the quadratic; reject the non-physical root (4).</li>
+    <li>V<sub>DSQ</sub> from the drain loop (1).</li>
+    <li>Check V<sub>DS</sub> ≥ V<sub>OV</sub> to confirm saturation (2).</li>
+    <li>Final answer boxed with units (1).</li>
+  </ol></div>
+  <details><summary>Quick check: why is Z<sub>i</sub> = R<sub>G</sub> for CS and CD but 1/g<sub>m</sub> for CG?</summary><p>In CS and CD the signal enters the insulated gate, which draws no current; only the bias resistors load the source. In CG the signal enters the source, where the device looks like a resistance 1/g<sub>m</sub>.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s9"> Mark topic 9 as done</label>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="sec" id="s10">
+  <div class="sechead"><span class="secno">Topic 10</span></div>
+  <h2>Frequency response of MOSFET amplifiers</h2>
+  <div class="tags"><span class="tag">Not in your Unit 2 notes (only a design rule with C<sub>4</sub> appears). Same theory as JFET Topic 4</span></div>
+  <p>The picture is identical to the JFET (Topic 4): mid-band flat, falling at low frequency because of the coupling and bypass capacitors, falling at high frequency because of the internal device capacitances. Use the same high-frequency model with the MOSFET’s capacitances:</p>
+  <ul>
+    <li><b>C<sub>gs</sub></b> (gate–source) ≈ ⅔ WLC<sub>ox</sub> + overlap. <b>C<sub>gd</sub></b> (gate–drain) is mainly the small overlap capacitance. <b>C<sub>db</sub>, C<sub>sb</sub></b> are the junction capacitances to the body.</li>
+  </ul>
+  <div class="eq key l">C_{i} = C_{gs} + C_{gd}(1 + g_{m}R_{L}′) &nbsp;&nbsp; f_{2} ≈ [[1|2π R_{sig} C_{i}]] &nbsp;&nbsp; f_{T} = [[g_{m}|2π(C_{gs} + C_{gd})]]</div>
+  <div class="eq">f_{1} ≈ √(f_{C1}² + f_{CS}² + f_{C3}²) &nbsp;&nbsp; f_{C1} = [[1|2π(r_{s}+R_{G})C_{1}]] &nbsp; f_{CS} = [[1 + g_{m}R_{S}|2πR_{S}C_{S}]] &nbsp; f_{C3} = [[1|2π(R_{D}+R_{L})C_{3}]]</div>
+  <div class="card intuition"><span class="label">Where your notes touch this</span>
+  <p>In the 2N7000 design (Topic 11), the notes pick C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub> from the rule X<sub>C</sub> ≤ 0.1R at f<sub>L</sub> = 20 Hz, and C<sub>4</sub> = 1/[2πf<sub>H</sub>(R<sub>D</sub>∥R<sub>L</sub>)] at f<sub>H</sub> = 20 kHz. C<sub>4</sub> is a small capacitor across the output that <i>sets</i> the upper cut-off of the design, so that the circuit’s own high-frequency roll-off is controlled and does not depend on the device capacitances.</p></div>
+  <div class="card intuition"><span class="label">Worked example (defaults of the widget)</span>
+  <p>g<sub>m</sub> = 7.5 mS, R<sub>L</sub>′ = 6.8 kΩ, source resistance 50 kΩ, C<sub>gs</sub> = 6 pF, C<sub>gd</sub> = 1.5 pF. A = 51 (34.2 dB). C<sub>i</sub> = 6 + 1.5(52) = <b>84 pF</b> → f<sub>in</sub> ≈ 37.9 kHz = f<sub>2</sub> (the output pole is at 9.3 MHz). C<sub>S</sub> = 68 µF with R<sub>S</sub> = 1.5 kΩ gives f<sub>CS</sub> = (1 + 11.25)/(2π × 1.5 k × 68 µ) = 19.1 Hz, so f<sub>1</sub> ≈ 19 Hz. A 51× gain with a 38 kHz bandwidth: the Miller multiplication is clear.</p></div>
+  <div class="widget" data-w="mosfreq"></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Frequency-response curve, mid-band, f<sub>1</sub>, f<sub>2</sub>, −3 dB, bandwidth (2).</li>
+    <li>Low-frequency effect of C<sub>1</sub>, C<sub>S</sub>, C<sub>3</sub> with expressions (3).</li>
+    <li>High-frequency model with C<sub>gs</sub>, C<sub>gd</sub>, Miller effect, f<sub>2</sub> (4).</li>
+    <li>f<sub>T</sub> and gain–bandwidth remark (1).</li>
+  </ol></div>
+  <label class="done-row"><input type="checkbox" data-done="s10"> Mark topic 10 as done</label>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="sec" id="s11">
+  <div class="sechead"><span class="secno">Topic 11</span></div>
+  <h2>Single-stage MOSFET CS amplifier design</h2>
+  <div class="tags"><span class="tag hot">From your notes: NMOS CS design with the 2N7000 (A<sub>v</sub> ≥ 50)</span></div>
+
+  <h3>11.1 Specification</h3>
+  <p>A<sub>v</sub> ≥ 50, v<sub>i</sub> = 50 mV, V<sub>DD</sub> = 12 V, R<sub>1</sub>∥R<sub>2</sub> = 100 kΩ, 2N7000, very high R<sub>L</sub>, f<sub>L</sub> = 20 Hz, upper design point 20 kHz.</p>
+  <h3>11.2 Step by step (with the “why”)</h3>
+  <ol class="steps">
+    <li><b>Device constant.</b> Data: V<sub>T</sub> = 2 V, I<sub>D(on)</sub> = 1 A at V<sub>GS(on)</sub> = 10 V. From I<sub>D</sub> = k(V<sub>GS</sub> − V<sub>T</sub>)²: k = 1/(10 − 2)² = <b>15.6 mA/V²</b> (this is K/2 in the notes’ convention).</li>
+    <li><b>Q-point from the gain.</b> A<sub>v</sub> = g<sub>m</sub>R<sub>D</sub> and put V<sub>DSQ</sub> = 0.5V<sub>DD</sub>, so R<sub>D</sub> = 0.5V<sub>DD</sub>/I<sub>DQ</sub>. With g<sub>m</sub> = 2kV<sub>OV</sub> and I<sub>DQ</sub> = kV<sub>OV</sub>² this gives a neat result: <b>V<sub>OV</sub> = V<sub>DD</sub>/A<sub>v</sub></b> = 12/50 = 0.24 V. So V<sub>GSQ</sub> = 2.24 V and I<sub>DQ</sub> = 0.0156 × 0.24² … in the notes they solve two equations to get the same V<sub>GSQ</sub> = 2.24 V, <b>I<sub>DQ</sub> = 898.6 µA</b>.</li>
+    <li><b>R<sub>D</sub> and R<sub>S</sub>.</b> R<sub>D</sub> = 6 V/898.56 µA = 6.67 kΩ → use <b>6.8 kΩ</b>. Take 10% of V<sub>DD</sub> across R<sub>S</sub> for stability: R<sub>S</sub> = 1.2 V/898.56 µA = 1.33 kΩ → <b>1.5 kΩ</b> (V<sub>RS</sub> = 1.35 V).</li>
+    <li><b>Divider.</b> V<sub>G</sub> = V<sub>S</sub> + V<sub>GS</sub> = 1.35 + 2.24 = 3.59 V. R<sub>2</sub>/(R<sub>1</sub>+R<sub>2</sub>) = 3.59/12 = 0.299; R<sub>1</sub> = 100 k/0.299 = 334 kΩ → <b>390 kΩ</b>; R<sub>2</sub> = 100 k/0.701 = 142.7 kΩ → <b>150 kΩ</b>.</li>
+    <li><b>Capacitors</b> from X<sub>C</sub> ≤ 0.1R at 20 Hz: C<sub>1</sub> ≥ 1/(2π × 20 × 0.1 × 100 k) = 796 nF → <b>1 µF</b>. C<sub>2</sub> (bypass, R<sub>S</sub> = 1.5 k) ≥ 53 µF → <b>68 µF</b>. C<sub>3</sub> (R<sub>D</sub> = 6.8 k) ≥ 11.7 µF → <b>15 µF</b>. C<sub>4</sub> = 1/(2π × 20 k × 6.8 k) = 1.17 nF → <b>1.2 nF</b>.</li>
+    <li><b>Check with the real values.</b> g<sub>m</sub> = 2(0.0156)(2.24 − 2) = 7.488 mS; A<sub>v</sub> = g<sub>m</sub>R<sub>D</sub> = 7.488 × 6.8 = <b>50.9</b> ✓ ≥ 50.</li>
+  </ol>
+  <div class="card watch"><span class="label">One subtlety in the notes</span><p>The notes call 15.6 mA/V² “K/2”. Then I<sub>D</sub> = 0.0156V<sub>OV</sub>² and g<sub>m</sub> = 2 × 0.0156 × V<sub>OV</sub>, consistent. Don’t confuse it with K = μ<sub>n</sub>C<sub>ox</sub>W/L = 31.2 mA/V².</p></div>
+  <h3>11.3 Second worked design (Problem 13)</h3>
+  <p>V<sub>DD</sub> = 15 V, |A<sub>v</sub>| = 40, V<sub>T</sub> = 2 V, K<sub>n</sub> = 10 mA/V² (I<sub>D</sub> = ½K<sub>n</sub>V<sub>OV</sub>²), R<sub>1</sub>∥R<sub>2</sub> = 100 kΩ, f<sub>L</sub> = 50 Hz.</p>
+  <p>V<sub>OV</sub> = 15/40 = <b>0.375 V</b>; I<sub>DQ</sub> = 5 × 0.375² = <b>0.703 mA</b>; R<sub>D</sub> = 7.5 V/0.703 mA = <b>10.67 kΩ</b>; R<sub>S</sub> = 1.5 V/0.703 mA = <b>2.13 kΩ</b>; V<sub>G</sub> = 2.375 + 1.5 = 3.875 V → R<sub>1</sub> ≈ <b>387 kΩ</b>, R<sub>2</sub> ≈ <b>135 kΩ</b>; C<sub>1</sub> ≥ <b>0.318 µF</b>, C<sub>2</sub> ≥ <b>14.9 µF</b>, C<sub>3</sub> ≥ <b>2.98 µF</b>.</p>
+  <div class="widget" data-w="mosdesign"></div>
+  <p style="font-size:.88rem;color:var(--muted)">Try the widget with V<sub>DD</sub> = 15, A<sub>v</sub> = 40, I<sub>D(on)</sub> = 1000 mA, V<sub>GS(on)</sub> and V<sub>T</sub> chosen so that k = 5 mA/V² (e.g. V<sub>GS(on)</sub> − V<sub>T</sub> = 14.1 V) to reproduce Problem 13.</p>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Circuit (1) and device data/constant k (1).</li>
+    <li>Q-point: V<sub>OV</sub> = V<sub>DD</sub>/A<sub>v</sub>, I<sub>DQ</sub> (2).</li>
+    <li>R<sub>D</sub>, R<sub>S</sub> with standard values (2).</li>
+    <li>R<sub>1</sub>, R<sub>2</sub> from V<sub>G</sub> and R<sub>1</sub>∥R<sub>2</sub> (2).</li>
+    <li>C<sub>1</sub>, C<sub>2</sub>, C<sub>3</sub>, C<sub>4</sub> from the frequency rules (1).</li>
+    <li>Check final gain with standard values (1).</li>
+  </ol></div>
+  <label class="done-row"><input type="checkbox" data-done="s11"> Mark topic 11 as done</label>
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="sec" id="s12">
+  <div class="sechead"><span class="secno">Topic 12</span></div>
+  <h2>MOSFET as a switch, NOT gates and the CMOS inverter</h2>
+
+  <h3>12.1 The switch</h3>
+  <div class="card intuition"><span class="label">Intuition</span><p>A good switch is either a very high resistance (OFF) or a very low resistance (ON). The E-MOSFET does exactly this: V<sub>GS</sub> ≤ V<sub>T</sub> → no channel → <b>open</b>. V<sub>GS</sub> far above V<sub>T</sub> with small V<sub>DS</sub> → <b>triode</b> → a resistor R<sub>DS(on)</sub> = 1/(K<sub>n</sub>V<sub>OV</sub>) of a few milliohms to ohms. <b>Saturation is the wrong state for an ON switch</b>: V<sub>DS</sub> is large and the transistor wastes power. Amplifiers live in saturation; switches live in cutoff and deep triode.</p></div>
+  <div class="card intuition"><span class="label">Worked problem 8 (notes): low-side power switch</span><p>5 V supply, 100 Ω load, R<sub>DS(on)</sub> = 0.2 Ω. I<sub>D</sub> = 5/100.2 = <b>49.9 mA</b>. V<sub>DS(on)</sub> = 49.9 mA × 0.2 = <b>9.98 mV</b>. P<sub>D</sub> = I<sub>D</sub>²R<sub>DS(on)</sub> = <b>0.498 mW</b>.</p></div>
+
+  <h3>12.2 Resistor-load NOT gates and their problem</h3>
+  <figure><div data-dg="resInv"></div><figcaption>nMOS resistor-load inverter. When V<sub>in</sub> is HIGH the transistor is ON and pulls the output LOW.</figcaption></figure>
+  <ul>
+    <li><b>V<sub>in</sub> LOW (0 V):</b> V<sub>GS</sub> = 0 &lt; V<sub>T</sub>, switch open, no current → V<sub>out</sub> = +V<sub>DD</sub> (HIGH).</li>
+    <li><b>V<sub>in</sub> HIGH (V<sub>DD</sub>):</b> switch ON with resistance r<sub>DS</sub>, so V<sub>out</sub> = V<sub>DD</sub>·r<sub>DS</sub>/(R + r<sub>DS</sub>) — a <b>weak LOW</b>, not exactly 0.</li>
+    <li>A p-channel version (source at +V) gives a <b>weak HIGH</b>: V<sub>out</sub> = V<sub>DD</sub>R/(R + r<sub>DS</sub>).</li>
+    <li>The resistor also wastes power whenever the transistor is ON, and its large value makes the output rise slowly when charging a capacitive load.</li>
+  </ul>
+  <div class="card intuition"><span class="label">Worked: design R for a required LOW (notes)</span><p>V = 5 V, K = 0.5 mA/V², V<sub>T</sub> = 1 V, V<sub>OL</sub> = 0.2 V. HIGH input (5 V) → triode. I<sub>D</sub> = ½(0.5)[2(5 − 1)(0.2) − 0.2²] = 0.25 × 1.56 = <b>0.39 mA</b>. R = (5 − 0.2)/0.39 mA = <b>12.3 kΩ</b>.</p>
+  <p><b>Problem 14:</b> V = 5 V, R = 10 kΩ, r<sub>DS</sub> = 200 Ω → n-channel LOW = 5 × 200/10200 = <b>0.098 V</b>; p-channel HIGH = 5 × 10000/10200 = <b>4.902 V</b>; I = 0.490 mA; P<sub>R</sub> = I²R = <b>2.40 mW</b>.</p></div>
+
+  <h3>12.3 The CMOS inverter: the fix</h3>
+  <figure><div data-dg="cmosInv"></div><figcaption>PMOS on top, NMOS at the bottom, gates tied together, drains tied together.</figcaption></figure>
+  <div class="tw"><table><thead><tr><th>V<sub>in</sub></th><th>PMOS</th><th>NMOS</th><th>V<sub>out</sub></th></tr></thead><tbody>
+  <tr><td>0 V (LOW)</td><td>ON (V<sub>GS</sub> = −V<sub>DD</sub> &lt; V<sub>Tp</sub>)</td><td>OFF</td><td><b>V<sub>DD</sub></b>, full HIGH</td></tr>
+  <tr><td>V<sub>DD</sub> (HIGH)</td><td>OFF</td><td>ON (V<sub>GS</sub> = V<sub>DD</sub> &gt; V<sub>Tn</sub>)</td><td><b>0 V</b>, full LOW</td></tr>
+  </tbody></table></div>
+  <ul>
+    <li>In each stable state one transistor is OFF, so <b>no path from V<sub>DD</sub> to ground: static power ≈ 0</b>.</li>
+    <li>Output levels are full rail (0 and V<sub>DD</sub>): no weak levels.</li>
+    <li>Power is used only while switching (charging C<sub>L</sub>): <b>P<sub>dyn</sub> = C<sub>L</sub>V<sub>DD</sub>²f</b>.</li>
+    <li>Fast: C<sub>L</sub> is charged and discharged through low r<sub>DS</sub> of an ON transistor: t ≈ 0.69R<sub>on</sub>C<sub>L</sub>.</li>
+  </ul>
+  <div class="card intuition"><span class="label">Worked problem 15 (notes)</span><p>V<sub>DD</sub> = 5 V, C<sub>L</sub> = 20 pF, f = 1 MHz. Static power = 0. P<sub>dyn</sub> = 20 pF × 25 × 1 MHz = <b>0.50 mW</b>. With R<sub>on</sub> = 1 kΩ: t ≈ 0.69 × 1 k × 20 p = <b>13.8 ns</b>.</p></div>
+  <div class="widget" data-w="mosinv"></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>MOSFET regions used as a switch: cutoff OFF, triode ON, why not saturation (2).</li>
+    <li>Resistor-load NMOS inverter with working and the V<sub>out</sub> equation, weak LOW (3).</li>
+    <li>CMOS inverter circuit, truth/state table, working (3).</li>
+    <li>Advantages: zero static power, full logic levels, speed; dynamic power formula (2).</li>
+  </ol></div>
+  <label class="done-row"><input type="checkbox" data-done="s12"> Mark topic 12 as done</label>
+</section>
+
+<!-- ============ 13 ============ -->
+<section class="sec" id="s13">
+  <div class="sechead"><span class="secno">Topic 13</span></div>
+  <h2>Power MOSFET</h2>
+
+  <h3>13.1 Why it is built differently</h3>
+  <div class="card intuition"><span class="label">Intuition</span><p>A small-signal MOSFET has source and drain side by side on the chip surface, so current runs sideways in a thin film: great for logic, but the current and voltage are limited. A power MOSFET puts the <b>drain on the back of the chip</b>, so current flows <b>vertically</b> through the whole chip thickness. Thousands of cells in parallel give a large current (big area → low R<sub>DS(on)</sub>). A lightly doped <b>n⁻ drift layer</b> sits between the body and the drain; it supports the blocking voltage: thicker layer = higher V<sub>DSS</sub>, but also higher R<sub>DS(on)</sub>. That is the main trade-off.</p></div>
+  <figure><div data-dg="powerMos"></div><figcaption>Vertical (VDMOS) power MOSFET cell. n-channel is preferred: electron mobility gives lower resistance than an equivalent p-channel.</figcaption></figure>
+  <p>The inherent p-body/n⁻ junction forms a <b>body diode</b> from source to drain. It conducts when the drain goes below the source (useful as a freewheel path, but with reverse-recovery loss).</p>
+
+  <h3>13.2 Datasheet parameters</h3>
+  <div class="tw"><table><thead><tr><th>Parameter</th><th>Meaning</th><th>Why it matters</th></tr></thead><tbody>
+  <tr><td>V<sub>DSS</sub></td><td>Maximum drain–source blocking voltage</td><td>Must exceed the highest drain voltage including spikes</td></tr>
+  <tr><td>I<sub>D</sub></td><td>Continuous / pulsed current rating</td><td>Limited by temperature, package</td></tr>
+  <tr><td>R<sub>DS(on)</sub></td><td>ON resistance at a specified V<sub>GS</sub></td><td>Sets conduction loss; rises with temperature</td></tr>
+  <tr><td>V<sub>GS(th)</sub></td><td>Threshold at a small test current</td><td>Not the drive voltage. Drive at the V<sub>GS</sub> where R<sub>DS(on)</sub> is specified</td></tr>
+  <tr><td>Q<sub>g</sub>, Q<sub>gd</sub></td><td>Total gate charge, Miller charge</td><td>Gate-drive current and switching speed</td></tr>
+  <tr><td>C<sub>iss</sub>, C<sub>oss</sub>, C<sub>rss</sub></td><td>Input, output, reverse-transfer capacitance</td><td>Switching dynamics</td></tr>
+  <tr><td>P<sub>D</sub>, T<sub>J</sub>, R<sub>θ</sub></td><td>Power, junction temperature, thermal resistance</td><td>Can the heat be removed?</td></tr>
+  <tr><td>SOA</td><td>Safe operating area</td><td>Allowed (V<sub>DS</sub>, I<sub>D</sub>, time) combinations</td></tr>
+  </tbody></table></div>
+
+  <h3>13.3 Gate charge and the Miller plateau</h3>
+  <p>The gate is a capacitor, so every switching event needs charge. The turn-on sequence:</p>
+  <ol class="steps">
+    <li><b>Delay:</b> the gate driver charges C<sub>gs</sub> until V<sub>GS</sub> reaches V<sub>th</sub>. Nothing happens to I<sub>D</sub> yet.</li>
+    <li><b>Current rise:</b> I<sub>D</sub> rises to the load current while V<sub>DS</sub> is still high (power is large: V × I overlap).</li>
+    <li><b>Miller plateau:</b> V<sub>GS</sub> stays almost constant while the driver charges C<sub>gd</sub> (charge Q<sub>gd</sub>). The drain voltage falls rapidly here.</li>
+    <li><b>Full enhancement:</b> V<sub>GS</sub> rises to the drive level; R<sub>DS(on)</sub> reaches its final low value.</li>
+  </ol>
+  <figure><div data-dg="mosSwitchTiming"></div><figcaption>Turn-on of a power MOSFET. Turn-off is the same sequence in reverse order.</figcaption></figure>
+  <div class="eq">I_{G(avg)} ≈ Q_{g}f_{s} &nbsp;&nbsp; P_{gate} ≈ Q_{g}V_{drive}f_{s} &nbsp;&nbsp; (a low-impedance gate driver is needed to switch quickly)</div>
+
+  <h3>13.4 Losses and temperature</h3>
+  <div class="eq key l">P_{cond} ≈ D·I_{D}²R_{DS(on)} &nbsp;&nbsp; E_{sw} ≈ ½V_{DS}I_{D}t_{sw} &nbsp;&nbsp; P_{sw} ≈ f_{s}(E_{on} + E_{off}) &nbsp;&nbsp; P_{loss} = P_{cond} + P_{sw} + P_{gate} &nbsp;&nbsp; T_{J} ≈ T_{A} + P_{loss}R_{θJA}</div>
+  <div class="tw"><table><thead><tr><th>State</th><th>Region</th><th>Dominant loss</th></tr></thead><tbody>
+  <tr><td>OFF</td><td>Cutoff</td><td>Leakage (small)</td></tr>
+  <tr><td>ON</td><td>Deep triode</td><td>Conduction: I<sub>D</sub>²R<sub>DS(on)</sub></td></tr>
+  <tr><td>Transition</td><td>Passes through saturation</td><td>Switching loss: V<sub>DS</sub>·I<sub>D</sub> overlap</td></tr>
+  </tbody></table></div>
+  <div class="card intuition"><span class="label">Worked example (widget defaults)</span>
+  <p>48 V, 20 A, R<sub>DS(on)</sub> = 10 mΩ (×1.6 hot), D = 0.5, f<sub>s</sub> = 100 kHz, t<sub>r</sub>+t<sub>f</sub> = 40 ns, Q<sub>g</sub> = 60 nC at 10 V. P<sub>cond</sub> = 0.5 × 400 × 0.016 = <b>3.2 W</b>. P<sub>sw</sub> = 100 k × ½ × 48 × 20 × 40 ns = <b>1.92 W</b>. P<sub>gate</sub> = 60 n × 10 × 100 k = <b>0.06 W</b>. Total = 5.18 W. With R<sub>θJA</sub> = 12 °C/W and 40 °C ambient: T<sub>J</sub> = 40 + 5.18 × 12 = <b>102 °C</b>, safe below 150 °C.</p></div>
+  <div class="widget" data-w="powermos"></div>
+  <div class="card watch"><span class="label">Design trade-off in one line</span><p>A lower R<sub>DS(on)</sub> means a bigger die and a bigger Q<sub>g</sub>: you gain conduction loss but lose switching speed and drive power. Choose by comparing both loss terms at your frequency.</p></div>
+
+  <h3>13.5 Power MOSFET vs power BJT (link back to Unit 1)</h3>
+  <div class="tw"><table><thead><tr><th></th><th>Power MOSFET</th><th>Power BJT</th></tr></thead><tbody>
+  <tr><td>Control</td><td>Voltage; gate draws no steady current</td><td>Current; needs large base drive</td></tr>
+  <tr><td>Switching speed</td><td>Very fast (majority carriers, no storage time)</td><td>Slower (storage time t<sub>s</sub>)</td></tr>
+  <tr><td>Temperature coefficient</td><td>R<sub>DS(on)</sub> rises with T → current sharing, <b>no thermal runaway</b></td><td>Negative feedback missing → thermal runaway and second breakdown risk</td></tr>
+  <tr><td>ON drop</td><td>I<sub>D</sub>R<sub>DS(on)</sub> (small at low voltage)</td><td>V<sub>CE(sat)</sub> ≈ 0.2–1 V</td></tr>
+  <tr><td>Best for</td><td>High frequency, low to medium voltage</td><td>Very high voltage and current at low frequency</td></tr>
+  </tbody></table></div>
+  <div class="card exam"><span class="label">10-mark answer skeleton</span>
+  <ol>
+    <li>Why a vertical structure; labelled cross-section (3).</li>
+    <li>Key datasheet parameters: V<sub>DSS</sub>, I<sub>D</sub>, R<sub>DS(on)</sub>, Q<sub>g</sub>, SOA (2).</li>
+    <li>Switching states and the Miller plateau with waveforms (3).</li>
+    <li>Loss equations and the thermal estimate; comparison with the BJT (2).</li>
+  </ol></div>
+  <details><summary>Quick check: why must you not drive a power MOSFET only to V<sub>GS(th)</sub>?</summary><p>V<sub>GS(th)</sub> is only where a tiny test current begins to flow. R<sub>DS(on)</sub> is specified at a much higher gate voltage (often 10 V). Below that the channel is poor and the device dissipates too much power.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s13"> Mark topic 13 as done</label>
+</section>
+
+<!-- ============ 14 ============ -->
+<section class="sec" id="s14">
+  <div class="sechead"><span class="secno">Revision</span></div>
+  <h2>Exam map and formula sheet</h2>
+  <h3>14.1 Where Unit 2 appeared in the paper you shared</h3>
+  <div class="tw"><table><thead><tr><th>Paper</th><th>Question</th><th>Section here</th></tr></thead><tbody>
+  <tr><td>Electronic Devices &amp; Applications, Sem III, Summer 2019 (11/05/2019)</td><td>Q3: design gate bias circuit with I<sub>D(max)</sub> = 3 mA, V<sub>DS(min)</sub> = 10 V, V<sub>DD</sub> = 25 V, V<sub>GS(off)</sub> = −6 V</td><td><a href="#s5">Topic 5.3</a></td></tr>
+  <tr><td>same</td><td>Q3 OR: output characteristics of N- and P-channel JFET; define g<sub>m</sub>, r<sub>d</sub>, μ</td><td><a href="#s1">Topic 1</a>, <a href="#s2">Topic 2</a></td></tr>
+  <tr><td>same</td><td>Q4: I<sub>DQ</sub> and V<sub>DSQ</sub> of a divider-biased n-channel MOSFET (R<sub>1</sub> = 90 k, R<sub>2</sub> = 45 k, R<sub>D</sub> = 5 k, R<sub>S</sub> = 2 k, V<sub>T</sub> = 1 V, k′W/L = 2 mA/V²)</td><td><a href="#s9">Topic 9.5</a></td></tr>
+  <tr><td>same</td><td>Q4 OR: D-MOSFET vs E-MOSFET with constructional diagrams</td><td><a href="#s7">Topic 7</a></td></tr>
+  <tr><td>Elements of Electronics Engg., Summer 2019 (15/05/2019)</td><td>What is a FET? Construction and characteristics of JFET (7 marks)</td><td><a href="#s1">Topic 1</a></td></tr>
+  <tr><td>VLSI Design Sem VI, Summer 2019 (adjacent topic)</td><td>Channel-length modulation; CMOS inverter delay</td><td><a href="#s7">Topic 7.3</a>, <a href="#s12">Topic 12.3</a></td></tr>
+  </tbody></table></div>
+  <p>What this tells you: the one paper in your file that tests this unit is a <b>2014-course Sem III paper</b>, whose questions mix JFET theory, a JFET design, a MOSFET Q-point numerical and D- vs E-MOSFET. The other papers in that file are for other subjects. No question there covered the CS/CD/CG derivations, FET frequency response, FET switches or power MOSFETs, but those are in your unit list, and the derivation style of Unit 1 suggests they will be asked as 10-mark questions. Topics 3, 5 and 9 are the highest-value ones to master.</p>
+  <h3>14.2 Formula sheet</h3>
+  <div class="tw"><table><thead><tr><th>Topic</th><th>Formulas</th></tr></thead><tbody>
+  <tr><td>JFET DC</td><td>I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)² · V<sub>GS</sub> = V<sub>P</sub>(1 − √(I<sub>D</sub>/I<sub>DSS</sub>)) · V<sub>G</sub> = V<sub>DD</sub>R<sub>2</sub>/(R<sub>1</sub>+R<sub>2</sub>) · V<sub>GS</sub> = V<sub>G</sub> − I<sub>D</sub>R<sub>S</sub> · V<sub>DS</sub> = V<sub>DD</sub> − I<sub>D</sub>(R<sub>D</sub>+R<sub>S</sub>)</td></tr>
+  <tr><td>JFET parameters</td><td>g<sub>m</sub> = ΔI<sub>D</sub>/ΔV<sub>GS</sub> · g<sub>m0</sub> = 2I<sub>DSS</sub>/|V<sub>P</sub>| · g<sub>m</sub> = g<sub>m0</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>) = g<sub>m0</sub>√(I<sub>D</sub>/I<sub>DSS</sub>) · r<sub>d</sub> = ΔV<sub>DS</sub>/ΔI<sub>D</sub> · μ = g<sub>m</sub>r<sub>d</sub></td></tr>
+  <tr><td>CS (JFET)</td><td>Bypassed: Z<sub>i</sub> ≈ R<sub>G</sub>, Z<sub>o</sub> = R<sub>D</sub>∥r<sub>d</sub>, A<sub>v</sub> = −g<sub>m</sub>(r<sub>d</sub>∥R<sub>D</sub>∥R<sub>L</sub>) · Unbypassed: Z<sub>d</sub> = r<sub>d</sub>(1+g<sub>m</sub>R<sub>S</sub>)+R<sub>S</sub>, Z<sub>o</sub> = R<sub>D</sub>∥Z<sub>d</sub>, A<sub>v</sub> ≈ −g<sub>m</sub>(R<sub>D</sub>∥R<sub>L</sub>)/(1+g<sub>m</sub>R<sub>S</sub>)</td></tr>
+  <tr><td>CD, CG</td><td>CD: A<sub>v</sub> = g<sub>m</sub>R<sub>S</sub>′/(1+g<sub>m</sub>R<sub>S</sub>′), R<sub>S</sub>′ = r<sub>d</sub>∥R<sub>S</sub>∥R<sub>L</sub>, Z<sub>o</sub> ≈ R<sub>S</sub>∥1/g<sub>m</sub> · CG: Z<sub>i</sub> ≈ R<sub>S</sub>∥1/g<sub>m</sub>, Z<sub>o</sub> = R<sub>D</sub>∥r<sub>d</sub>, A<sub>v</sub> = g<sub>m</sub>(r<sub>d</sub>∥R<sub>D</sub>∥R<sub>L</sub>)</td></tr>
+  <tr><td>JFET design</td><td>K<sub>1</sub> = (V<sub>DD</sub>−V<sub>DSQ</sub>)/I<sub>DQ</sub> = R<sub>D</sub>+R<sub>S</sub> · K = K<sub>1</sub>+1/g<sub>m</sub> · AR<sub>D</sub>² − [A(K−R<sub>L</sub>)−R<sub>L</sub>]R<sub>D</sub> − AKR<sub>L</sub> = 0 · V<sub>G</sub> = V<sub>GSQ</sub>+I<sub>DQ</sub>R<sub>S</sub> · R<sub>1</sub> = R<sub>G</sub>V<sub>DD</sub>/V<sub>G</sub> · R<sub>2</sub> = R<sub>G</sub>V<sub>DD</sub>/(V<sub>DD</sub>−V<sub>G</sub>)</td></tr>
+  <tr><td>FET frequency</td><td>C<sub>i</sub> = C<sub>gs</sub>+C<sub>gd</sub>(1+g<sub>m</sub>R<sub>L</sub>′) · f<sub>2</sub> ≈ 1/(2πR<sub>sig</sub>C<sub>i</sub>) · f<sub>T</sub> = g<sub>m</sub>/2π(C<sub>gs</sub>+C<sub>gd</sub>) · f<sub>CS</sub> = (1+g<sub>m</sub>R<sub>S</sub>)/(2πR<sub>S</sub>C<sub>S</sub>) · X<sub>C</sub> ≤ 0.1R rule</td></tr>
+  <tr><td>JFET switch</td><td>r<sub>ds</sub> = r<sub>ds0</sub>/(1−V<sub>GS</sub>/V<sub>P</sub>), r<sub>ds0</sub> ≈ |V<sub>P</sub>|/(2I<sub>DSS</sub>) · series V<sub>o</sub>/V<sub>i</sub> = R<sub>L</sub>/(R<sub>L</sub>+r<sub>ds</sub>)</td></tr>
+  <tr><td>MOSFET DC</td><td>V<sub>OV</sub> = V<sub>GS</sub>−V<sub>T</sub> · Triode I<sub>D</sub> = K<sub>n</sub>[V<sub>OV</sub>V<sub>DS</sub>−V<sub>DS</sub>²/2] · Sat I<sub>D</sub> = ½K<sub>n</sub>V<sub>OV</sub>²(1+λV<sub>DS</sub>) · R<sub>DS(on)</sub> ≈ 1/(K<sub>n</sub>V<sub>OV</sub>) · divider Q: (½K R<sub>S</sub>)x² + x − (V<sub>G</sub>−V<sub>T</sub>) = 0</td></tr>
+  <tr><td>MOSFET small-signal</td><td>g<sub>m</sub> = K<sub>n</sub>V<sub>OV</sub> = 2I<sub>D</sub>/V<sub>OV</sub> = √(2K<sub>n</sub>I<sub>D</sub>) · r<sub>o</sub> = 1/(λI<sub>D</sub>) · i<sub>d</sub> = g<sub>m</sub>v<sub>gs</sub> + v<sub>ds</sub>/r<sub>o</sub></td></tr>
+  <tr><td>MOSFET amps</td><td>CS: A<sub>v</sub> = −g<sub>m</sub>R<sub>D</sub>′/(1+g<sub>m</sub>R<sub>S</sub>) · R<sub>G</sub>/(R<sub>G</sub>+r<sub>s</sub>), Z<sub>i</sub> = R<sub>G</sub> · CD: A<sub>v</sub> = g<sub>m</sub>R′/(1+g<sub>m</sub>R′), R′ = R<sub>S</sub>∥R<sub>L</sub>, Z<sub>o</sub> ≈ 1/g<sub>m</sub> · CG: A<sub>v</sub> = g<sub>m</sub>R<sub>D</sub>′/(1+g<sub>m</sub>(r<sub>s</sub>∥R<sub>S</sub>)), Z<sub>i</sub> ≈ 1/g<sub>m</sub></td></tr>
+  <tr><td>MOSFET design</td><td>V<sub>OV</sub> = V<sub>DD</sub>/A<sub>v</sub> · I<sub>DQ</sub> = kV<sub>OV</sub>² · R<sub>D</sub> = 0.5V<sub>DD</sub>/I<sub>DQ</sub> · R<sub>S</sub> = 0.1V<sub>DD</sub>/I<sub>DQ</sub> · V<sub>G</sub> = V<sub>T</sub>+V<sub>OV</sub>+0.1V<sub>DD</sub> · C = 1/(2πf·0.1·R)</td></tr>
+  <tr><td>Switch and CMOS</td><td>NMOS NOT: V<sub>out</sub> = V·r<sub>DS</sub>/(R+r<sub>DS</sub>) · PMOS NOT: V·R/(R+r<sub>DS</sub>) · CMOS: P<sub>static</sub> = 0, P<sub>dyn</sub> = C<sub>L</sub>V<sub>DD</sub>²f, t ≈ 0.69R<sub>on</sub>C<sub>L</sub></td></tr>
+  <tr><td>Power MOSFET</td><td>P<sub>cond</sub> = D·I<sub>D</sub>²R<sub>DS(on)</sub> · E<sub>sw</sub> = ½V<sub>DS</sub>I<sub>D</sub>t<sub>sw</sub> · P<sub>sw</sub> = f<sub>s</sub>(E<sub>on</sub>+E<sub>off</sub>) · P<sub>gate</sub> = Q<sub>g</sub>V<sub>drive</sub>f<sub>s</sub> · T<sub>J</sub> = T<sub>A</sub>+P<sub>loss</sub>R<sub>θJA</sub></td></tr>
+  </tbody></table></div>
+  <footer>Built from Prof. Dr R. B. Ghongade’s Unit 2 notes (JFET and MOSFET parts) and your Summer 2019 paper. Parts marked “not in notes” are standard textbook theory added to cover your topic list. Send Unit 3 topics and notes and the same format continues.</footer>
+</section>
+</main>
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const par=(a,b)=>a*b/(a+b);
+const F=n=>Math.round(n*10)/10;
+const LOG=Math.log10;
+
+/* ---------- number / text helpers ---------- */
+function fmt3(x){return String(parseFloat(Number(x).toPrecision(3)));}
+function eng(v,u){
+  u=u||'';
+  if(!isFinite(v))return '—';
+  if(v===0)return '0 '+u;
+  const a=Math.abs(v),P=[[1e9,'G'],[1e6,'M'],[1e3,'k'],[1,''],[1e-3,'m'],[1e-6,'µ'],[1e-9,'n'],[1e-12,'p']];
+  for(const [m,s] of P){if(a>=m*0.9995)return fmt3(v/m)+' '+s+u;}
+  return v.toExponential(2)+' '+u;
+}
+function mk(s){
+  s=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function rBraced(str,cmd,f){
+    const p='\\'+cmd+'{';let idx;
+    while((idx=str.indexOf(p))!==-1){
+      const st=idx+p.length;let c=1,i=st;
+      while(i<str.length&&c>0){if(str[i]==='{')c++;else if(str[i]==='}')c--;i++;}
+      if(c===0){str=str.slice(0,idx)+f(str.slice(st,i-1))+str.slice(i);}else break;
+    }
+    return str;
+  }
+  s=rBraced(s,'text',x=>x);
+  s=rBraced(s,'mathbf',x=>'<b>'+x+'</b>');
+  s=rBraced(s,'sqrt',x=>'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">'+x+'</span></span>');
+  s=s.replace(/\\sqrt\s*(\d+)/g,'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">$1</span></span>');
+  
+  // Frac
+  let prev;
+  do{prev=s;s=s.replace(/_\{([^{}]+)\}/g,'<sub>$1</sub>').replace(/\^\{([^{}]+)\}/g,'<sup>$1</sup>');}while(s!==prev);
+  do{prev=s;s=s.replace(/\[\[([^\[\]|]+)\|([^\[\]]+)\]\]/g,'<span class="frac"><span>$1</span><span>$2</span></span>');}while(s!==prev);
+  s=s.replace(/\\left\s*([(\[{|])/g,'$1').replace(/\\right\s*([)\]}|])/g,'$1')
+     .replace(/\\left\b/g,'').replace(/\\right\b/g,'')
+     .replace(/\\implies\b/g,'&rArr;')
+     .replace(/\\approx\b/g,'&approx;')
+     .replace(/\\times\b/g,'&times;')
+     .replace(/\\cdot\b/g,'&middot;')
+     .replace(/\\Omega\b/g,'&Omega;')
+     .replace(/\\mu\b/g,'&mu;')
+     .replace(/\\pi\b/g,'&pi;')
+     .replace(/\\theta\b/g,'&theta;')
+     .replace(/\\eta\b/g,'&eta;')
+     .replace(/\\omega\b/g,'&omega;')
+     .replace(/\\ge\b/g,'&ge;')
+     .replace(/\\le\b/g,'&le;')
+     .replace(/\\pm\b/g,'&plusmn;')
+     .replace(/\\circ\b/g,'&deg;')
+     .replace(/\\dots\b/g,'&hellip;')
+     .replace(/\\quad\b/g,' ')
+     .replace(/\\qquad\b/g,'  ')
+     .replace(/\\parallel\b/g,'||')
+     .replace(/\\%/g,'%');
+  return s;
+}
+function mathify(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    if(!/_\{|\^\{|\[\[|\\sqrt|\\frac|\\implies|\\times|\\approx|\\mathbf|\\text|\\Omega|\\mu|\\le|\\ge|\\pi|&radic;|√/.test(n.nodeValue))return NodeFilter.FILTER_REJECT;
+    for(let p=n.parentNode;p&&p!==root;p=p.parentNode){const t=p.nodeName.toLowerCase();
+      if(t==='svg'||t==='script'||t==='style'||t==='textarea'||t==='input'||t==='option')return NodeFilter.FILTER_REJECT;}
+    return NodeFilter.FILTER_ACCEPT;}});
+  const list=[];while(w.nextNode())list.push(w.currentNode);
+  list.forEach(n=>{const sp=document.createElement('span');sp.innerHTML=mk(n.nodeValue);n.replaceWith(...sp.childNodes);});
+}
+
+/* ---------- SVG symbol library ---------- */
+const tx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/_\{([^{}]+)\}/g,'<tspan dy="3" font-size="9">$1</tspan><tspan dy="-3">​</tspan>');
+const W=(d,c)=>`<path${c?` class="${c}"`:''} d="${d}"/>`;
+const T=(x,y,s,c,a)=>`<text x="${x}" y="${y}" text-anchor="${a||'middle'}"${c?` class="${c}"`:''}>${tx(s)}</text>`;
+const dot=(x,y)=>`<circle class="dot" cx="${x}" cy="${y}" r="3"/>`;
+const term=(x,y)=>`<circle class="node" cx="${x}" cy="${y}" r="3.6"/>`;
+const G=(x,y,rot,inner)=>`<g transform="translate(${x} ${y})${rot?` rotate(${rot})`:''}">${inner}</g>`;
+function zig(len){const lead=8,n=3,seg=(len-2*lead)/(2*n);let d=`M0,0H${lead}`;for(let k=1;k<2*n;k++)d+=`L${F(lead+k*seg)},${k%2?-6:6}`;return d+`L${F(len-lead)},0H${len}`;}
+const R=(x,y,len,rot,c)=>G(x,y,rot||0,W(zig(len),c));
+const C=(x,y,len,rot,c)=>G(x,y,rot||0,W(`M0,0H${len/2-3}M${len/2-3},-10V10M${len/2+3},-10V10M${len/2+3},0H${len}`,c));
+const ACS=(x,y)=>`<circle class="sym" cx="${x}" cy="${y}" r="13"/>`+G(x,y,0,W('M-7,0q3.5,-8 7,0t7,0'));
+const VSRC=(x,y)=>`<polygon points="${x},${y-15} ${x+15},${y} ${x},${y+15} ${x-15},${y}"/>`+T(x,y-2,'+','s')+T(x,y+11,'−','s');
+const ISRC=(x,y,dir)=>`<polygon points="${x},${y-15} ${x+15},${y} ${x},${y+15} ${x-15},${y}"/>`+G(x,y,dir==='up'?180:0,W('M0,-8V8M-3.5,3L0,8L3.5,3'));
+const CSRC=(x,y,right)=>`<circle class="sym" cx="${x}" cy="${y}" r="14"/>`+G(x,y,0,W(right?'M-7,0H7M2,-4L7,0L2,4':'M7,0H-7M-2,-4L-7,0L-2,4'));
+const GND=(x,y)=>G(x,y,0,W('M0,0V6M-9,6H9M-5,10H5M-2,14H2'));
+const NPN=(x,y)=>G(x,y,0,W('M-30,0H0M0,-16V16M0,-8L18,-20V-40M0,8L18,20V40')+W('M17,19.4L8.4,17.9L12.3,12Z','fl'));
+function ARW(x1,y1,x2,y2,c){const a=Math.atan2(y2-y1,x2-x1),h=7;
+  const p1=[x2-h*Math.cos(a-0.4),y2-h*Math.sin(a-0.4)],p2=[x2-h*Math.cos(a+0.4),y2-h*Math.sin(a+0.4)];
+  return W(`M${x1},${y1}L${x2},${y2}M${F(p1[0])},${F(p1[1])}L${x2},${y2}L${F(p2[0])},${F(p2[1])}`,c);}
+const SVG=(w,h,inner,label)=>`<svg class="dg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${inner}</svg>`;
+function sine(x0,x1,yc,amp,phase,cycles,cls){let d='';for(let i=0;i<=160;i++){const x=x0+(x1-x0)*i/160,y=yc-amp*Math.sin(2*Math.PI*cycles*(x-x0)/(x1-x0)+phase);d+=(i?'L':'M')+F(x)+','+F(y);}return W(d,cls);}
+
+/* ---------- diagrams ---------- */
+const DG={};
+const WID={};
+function niceStep(max,n){const raw=max/n,m=Math.pow(10,Math.floor(LOG(raw))),f=raw/m;return (f<1.5?1:f<3?2:f<7?5:10)*m;}
+function freqPlot(Am,fL,fH){
+  const W0=620,H0=320,L=54,Rr=16,Tp=18,B=48,pw=W0-L-Rr,ph=H0-Tp-B,ymax=Am+8,ymin=Am-46;
+  const X=f=>L+LOG(f)/8*pw,Y=g=>Tp+ph-(g-ymin)/(ymax-ymin)*ph,gain=f=>Am-10*LOG(1+Math.pow(fL/f,2))-10*LOG(1+Math.pow(f/fH,2));
+  let s='';const lab=['1','10','100','1k','10k','100k','1M','10M','100M'];
+  for(let k=0;k<=8;k++)s+=W(`M${F(L+k*pw/8)},${Tp}V${Tp+ph}`,'thin')+T(F(L+k*pw/8),Tp+ph+16,lab[k],'s');
+  for(let g=Math.ceil(ymin/10)*10;g<=ymax;g+=10)s+=W(`M${L},${F(Y(g))}H${L+pw}`,'thin')+T(L-6,F(Y(g))+4,g,'s','end');
+  s+=W(`M${F(X(fL))},${F(Y(Am-3))}H${F(X(fH))}V${Tp+ph}H${F(X(fL))}Z`,'shade');
+  s+=W(`M${L},${F(Y(Am))}H${L+pw}`,'dc dash');
+  let d='';for(let k=0;k<=320;k++){const f=Math.pow(10,k/40);d+=(k?'L':'M')+F(X(f))+','+F(Math.min(Tp+ph,Math.max(Tp,Y(gain(f)))));}
+  s+=W(d,'ac2');
+  s+=W(`M${L},${F(Y(Am-3))}H${L+pw}`,'thin dash')+`<circle class="q" cx="${F(X(fL))}" cy="${F(Y(Am-3))}" r="4.5"/><circle class="q" cx="${F(X(fH))}" cy="${F(Y(Am-3))}" r="4.5"/>`;
+  s+=T(F(X(fL)),Tp+ph-8,'f_{1}','b')+T(F(X(fH)),Tp+ph-8,'f_{2}','b');
+  s+=T(F((X(fL)+X(fH))/2),F(Y(Am))-8,'mid-band A_{v(max)}','dc')+T(F((X(fL)+X(fH))/2),F(Y(Am-3))+16,'bandwidth','s')+T(L+pw-4,F(Y(Am-3))-6,'−3 dB','s','end');
+  s+=T(F(X(1))+6,Tp+14,'dashed orange: ideal amplifier','s','start');
+  s+=W(`M${L},${Tp}V${Tp+ph}H${L+pw}`)+T(L+pw/2,Tp+ph+36,'frequency (Hz, log scale)')+`<text transform="rotate(-90)" x="${-(Tp+ph/2)}" y="14" text-anchor="middle">gain (dB)</text>`;
+  return SVG(W0,H0,s,'Frequency response curve');
+}
+/* ---------- widget builder ---------- */
+const cells=a=>a.map(x=>x.warn?`<div class="warn">${mk(x.warn)}</div>`:x.note?`<div class="note">${mk(x.note)}</div>`:`<div><small>${mk(x.k)}</small><b>${x.v}</b></div>`).join('');
+function widget(host,o){
+  host.className='widget';
+  host.innerHTML=`<span class="wlabel">Try it</span> <b>${mk(o.title)}</b>${o.intro?`<p style="margin:.3rem 0;font-size:.88rem;color:var(--muted)">${mk(o.intro)}</p>`:''}<div class="wgrid"></div><div class="wfig"></div><div class="res"></div>`;
+  const g=$('.wgrid',host),fig=$('.wfig',host),res=$('.res',host),els={};
+  o.fields.forEach(f=>{
+    const id=host.dataset.w+'_'+f.id,d=document.createElement('div');d.className='fld';let ctl;
+    if(f.type==='sel')ctl=`<select id="${id}">${f.opts.map(([v,l])=>`<option value="${v}"${String(v)===String(f.val)?' selected':''}>${l}</option>`).join('')}</select>`;
+    else if(f.type==='range'||f.type==='log')ctl=`<input id="${id}" type="range" min="${f.min}" max="${f.max}" step="${f.step||'any'}" value="${f.type==='log'?LOG(f.val):f.val}"><output id="${id}_o"></output>`;
+    else ctl=`<input id="${id}" type="number" inputmode="decimal" min="0" step="any" value="${f.val}"><span class="u">${mk(f.unit||'')}</span>`;
+    d.innerHTML=`<label for="${id}">${mk(f.label)}</label><div class="row">${ctl}</div>`;g.appendChild(d);els[f.id]=$('#'+id,d);
+  });
+  function update(){
+    const v={};
+    o.fields.forEach(f=>{const e=els[f.id];let x;
+      if(f.type==='sel'){x=e.value;if(x!==''&&!isNaN(+x))x=+x;}
+      else if(f.type==='log')x=Math.pow(10,+e.value);
+      else{x=parseFloat(e.value);if(isNaN(x))x=0;x*=(f.scale||1);}
+      v[f.id]=x;
+      if(f.type==='range'||f.type==='log'){$('#'+e.id+'_o',host).textContent=f.fmt?f.fmt(x):x;}
+    });
+    if(o.figure)fig.innerHTML=o.figure(v);
+    res.innerHTML=cells(o.run(v));
+  }
+  host.addEventListener('input',update);update();
+}
+const YN=[[1,'Yes, bypassed'],[0,'No, not bypassed']];
+const pill=(t,c)=>`<span class="pill" style="background:${c}">${t}</span>`;
+
+/* ================= UNIT 2 : new symbols, diagrams, widgets ================= */
+const FILL=(d,c,o)=>`<path d="${d}" style="fill:var(${c});opacity:${o||.3};stroke:none"/>`;
+const RECT=(x,y,w,h,c,o)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" style="fill:var(${c||'--surface2'});opacity:${o||1};stroke:var(--line)"/>`;
+const JF=(x,y)=>G(x,y,0,W('M-30,0H-9')+W('M-9,-4.5L-9,4.5L-1,0Z','fl')+W('M0,-22V22M0,-18H18V-40M0,18H18V40'));
+const MF=(x,y,p)=>G(x,y,0,W(p?'M-30,0H-16':'M-30,0H-9')+(p?'<circle class="sym" cx="-12.5" cy="0" r="3.5"/>':'')+W('M-8,-16V16')+W('M0,-20V-10M0,-4V4M0,10V20')+W('M0,-15H18V-40M0,15H18V40M0,0H18V15')+W(p?'M13,-4L18,0L13,4':'M5,-4L0,0L5,4'));
+function xy(o){
+  const W0=o.w||560,H0=o.h||300,L=60,Rr=18,Tp=16,B=46,pw=W0-L-Rr,ph=H0-Tp-B,x0=o.x0||0,x1=o.x1,y0=o.y0||0,y1=o.y1;
+  const X=v=>L+(v-x0)/(x1-x0)*pw,Y=v=>Tp+ph-(v-y0)/(y1-y0)*ph,sx=o.sx||niceStep(x1-x0,7),sy=o.sy||niceStep(y1-y0,6);let s='';
+  for(let v=Math.ceil(x0/sx-1e-9)*sx;v<=x1+1e-9;v+=sx)s+=W(`M${F(X(v))},${Tp}V${Tp+ph}`,'thin')+T(F(X(v)),Tp+ph+16,fmt3(v),'s');
+  for(let v=Math.ceil(y0/sy-1e-9)*sy;v<=y1+1e-9;v+=sy)s+=W(`M${L},${F(Y(v))}H${L+pw}`,'thin')+T(L-8,F(Y(v))+4,fmt3(v),'s','end');
+  (o.curves||[]).forEach(c=>{let d='';c.pts.forEach((p,i)=>{d+=(i?'L':'M')+F(X(p[0]))+','+F(Y(p[1]));});s+=W(d,c.cls||'ac');});
+  (o.marks||[]).forEach(m=>{s+=`<circle class="${m.cls||'q'}" cx="${F(X(m.x))}" cy="${F(Y(m.y))}" r="5"/>`;});
+  (o.texts||[]).forEach(t=>{s+=T(F(X(t.x))+(t.dx||0),F(Y(t.y))+(t.dy||0),t.s,t.cls,t.a);});
+  s+=W(`M${L},${Tp}V${Tp+ph}H${L+pw}`)+T(L+pw/2,H0-8,o.xl||'')+`<text transform="rotate(-90)" x="${-(Tp+ph/2)}" y="16" text-anchor="middle">${tx(o.yl||'')}</text>`;
+  return SVG(W0,H0,s,o.label||'plot');
+}
+const sweep=(a,b,n,f)=>{const r=[];for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;r.push([x,f(x)]);}return r;};
+
+/* ---- circuits generated from the Unit 1 BJT drawings by swapping the symbol ---- */
+const csCkt=(SYM)=>{let s='';
+  s+=W('M120,30H440')+T(452,34,'+V_{DD}','b','start')+dot(170,30)+dot(318,30);
+  s+=R(170,30,80,90)+W('M170,110V150')+dot(170,150)+R(170,150,80,90)+W('M170,230V300');
+  s+=W('M40,150H90')+C(90,150,40,0)+W('M130,150H270');
+  s+=R(40,190,40,270)+W('M40,190V217')+ACS(40,230)+W('M40,243V300');
+  s+=SYM(300,150);
+  s+=R(318,30,60,90)+W('M318,90V110')+dot(318,100)+W('M318,100H360')+C(360,100,40,0)+W('M400,100H480')+dot(450,100)+term(480,100);
+  s+=R(450,100,100,90)+W('M450,200V300');
+  s+=W('M318,190V210')+dot(318,210)+R(318,210,70,90)+W('M318,280V300')+W('M318,210H360')+C(360,210,40,90)+W('M360,250V300');
+  s+=W('M40,300H450')+GND(245,300)+dot(170,300)+dot(318,300)+dot(360,300)+dot(450,300);
+  s+=T(188,74,'R_{1}','','start')+T(188,198,'R_{2}','','start')+T(336,66,'R_{D}','','start')+T(300,254,'R_{S}','','end')+T(374,234,'C_{S} (bypass)','s','start')
+    +T(110,134,'C_{1}')+T(380,82,'C_{3}')+T(466,158,'R_{L}','','start')+T(56,174,'r_{s}','','start')+T(24,234,'V_{s}','','end')+T(494,104,'V_{o}','b','start');
+  return SVG(560,330,s,'CS amplifier with voltage divider bias');};
+
+function ceAC(unb){let s='';
+  s+=ACS(30,205)+W('M30,192V150')+R(30,150,60,0)+W('M90,150H270')+dot(130,150)+dot(190,150)+W('M30,218V260');
+  s+=R(130,150,110,90)+R(190,150,110,90)+W('M30,260H480')+GND(230,260)+dot(130,260)+dot(190,260);
+  s+=SYM(300,150);
+  s+=unb?(R(318,190,70,90)+T(300,230,'R_{S}','','end')):W('M318,190V260');
+  s+=W('M318,110V100')+dot(318,100)+W('M318,100H480')+dot(380,100)+dot(440,100)+R(380,100,160,90)+R(440,100,160,90)+dot(318,260)+dot(380,260)+dot(440,260)+term(480,100);
+  s+=T(60,138,'r_{s}')+T(14,209,'V_{s}','','end')+T(160,140,'V_{i}','b')+T(146,200,'R_{1}','','start')+T(206,200,'R_{2}','','start')+T(396,186,'R_{D}','','start')+T(456,186,'R_{L}','','start')+T(498,104,'V_{o}','b','start')+T(232,142,'i_{b} →','s')+T(330,90,'i_{c} ↓','s','start');
+  s+=T(380,284,unb?'AC equivalent, R_{S} not bypassed':'AC equivalent, R_{S} bypassed (emitter grounded)','s');
+  return SVG(560,300,s,unb?'AC equivalent of CS amplifier, unbypassed RE':'AC equivalent of CS amplifier, bypassed RE');}
+const cdCkt=(SYM)=>{let s='';
+  s+=W('M120,30H320')+T(340,34,'+V_{DD}','b','start')+dot(140,30)+dot(288,30);
+  s+=R(140,30,80,90)+W('M140,110V150')+dot(140,150)+R(140,150,80,90)+W('M140,230V300');
+  s+=W('M140,150H240')+SYM(270,150)+W('M288,110V30');
+  s+=W('M40,150H90')+C(90,150,40,0)+W('M130,150H140')+R(40,190,40,270)+W('M40,190V222')+ACS(40,235)+W('M40,248V300');
+  s+=W('M288,190V200')+dot(288,200)+R(288,200,100,90)+W('M288,200H330')+C(330,200,40,0)+W('M370,200H460')+dot(420,200)+R(420,200,100,90)+term(460,200);
+  s+=W('M40,300H420')+GND(230,300)+dot(140,300)+dot(288,300)+dot(420,300);
+  s+=T(158,74,'R_{1}','','start')+T(158,198,'R_{2}','','start')+T(306,250,'R_{S}','','start')+T(110,134,'C_{1}')+T(350,188,'C_{2}')+T(438,254,'R_{L}','','start')+T(56,174,'r_{s}','','start')+T(24,239,'V_{s}','','end')+T(474,204,'V_{o}','b','start');
+  s+=T(304,76,'drain at AC ground','s','start');
+  return SVG(540,330,s,'Common drain amplifier circuit');};
+const cgCkt=(SYM)=>{let s='';
+  s+=W('M70,30H440')+T(452,34,'+V_{DD}','b','start')+dot(70,30)+dot(288,30);
+  s+=R(70,30,80,90)+W('M70,110V150')+dot(70,150)+R(70,150,80,90)+W('M70,230V300')+dot(70,300);
+  s+=W('M70,150H240')+dot(120,150)+C(120,150,60,90)+W('M120,210V300')+dot(120,300);
+  s+=SYM(270,150);
+  s+=R(288,30,60,90)+W('M288,90V110')+dot(288,100)+W('M288,100H330')+C(330,100,40,0)+W('M370,100H460')+dot(420,100)+R(420,100,110,90)+W('M420,210V300')+term(460,100);
+  s+=W('M288,190V200')+dot(288,200)+R(288,200,90,90)+W('M288,290V300')+dot(288,300)+W('M288,200H250')+C(210,200,40,0)+W('M210,200H180')+R(180,200,50,90)+W('M180,250V265')+ACS(180,278)+W('M180,291V300')+dot(180,300);
+  s+=W('M70,300H420')+GND(350,300)+dot(420,300);
+  s+=T(88,74,'R_{1}','','start')+T(88,198,'R_{2}','','start')+T(138,190,'C_{1}','','start')+T(306,64,'R_{D}','','start')+T(306,252,'R_{S}','','start')+T(230,188,'C_{2}')+T(350,88,'C_{3}')+T(438,160,'R_{L}','','start')+T(198,232,'r_{s}','','start')+T(160,282,'V_{s}','','end')+T(474,104,'V_{o}','b','start');
+  s+=T(138,134,'gate grounded for AC','s','start');
+  return SVG(540,330,s,'Common gate amplifier circuit');};
+
+DG.csJfet=()=>csCkt(JF);  DG.csMos=()=>csCkt(MF);
+DG.cdJfet=()=>cdCkt(JF);  DG.cdMos=()=>cdCkt(MF);
+DG.cgJfet=()=>cgCkt(JF);  DG.cgMos=()=>cgCkt(MF);
+
+DG.jfetStruct=()=>{let s='';
+  s+=RECT(60,100,380,70,'--fill')+RECT(130,50,240,50)+RECT(130,170,240,50);
+  s+=FILL('M130,100H370V128L130,112Z','--bad',.3)+FILL('M130,170H370V142L130,158Z','--bad',.3);
+  s+=W('M60,135H20')+W('M440,135H480')+W('M250,50V28')+W('M250,220V240H130V50','thin');
+  s+=T(14,128,'S','b')+T(488,128,'D','b')+T(250,20,'G','b');
+  s+=T(250,80,'p⁺ gate','s')+T(250,205,'p⁺ gate','s')+T(250,140,'n-type channel (carriers flow S → D)','s');
+  s+=T(160,100,'','s')+T(300,115,'depletion','s','start')+T(70,160,'wide channel','s','start')+T(372,160,'pinching','s','end');
+  s+=ARW(100,135,150,135)+T(125,125,'I_{D}','s');
+  s+=T(250,262,'More negative V_{GS} → thicker depletion layers → narrower channel → smaller I_{D}','s');
+  return SVG(520,276,s,'n-channel JFET cross-section');};
+
+DG.jfetChar=()=>{
+  const IDSS=8,VP=-4,vg=[0,-1,-2,-3],cv=[];
+  vg.forEach(v=>{const vsat=v-VP,pts=[];for(let k=0;k<=96;k++){const d=k/4;let i;
+      if(d<vsat)i=IDSS*(2*(1-v/VP)*(d/-VP)-Math.pow(d/VP,2));else i=IDSS*Math.pow(1-v/VP,2)*(1+(d-vsat)/120);
+      if(v===0&&d>20)i+= Math.pow(d-20,2)*1.2;pts.push([d,i]);}cv.push({pts,cls:'ac2'});});
+  cv.push({pts:sweep(0,4,40,d=>IDSS*Math.pow(d/4,2)),cls:'dc dash'});
+  const out=xy({x1:24,y1:12,sx:4,sy:2,xl:'V_{DS} (V)',yl:'I_{D} (mA)',curves:cv,w:520,h:290,label:'JFET drain characteristics',
+    texts:[{x:24,y:8.3,s:'V_{GS} = 0',cls:'s',a:'end',dy:-8},{x:24,y:4.7,s:'−1 V',cls:'s',a:'end',dy:-6},{x:24,y:2.1,s:'−2 V',cls:'s',a:'end',dy:-6},{x:24,y:0.6,s:'−3 V',cls:'s',a:'end',dy:-6},
+      {x:1.2,y:10,s:'OHMIC',cls:'b',a:'start'},{x:10,y:10,s:'ACTIVE (amplifier)',cls:'b',a:'start'},{x:5.7,y:6.2,s:'pinch-off locus',cls:'dc',a:'start',dx:4},{x:20,y:11.4,s:'breakdown',cls:'bad',a:'start',dx:-30}]});
+  const tr=xy({x0:-5,x1:0,y1:9,sx:1,sy:2,xl:'V_{GS} (V)',yl:'I_{D} (mA)',w:460,h:290,label:'JFET transfer characteristic',
+    curves:[{pts:sweep(-4,0,60,v=>IDSS*Math.pow(1-v/VP,2)),cls:'ac'}],marks:[{x:0,y:IDSS,cls:'node'},{x:-4,y:0,cls:'node'}],
+    texts:[{x:-3.9,y:0,s:'V_{P} = V_{GS(off)}',cls:'s',a:'start',dy:-12},{x:-0.1,y:8,s:'I_{DSS}',cls:'s',a:'end',dy:-10},{x:-2.5,y:5,s:'I_{D} = I_{DSS}(1 − V_{GS}/V_{P})²',cls:'s',a:'start'}]});
+  return `<div class="two">${out}${tr}</div>`;};
+
+DG.jfetModel=()=>{let s='';
+  s+=term(40,110)+W('M40,110H120')+dot(120,110)+R(120,110,100,90)+dot(120,210)+W('M40,210H420')+term(40,210);
+  s+=W('M120,110H420')+dot(220,110)+W('M220,110V145')+ISRC(220,160,'down')+W('M220,175V210')+dot(220,210)+R(320,110,100,90)+dot(320,110)+dot(320,210)+term(420,110)+term(420,210);
+  s+=T(40,98,'G')+T(40,232,'S')+T(420,98,'D')+T(420,232,'S')+T(136,168,'R_{GS}','','start')+T(238,164,'g_{m}v_{gs}','','start')+T(336,168,'r_{d}','','start')+T(72,98,'i_{g} ≈ 0','s');
+  s+=ARW(22,206,22,114)+T(14,164,'v_{gs}','','end')+ARW(450,114,450,206)+T(458,164,'v_{ds}','','start');
+  s+=T(230,250,'R_{GS} is very large (reverse-biased gate junction). The current source pushes g_{m}v_{gs} from drain to source.','s');
+  return SVG(520,266,s,'JFET low-frequency small-signal model');};
+
+DG.mosModel=()=>{let s='';
+  s+=term(60,110)+term(60,210)+W('M60,210H400')+ARW(36,206,36,114)+T(28,164,'v_{gs}','','end')+T(60,98,'G')+T(60,232,'S');
+  s+=T(110,110,'open: i_{g} = 0','s','start');
+  s+=W('M180,110H400')+dot(180,110)+dot(180,210)+W('M180,110V145')+ISRC(180,160,'down')+W('M180,175V210')+R(290,110,100,90)+dot(290,110)+dot(290,210)+term(400,110)+term(400,210);
+  s+=T(198,164,'g_{m}v_{gs}','','start')+T(306,168,'r_{o}','','start')+T(400,98,'D')+T(400,232,'S')+ARW(430,114,430,206)+T(438,164,'v_{ds}','','start');
+  s+=T(230,250,'Gate is insulated, so no resistor from G to S. Current: i_{d} = g_{m}v_{gs} + v_{ds}/r_{o}','s');
+  return SVG(500,266,s,'MOSFET small-signal model');};
+
+DG.csAC1=()=>csAC(false);DG.csAC2=()=>csAC(true);
+function csAC(unb){let s='';const yS=unb?225:270;
+  s+=ACS(30,225)+W('M30,212V150')+R(30,150,60,0)+W('M90,150H260')+dot(130,150)+R(130,150,120,90)+W('M30,238V270')+term(260,150);
+  s+=R(260,150,yS-150,90)+W(`M130,270H600`)+W('M30,270H130')+dot(130,270);
+  s+=W('M340,100H600')+W('M340,100V135')+ISRC(340,150,'down')+W(`M340,165V${yS}`)+R(400,100,yS-100,90)+R(460,100,170,90)+R(520,100,170,90)+dot(340,100)+dot(400,100)+dot(460,100)+dot(520,100);
+  if(unb){s+=W(`M260,${yS}H430`)+dot(340,yS)+dot(400,yS)+R(430,yS,45,90)+dot(460,270)+W('M460,270V270');}
+  else s+=W('M260,270V270')+dot(260,270)+dot(340,270)+dot(400,270);
+  s+=dot(460,270)+dot(520,270)+term(600,100);
+  s+=T(60,138,'r_{s}')+T(14,233,'V_{s}','','end')+T(112,208,'R_{G}','','start')+T(276,210,'R_{GS}','','start')+T(356,166,'g_{m}v_{gs}','','start')+T(416,200,'r_{d}','','start')+T(476,200,'R_{D}','','start')+T(536,200,'R_{L}','','start')+T(618,104,'V_{o}','b','start')+T(260,138,'G')+T(340,90,'D');
+  if(unb)s+=T(448,252,'R_{S}','','start');
+  s+=T(330,292,unb?'AC equivalent, R_{S} not bypassed (source degeneration)':'AC equivalent, R_{S} bypassed (source at AC ground)','s');
+  return SVG(680,306,s,unb?'CS small-signal equivalent unbypassed RS':'CS small-signal equivalent bypassed RS');}
+
+DG.cdAC=()=>{let s='';
+  s+=ACS(30,205)+W('M30,192V150')+R(30,150,60,0)+W('M90,150H230')+dot(130,150)+R(130,150,110,90)+W('M30,218V260')+W('M30,260H620')+dot(130,260)+term(230,150)+term(330,150);
+  s+=ARW(236,134,324,134)+T(280,124,'v_{gs}')+T(230,170,'G','s')+T(330,170,'S','s');
+  s+=W('M330,150H620')+dot(380,150)+dot(440,150)+dot(500,150)+dot(560,150)+W('M380,150V165')+ISRC(380,180,'up')+W('M380,195V260')+R(440,150,110,90)+R(500,150,110,90)+R(560,150,110,90)+dot(380,260)+dot(440,260)+dot(500,260)+dot(560,260)+term(620,150);
+  s+=T(60,138,'r_{s}')+T(14,213,'V_{s}','','end')+T(146,208,'R_{G}','','start')+T(396,204,'g_{m}v_{gs}','','start')+T(456,200,'r_{d}','','start')+T(516,200,'R_{S}','','start')+T(576,200,'R_{L}','','start')+T(636,154,'V_{o}','b','start')+T(380,288,'drain = AC ground; output at the source','s','start');
+  return SVG(700,304,s,'CD small-signal equivalent');};
+
+DG.cgAC=()=>{let s='';
+  s+=ACS(30,235)+W('M30,222V210')+R(30,210,60,0)+W('M90,210H260')+dot(130,210)+R(130,210,60,90)+W('M30,248V270')+W('M30,270H560')+dot(130,270);
+  s+=term(260,210)+W('M260,210H360')+W('M300,90V105')+ISRC(300,120,'down')+W('M300,135V210')+dot(300,210)+W('M300,90H560')+dot(300,90)+dot(360,90)+R(360,90,120,90)+dot(360,210)+R(430,90,180,90)+R(490,90,180,90)+dot(430,90)+dot(490,90)+dot(430,270)+dot(490,270)+term(560,90);
+  s+=T(260,230,'S','s')+T(300,70,'D','s')+T(60,198,'r_{s}')+T(14,243,'V_{s}','','end')+T(146,250,'R_{S}','','start')+T(316,168,'g_{m}v_{gs}','','start')+T(376,160,'r_{d}','','start')+T(446,190,'R_{D}','','start')+T(506,190,'R_{L}','','start')+T(576,94,'V_{o}','b','start');
+  s+=T(330,292,'gate at AC ground: v_{gs} = −v_{i}, so the current gm·vi flows up into the output','s');
+  return SVG(640,306,s,'CG small-signal equivalent');};
+
+DG.fetHF=()=>{let s='';
+  s+=ACS(30,225)+W('M30,212V150')+R(30,150,60,0)+W('M90,150H230')+term(230,150)+C(230,150,110,90)+W('M30,238V260')+W('M30,260H560')+dot(230,260);
+  s+=W('M230,150V70H290')+C(290,70,40,0)+W('M330,70H340V100')+W('M340,100H560')+dot(340,100)+W('M340,100V135')+ISRC(340,150,'down')+W('M340,165V260')+dot(340,260);
+  s+=C(400,100,160,90)+R(460,100,160,90)+R(520,100,160,90)+dot(400,100)+dot(460,100)+dot(520,100)+dot(400,260)+dot(460,260)+dot(520,260)+term(560,100);
+  s+=T(60,138,'r_{s}')+T(14,233,'V_{s}','','end')+T(246,206,'C_{gs}','','start')+T(310,56,'C_{gd}')+T(356,166,'g_{m}v_{gs}','','start')+T(416,200,'C_{ds}','','start')+T(476,200,'r_{d}','','start')+T(536,200,'R_{L}′','','start')+T(578,104,'V_{o}','b','start')+T(230,138,'G','s')+T(340,90,'D','s');
+  s+=T(300,286,'High-frequency model. C_{gd} bridges input and output → Miller effect.','s');
+  return SVG(620,300,s,'FET high-frequency model');};
+
+DG.fetSwitch=()=>{let s='';
+  s+=term(40,60)+W('M40,60H110')+R(110,60,90,0)+ARW(120,82,190,40)+W('M200,60H300')+dot(300,60)+R(300,60,90,90)+GND(300,150)+W('M300,60H350')+term(350,60);
+  s+=T(40,48,'V_{in}','b')+T(155,40,'r_{ds}','s')+T(155,106,'FET channel, set by V_{GS}','s')+T(318,112,'R_{L}','','start')+T(350,48,'V_{out}','b')+T(190,22,'SERIES switch: ON → V_{out} ≈ V_{in}, OFF → V_{out} ≈ 0','s');
+  s+=term(40,220)+W('M40,220H110')+R(110,220,90,0)+W('M200,220H230')+dot(230,220)+R(230,220,70,90)+GND(230,290)+W('M230,220H350')+term(350,220);
+  s+=ARW(247,240,247,285)+T(40,208,'V_{in}','b')+T(155,208,'R_{s}','s')+T(262,258,'r_{ds}','','start')+T(350,208,'V_{out}','b')+T(190,190,'SHUNT switch: ON → V_{out} ≈ 0 (grounded), OFF → V_{out} ≈ V_{in}','s');
+  return SVG(500,310,s,'Series and shunt FET switches');};
+
+DG.mosStruct=()=>mosStruct(false);DG.dmosStruct=()=>mosStruct(true);
+function mosStruct(dep){let s='';
+  s+=RECT(40,130,420,90)+RECT(60,130,100,40,'--fill')+RECT(340,130,100,40,'--fill')+RECT(160,118,180,12,'--line')+RECT(160,88,180,30,'--muted',.45);
+  s+=dep?`<rect x="160" y="130" width="180" height="9" style="fill:var(--ac);opacity:.65;stroke:none"/>`:`<rect x="160" y="130" width="180" height="9" style="fill:var(--ac);opacity:.3;stroke:var(--ac);stroke-dasharray:4 3"/>`;
+  s+=W('M110,130V72')+W('M250,88V72')+W('M390,130V72')+W('M250,220V244');
+  s+=T(110,62,'S','b')+T(250,62,'G','b')+T(390,62,'D','b')+T(250,262,'B (body) – usually tied to S','s');
+  s+=T(110,155,'n⁺','s')+T(390,155,'n⁺','s')+T(250,106,'metal gate','s')+T(250,127,'oxide','s')+T(250,200,'p-type substrate','s')+W('M160,208H340','thin')+T(250,222,'L','s');
+  s+=T(250,40,dep?'Depletion MOSFET: channel is built in (n-type layer under the oxide)':'Enhancement MOSFET: no channel until V_{GS} > V_{T} induces one','s');
+  return SVG(500,276,s,dep?'D-MOSFET cross-section':'E-MOSFET cross-section');}
+
+DG.mosChar=()=>{
+  const K=1,VT=1,cv=[];[2,3,4,5].forEach(vg=>{const vov=vg-VT,pts=[];for(let k=0;k<=80;k++){const d=k/10;pts.push([d,d<vov?K*(vov*d-d*d/2):0.5*K*vov*vov*(1+0.02*(d-vov))]);}cv.push({pts,cls:'ac2'});});
+  cv.push({pts:sweep(0,4,40,d=>0.5*K*d*d),cls:'dc dash'});
+  const o=xy({x1:8,y1:9,sx:1,sy:1,xl:'V_{DS} (V)',yl:'I_{D} (mA)',curves:cv,w:560,h:300,label:'E-MOSFET output characteristics',
+    texts:[{x:8,y:8.9,s:'V_{GS} = 5 V',cls:'s',a:'end',dy:-7},{x:8,y:4.7,s:'4 V',cls:'s',a:'end',dy:-7},{x:8,y:2.2,s:'3 V',cls:'s',a:'end',dy:-7},{x:8,y:0.65,s:'2 V',cls:'s',a:'end',dy:-7},
+      {x:0.1,y:7.5,s:'TRIODE',cls:'b',a:'start'},{x:5,y:1.0,s:'SATURATION (amplifier)',cls:'b',a:'start',dy:46},{x:3.2,y:6,s:'V_{DS} = V_{OV}',cls:'dc',a:'start'},{x:0.1,y:0.1,s:'V_{GS} ≤ V_{T}: cutoff (I_{D}=0)',cls:'bad',a:'start',dy:-6}]});
+  return o;};
+
+DG.emDm=()=>{
+  const e=xy({x0:-5,x1:6,y1:18,sx:1,sy:3,xl:'V_{GS} (V)',yl:'I_{D} (mA)',w:560,h:300,label:'D-MOSFET and E-MOSFET transfer curves',
+    curves:[{pts:sweep(-4,3,70,v=>6*Math.pow(1+v/4,2)),cls:'ac'},{pts:sweep(2,6,40,v=>Math.pow(v-2,2)),cls:'dc'}],
+    marks:[{x:0,y:6,cls:'node'},{x:-4,y:0,cls:'node'},{x:2,y:0,cls:'node'}],
+    texts:[{x:0.2,y:6,s:'I_{DSS} at V_{GS}=0',cls:'s',a:'start',dx:6},{x:-4,y:0,s:'V_{P}',cls:'s',dy:-12},{x:2,y:0,s:'V_{T}',cls:'s',dy:-12},{x:-4.6,y:12,s:'D-MOSFET (V_{GS} < 0 or > 0)',cls:'ac',a:'start'},{x:2.2,y:16.6,s:'E-MOSFET (V_{GS} > V_{T})',cls:'dc',a:'start'}]});
+  return e;};
+
+DG.powerMos=()=>{let s='';
+  s+=RECT(40,232,420,34,'--fill')+RECT(40,140,420,92)+RECT(70,106,130,36,'--fill',.8)+RECT(300,106,130,36,'--fill',.8)+RECT(80,106,40,14,'--accent',.35)+RECT(150,106,40,14,'--accent',.35)+RECT(310,106,40,14,'--accent',.35)+RECT(380,106,40,14,'--accent',.35);
+  s+=RECT(190,96,120,10,'--line')+RECT(190,70,120,26,'--muted',.45)+W('M250,70V46')+W('M70,96H200V88','thin')+W('M300,96H430','thin')+W('M130,106V60H370V106','dash')+W('M250,266V292');
+  s+=T(250,36,'G','b')+T(250,306,'D (drain contact on the back of the chip)','s')+T(250,54,'','s')+T(250,246,'n⁺ substrate (low resistance)','s')+T(250,196,'n⁻ drift region (supports the blocking voltage)','s')+T(135,138,'p body','s')+T(365,138,'p body','s')+T(250,83,'gate','s')+T(250,92,'','s');
+  s+=T(250,20,'Source metal covers the top (dashed): S','s')+ARW(250,228,250,150,'dc')+ARW(250,150,190,118,'dc')+ARW(250,150,310,118,'dc')+T(262,176,'I_{D} flows vertically','dc','start');
+  return SVG(500,318,s,'Vertical power MOSFET cross-section');};
+
+DG.resInv=()=>{let s='';
+  s+=W('M170,34V30')+W('M110,30H230')+T(110,22,'+V_{DD}','b','start')+R(170,30,70,90)+dot(170,100)+W('M170,100H270')+term(270,100)+T(278,104,'V_{out}','b','start')+T(190,72,'R (load)','','start');
+  s+=MF(152,150)+W('M170,110V100')+term(40,150)+W('M40,150H122')+T(40,138,'V_{in}','b')+W('M170,190V200')+GND(170,200);
+  return SVG(340,240,s,'Resistor-load nMOS inverter');};
+
+DG.cmosInv=()=>{let s='';
+  s+=W('M110,24H230')+T(110,16,'+V_{DD}','b','start')+W('M170,24V60')+MF(152,100,true)+W('M170,140V160')+dot(170,150)+W('M170,150H280')+term(280,150)+T(288,154,'V_{out}','b','start')+MF(152,200)+W('M170,240V250')+GND(170,250);
+  s+=term(30,150)+W('M30,150H80V100H122')+W('M80,150V200H122')+dot(80,150)+T(30,138,'V_{in}','b')+T(200,92,'PMOS','s','start')+T(200,210,'NMOS','s','start');
+  return SVG(380,296,s,'CMOS inverter');};
+
+DG.mosSwitchTiming=()=>{let s='';
+  const xs=[100,150,190,290,340];
+  s+=W('M40,90H100L150,62L190,50H290L340,26H520','ac')+W('M40,190H150L190,135H520','ac')+W('M40,235H190L290,288H520','ac2');
+  xs.forEach(x=>s+=W(`M${x},14V300`,'thin dash'));
+  s+=T(40,36,'V_{GS}','b','start')+T(40,126,'I_{D}','b','start')+T(40,222,'V_{DS}','b','start');
+  s+=T(150,100,'V_{th}','s')+T(240,44,'Miller plateau','s')+T(120,160,'turn-on delay','s')+T(170,110,'','s')+T(240,168,'current rises','s','start')+T(345,262,'V_{DS} falls','s','start')+T(395,116,'I_{D} = load current','s','start')+T(405,50,'V_{GS} → drive level','s','start');
+  s+=T(125,308,'Q_{gs}','s')+T(240,308,'Q_{gd} (Miller)','s')+T(430,308,'fully ON','s');
+  return SVG(560,316,s,'Power MOSFET turn-on waveforms with Miller plateau');};
+
+/* ---------------- widgets ---------------- */
+function jfetState(v){const VP=-v.VPm,IDSS=v.IDSS;let id=0,reg='Cutoff';if(v.VGS>VP){id=IDSS*Math.pow(1-v.VGS/VP,2);reg='Active';}return {VP,id,reg,gm0:2*IDSS/v.VPm};}
+
+WID.jfetq=h=>widget(h,{title:'JFET explorer: Shockley curve, g_{m} and gain',intro:'Slide V_{GS} and watch the Q-point move along the curve. The dashed line is the tangent: its slope is g_{m}. Defaults match the example in your notes style (I_{DSS} = 20 mA, V_{P} = −5 V gives g_{m0} = 8 mS).',
+  fields:[{id:'IDSS',label:'I_{DSS}',val:20,unit:'mA'},{id:'VPm',label:'|V_{GS(off)}| (pinch-off magnitude)',val:5,unit:'V'},{id:'VGS',label:'V_{GS}',type:'range',min:-8,max:0,step:0.05,val:-4,fmt:x=>fmt3(x)+' V'},{id:'RD',label:'R_{D} for the gain line',val:6,unit:'kΩ'}],
+  figure(v){const st=jfetState(v),VP=st.VP,pts=sweep(VP,0,80,x=>v.IDSS*Math.pow(1-x/VP,2)),gm=st.gm0*(1-v.VGS/VP),m=[],cu=[{pts,cls:'ac'}];
+    if(st.reg==='Active'){const a=v.VGS-1.5,b=v.VGS+1.5;cu.push({pts:[[Math.max(a,VP-.5),st.id+gm*(Math.max(a,VP-.5)-v.VGS)],[Math.min(b,0.4),st.id+gm*(Math.min(b,0.4)-v.VGS)]],cls:'dc dash'});m.push({x:v.VGS,y:st.id});}
+    return xy({x0:VP-0.5,x1:0.5,y1:v.IDSS*1.1,xl:'V_{GS} (V)',yl:'I_{D} (mA)',curves:cu,marks:m,w:520,h:280,label:'Shockley transfer curve with tangent'});},
+  run(v){const st=jfetState(v),VP=st.VP;if(st.reg==='Cutoff')return [{k:'Region',v:pill('Cutoff','var(--muted)')},{k:'I_{D}',v:'0'},{note:'V_{GS} is at or below V_{GS(off)}: the channel is fully pinched. No drain current flows.'}];
+    const gm=st.gm0*(1-v.VGS/VP);
+    return [{k:'Region',v:pill('Active','var(--ac)')},{k:'I_{D} = I_{DSS}(1−V_{GS}/V_{P})²',v:fmt3(st.id)+' mA'},{k:'g_{m0} = 2I_{DSS}/|V_{P}|',v:fmt3(st.gm0)+' mS'},{k:'g_{m} = g_{m0}(1−V_{GS}/V_{P})',v:fmt3(gm)+' mS'},{k:'Check g_{m0}√(I_{D}/I_{DSS})',v:fmt3(st.gm0*Math.sqrt(st.id/v.IDSS))+' mS'},{k:'A_{v} ≈ −g_{m}R_{D}',v:fmt3(-gm*v.RD)},
+      {note:'g_{m} falls as the JFET is biased closer to pinch-off. At V_{GS} = 0 it is largest (g_{m0}) but I_{D} is also largest.'}];}
+});
+
+function fetAmpRun(cfg,v,mos){
+  const rd=(mos&&!v.rd)?Infinity:(v.rd||Infinity),gm=v.gm,RD=v.RD,RS=v.RS,RL=v.RL,RG=v.RG,rs=v.rs||0;
+  const par2=(...a)=>1/a.reduce((s,x)=>s+(isFinite(x)?1/x:0),0),k=x=>eng(x*1e3,'Ω');let Zi,Zo,Av,ph,extra=[];
+  if(cfg==='cs1'){Zi=RG;Zo=par2(RD,rd);Av=-gm*par2(rd,RD,RL);ph='180° (inverting)';}
+  else if(cfg==='cs2'){const Zd=isFinite(rd)?rd*(1+gm*RS)+RS:Infinity;Zi=RG;Zo=par2(RD,Zd);Av=-gm*par2(RD,RL)/(1+gm*RS);ph='180° (inverting)';extra.push({k:'Z_{d} (drain side)',v:isFinite(Zd)?k(Zd):'∞'});}
+  else if(cfg==='cd'){const X=par2(rd,RS,RL);Zi=RG;Zo=par2(RS,1/gm);Av=gm*X/(1+gm*X);ph='0° (in phase)';extra.push({k:'R_{S}′ = r_{d}∥R_{S}∥R_{L}',v:k(X)});}
+  else{Zi=par2(RS,1/gm);Zo=par2(RD,rd);Av=gm*par2(rd,RD,RL);ph='0° (in phase)';if(mos){Av=gm*par2(RD,RL)/(1+gm*par2(rs||1e-9,RS));extra.push({k:'Z_{D} = r_{o}[1+g_{m}(R_{S}∥r_{s})]',v:isFinite(rd)?k(rd*(1+gm*par2(RS,rs||1e9))):'∞'});}}
+  const out=[{k:'Z_{i}',v:k(Zi)},{k:'Z_{o}',v:k(Zo)},{k:'A_{v}',v:fmt3(Av)},{k:'Phase',v:ph}].concat(extra);
+  if(mos&&cfg!=='cg'&&rs>0)out.push({k:'A_{v} with source r_{s}',v:fmt3(Av*RG/(RG+rs))});
+  return out;}
+
+WID.jfetamp=h=>widget(h,{title:'JFET CS / CD / CG analyser',intro:'Pick the configuration and enter values. Defaults are the CS (unbypassed) example. For the CD example use g_{m}=4, r_{d}=40, R_{S}=2.2, R_{L}=4.7. For CG use g_{m}=5, r_{d}=60, R_{S}=1, R_{D}=4.7, R_{L}=10 (all in mS and kΩ).',
+  fields:[{id:'cfg',label:'Configuration',type:'sel',opts:[['cs1','CS, R_{S} bypassed'],['cs2','CS, R_{S} not bypassed'],['cd','CD (source follower)'],['cg','CG']],val:'cs2'},
+    {id:'gm',label:'g_{m}',val:2.5,unit:'mS'},{id:'rd',label:'r_{d}',val:50,unit:'kΩ'},{id:'RD',label:'R_{D}',val:6,unit:'kΩ'},{id:'RS',label:'R_{S}',val:1,unit:'kΩ'},{id:'RL',label:'R_{L}',val:12,unit:'kΩ'},{id:'RG',label:'R_{G} = R_{1}∥R_{2}',val:1000,unit:'kΩ'}],
+  run:v=>fetAmpRun(v.cfg,v,false).concat([{note:'Units: mS with kΩ gives dimensionless g_{m}R. Formulas are the ones from your notes (r_{d} neglected in the unbypassed CS gain).'}])});
+
+WID.jfetdesign=h=>widget(h,{title:'JFET CS design (your notes’ method)',intro:'Choose Q-point and gain. The quadratic for R_{D} is solved for you. Defaults: I_{DSS}=10 mA, V_{P}=−4 V, V_{DD}=24 V, I_{DQ}=4 mA, V_{DSQ}=8 V, |A_{v}|=3, R_{L}=10 kΩ, R_{G}=1 MΩ.',
+  fields:[{id:'IDSS',label:'I_{DSS}',val:10,unit:'mA'},{id:'VPm',label:'|V_{GS(off)}|',val:4,unit:'V'},{id:'VDD',label:'V_{DD}',val:24,unit:'V'},{id:'IDQ',label:'I_{DQ}',val:4,unit:'mA'},{id:'VDSQ',label:'V_{DSQ}',val:8,unit:'V'},{id:'A',label:'|A_{v}| wanted',val:3,unit:''},{id:'RL',label:'R_{L}',val:10,unit:'kΩ'},{id:'RG',label:'R_{G} = R_{1}∥R_{2}',val:1000,unit:'kΩ'}],
+  run(v){if(v.IDQ>=v.IDSS)return [{warn:'I_{DQ} must be smaller than I_{DSS}.'}];
+    const VP=-v.VPm,VGS=VP*(1-Math.sqrt(v.IDQ/v.IDSS)),gm0=2*v.IDSS/v.VPm,gm=gm0*(1-VGS/VP),K1=(v.VDD-v.VDSQ)/v.IDQ,K=K1+1/gm,A=v.A,RL=v.RL;
+    const b=-(A*(K-RL)-RL),c=-A*K*RL,RD=(-b+Math.sqrt(b*b-4*A*c))/(2*A),RS=K1-RD;
+    const out=[{k:'1 · V_{GSQ} (inverse Shockley)',v:fmt3(VGS)+' V'},{k:'2 · g_{m} at Q',v:fmt3(gm)+' mS'},{k:'3 · K₁ = (V_{DD}−V_{DSQ})/I_{DQ}',v:fmt3(K1)+' kΩ'},{k:'4 · K = K₁ + 1/g_{m}',v:fmt3(K)+' kΩ'}];
+    if(!(RD>0&&RD<K1))return out.concat([{warn:'No valid R_{D} (0 < R_{D} < K₁): this gain is not possible with this Q-point and R_{L}. Lower the gain or change V_{DSQ}.'}]);
+    const VS=v.IDQ*RS,VG=VGS+VS,R1=v.RG*v.VDD/VG,R2=v.RG*v.VDD/(v.VDD-VG);
+    out.push({k:'5 · R_{D}',v:fmt3(RD)+' kΩ'},{k:'6 · R_{S} = K₁ − R_{D}',v:fmt3(RS)+' kΩ'},{k:'7 · V_{G} = V_{GSQ} + I_{DQ}R_{S}',v:fmt3(VG)+' V'});
+    if(VG<=0||VG>=v.VDD)out.push({warn:'V_{G} comes out negative (or above V_{DD}), so a divider to ground cannot make it. Choose a smaller gain, so R_{S} grows, or use self-bias.'});
+    else out.push({k:'8 · R_{1}',v:eng(R1*1e3,'Ω')},{k:'8 · R_{2}',v:eng(R2*1e3,'Ω')});
+    out.push({k:'Check: gain',v:fmt3(par(RD,RL)/(RS+1/gm))},{note:'Then pick standard resistor values, recompute the DC point, and check the swing (step 10.4 in your notes).'});return out;}
+});
+
+function fetFreqWidget(def){return h=>widget(h,{title:'FET amplifier frequency response',intro:'High end is set by the internal capacitances and the Miller effect. Low end is set by the coupling and bypass capacitors. Edit any value.',
+  fields:[{id:'gm',label:'g_{m}',val:def.gm,unit:'mS'},{id:'RDL',label:'R_{D}∥R_{L}∥r_{d}',val:def.RDL,unit:'kΩ'},{id:'rsig',label:'Source resistance seen at the gate',val:def.rsig,unit:'kΩ'},{id:'Cgs',label:'C_{gs}',val:def.Cgs,unit:'pF'},{id:'Cgd',label:'C_{gd}',val:def.Cgd,unit:'pF'},{id:'Cds',label:'C_{ds} + wiring',val:def.Cds,unit:'pF'},
+    {id:'C1',label:'C_{1} (input coupling)',val:def.C1,unit:'µF'},{id:'Rin',label:'R seen by C_{1} (r_{s}+R_{G})',val:def.Rin,unit:'kΩ'},{id:'CS',label:'C_{S} (source bypass)',val:def.CS,unit:'µF'},{id:'RS',label:'R_{S}',val:def.RS,unit:'kΩ'},{id:'C3',label:'C_{3} (output coupling)',val:def.C3,unit:'µF'},{id:'R3',label:'R_{D}+R_{L}',val:def.R3,unit:'kΩ'}],
+  figure(v){const f=fetFreq(v);return freqPlot(f.Am,Math.max(1.5,f.fL),Math.min(9e7,f.fH));},
+  run(v){const f=fetFreq(v);return [{k:'Mid-band gain',v:fmt3(f.A)+' ('+fmt3(f.Am)+' dB)'},{k:'Miller input capacitance',v:eng(f.Ci*1e-12,'F')},{k:'Input pole',v:eng(f.fin,'Hz')},{k:'Output pole',v:eng(f.fout,'Hz')},{k:'Upper cut-off f₂',v:eng(f.fH,'Hz')},
+    {k:'f from C₁',v:eng(f.f1,'Hz')},{k:'f from C_{S}',v:eng(f.fS,'Hz')},{k:'f from C₃',v:eng(f.f3,'Hz')},{k:'Lower cut-off f₁ (approx.)',v:eng(f.fL,'Hz')},{k:'Bandwidth',v:eng(f.fH-f.fL,'Hz')},{k:'Unity-gain f_{T} = g_{m}/2π(C_{gs}+C_{gd})',v:eng(f.fT,'Hz')},
+    {note:'The biggest of the three low-frequency terms usually decides f₁ (normally the source bypass C_{S}). Larger gain makes C_{gd}(1+g_{m}R) bigger, so f₂ falls: gain and bandwidth trade off.'}];}});}
+function fetFreq(v){const A=v.gm*v.RDL,Am=20*LOG(A),Ci=v.Cgs+v.Cgd*(1+A),Co=v.Cds+v.Cgd*(1+1/A),TP=2*Math.PI,
+  fin=1/(TP*v.rsig*1e3*Ci*1e-12),fout=1/(TP*v.RDL*1e3*Co*1e-12),fH=1/Math.sqrt(1/(fin*fin)+1/(fout*fout)),
+  f1=1/(TP*v.Rin*1e3*v.C1*1e-6),fS=(1+v.gm*v.RS)/(TP*v.RS*1e3*v.CS*1e-6),f3=1/(TP*v.R3*1e3*v.C3*1e-6),fL=Math.sqrt(f1*f1+fS*fS+f3*f3),fT=v.gm*1e-3/(TP*(v.Cgs+v.Cgd)*1e-12);
+  return {A,Am,Ci,fin,fout,fH,f1,fS,f3,fL,fT};}
+WID.jfetfreq=fetFreqWidget({gm:3,RDL:4,rsig:50,Cgs:5,Cgd:2,Cds:1,C1:0.01,Rin:1000,CS:10,RS:1,C3:0.1,R3:20});
+WID.mosfreq=fetFreqWidget({gm:7.5,RDL:6.8,rsig:50,Cgs:6,Cgd:1.5,Cds:1,C1:1,Rin:100,CS:68,RS:1.5,C3:15,R3:6.8});
+
+WID.fetswitch=h=>widget(h,{title:'JFET as an analog switch',intro:'The channel behaves as a resistor r_{ds} that you control with V_{GS}. V_{GS} = 0 → switch ON (smallest r_{ds}). V_{GS} ≤ V_{P} → switch OFF.',
+  fields:[{id:'IDSS',label:'I_{DSS}',val:10,unit:'mA'},{id:'VPm',label:'|V_{P}|',val:4,unit:'V'},{id:'Rs',label:'R_{L} (series) / R_{s} (shunt)',val:10,unit:'kΩ'},{id:'VGS',label:'V_{GS}',type:'range',min:-8,max:0,step:0.05,val:0,fmt:x=>fmt3(x)+' V'}],
+  figure(v){const r0=v.VPm/(2*v.IDSS),rds=x=>x<=-v.VPm?1e9:r0/(1-x/(-v.VPm));
+    return xy({x0:-8,x1:0,y1:1.05,sx:1,sy:0.2,xl:'V_{GS} (V)',yl:'V_{out}/V_{in}',w:520,h:260,label:'Switch transfer ratio',curves:[{pts:sweep(-8,0,160,x=>v.Rs/(v.Rs+rds(x)/1)),cls:'ac'},{pts:sweep(-8,0,160,x=>rds(x)/(v.Rs+rds(x))),cls:'dc'}],marks:[{x:v.VGS,y:v.Rs/(v.Rs+rds(v.VGS))}],
+      texts:[{x:-7.8,y:0.95,s:'series switch (V_{out} = V_{in} when ON)',cls:'ac',a:'start'},{x:-7.8,y:0.08,s:'shunt switch (V_{out} = 0 when ON)',cls:'dc',a:'start',dy:-4}]});},
+  run(v){const VP=-v.VPm,r0=v.VPm/(2*v.IDSS)*1e3,off=v.VGS<=VP,rds=off?Infinity:r0/(1-v.VGS/VP);
+    return [{k:'State',v:off?pill('OFF','var(--muted)'):pill('ON','var(--ac)')},{k:'r_{ds(on)} at V_{GS}=0 ≈ |V_{P}|/(2I_{DSS})',v:eng(r0,'Ω')},{k:'r_{ds} now = r_{ds0}/(1−V_{GS}/V_{P})',v:off?'∞ (cut-off)':eng(rds,'Ω')},
+      {k:'Series: V_{out}/V_{in}',v:off?'≈ 0':fmt3(v.Rs*1e3/(v.Rs*1e3+rds))},{k:'Shunt: V_{out}/V_{in}',v:off?'≈ 1':fmt3(rds/(v.Rs*1e3+rds))},{note:'A good analog switch has r_{ds(on)} ≪ the load, and V_{in} must stay small enough not to push the JFET out of the ohmic region.'}];}
+});
+
+WID.mosregion=h=>widget(h,{title:'MOSFET region finder',intro:'Move V_{GS} and V_{DS}. The red dot is the operating point on the output characteristics. Dashed orange line: V_{DS} = V_{OV}, the triode/saturation boundary.',
+  fields:[{id:'K',label:'K_{n} (I_{D(sat)} = ½K_{n}V_{OV}²)',val:2,unit:'mA/V²'},{id:'VT',label:'V_{T}',val:1,unit:'V'},{id:'VGS',label:'V_{GS}',type:'range',min:0,max:6,step:0.05,val:3,fmt:x=>fmt3(x)+' V'},{id:'VDS',label:'V_{DS}',type:'range',min:0,max:10,step:0.05,val:1.5,fmt:x=>fmt3(x)+' V'}],
+  figure(v){const cv=[];[1,2,3,4].forEach(o=>{cv.push({pts:sweep(0,10,100,d=>d<o?v.K*(o*d-d*d/2):0.5*v.K*o*o),cls:'ac2'});});cv.push({pts:sweep(0,4,40,d=>0.5*v.K*d*d),cls:'dc dash'});
+    const st=mosSt(v);return xy({x1:10,y1:Math.max(0.5*v.K*16*1.05,st.id*1.1),xl:'V_{DS} (V)',yl:'I_{D} (mA)',w:520,h:280,label:'Operating point on output characteristics',curves:cv,marks:[{x:v.VDS,y:st.id}],texts:[{x:10,y:0.5*v.K*1,s:'V_{OV}=1',cls:'s',a:'end',dy:-6},{x:10,y:0.5*v.K*16,s:'V_{OV}=4',cls:'s',a:'end',dy:-6}]});},
+  run(v){const s=mosSt(v);const col=s.reg==='Cutoff'?'var(--muted)':s.reg==='Triode'?'var(--accent)':'var(--ac)';
+    const out=[{k:'V_{OV} = V_{GS} − V_{T}',v:fmt3(v.VGS-v.VT)+' V'},{k:'Region',v:pill(s.reg,col)},{k:'I_{D}',v:fmt3(s.id)+' mA'}];
+    if(s.reg==='Saturation')out.push({k:'g_{m} = K_{n}V_{OV}',v:fmt3(v.K*(v.VGS-v.VT))+' mS'});
+    if(s.reg==='Triode')out.push({k:'r_{DS} ≈ 1/(K_{n}V_{OV})',v:eng(1/(v.K*(v.VGS-v.VT))*1e3,'Ω')});
+    out.push({note:s.reg==='Saturation'?'Saturation = constant-current region = amplifier region.':s.reg==='Triode'?'Triode = voltage-controlled resistor = switch ON region.':'No channel: the transistor is an open switch.'});return out;}
+});
+function mosSt(v){const vov=v.VGS-v.VT;if(vov<=0)return {reg:'Cutoff',id:0};if(v.VDS<vov)return {reg:'Triode',id:v.K*(vov*v.VDS-v.VDS*v.VDS/2)};return {reg:'Saturation',id:0.5*v.K*vov*vov};}
+
+WID.mosq=h=>widget(h,{title:'MOSFET voltage-divider bias: find I_{DQ} and V_{DSQ}',intro:'Defaults are Summer 2019 Q4: R₁ = 90 k, R₂ = 45 k, R_{D} = 5 k, R_{S} = 2 k, V_{T} = 1 V, k′(W/L) = 2 mA/V². The paper does not print V_{DD}; 12 V is assumed (it gives clean numbers).',
+  fields:[{id:'VDD',label:'V_{DD}',val:12,unit:'V'},{id:'R1',label:'R₁',val:90,unit:'kΩ'},{id:'R2',label:'R₂',val:45,unit:'kΩ'},{id:'RD',label:'R_{D}',val:5,unit:'kΩ'},{id:'RS',label:'R_{S}',val:2,unit:'kΩ'},{id:'VT',label:'V_{T}',val:1,unit:'V'},{id:'K',label:'k′(W/L)',val:2,unit:'mA/V²'},{id:'cv',label:'Current equation',type:'sel',opts:[[0.5,'I_{D} = ½·k′(W/L)·(V_{GS}−V_{T})²'],[1,'I_{D} = k′(W/L)·(V_{GS}−V_{T})²']],val:0.5}],
+  figure(v){const q=mosBias(v);if(!q)return '';const c=v.cv*v.K;return xy({x0:0,x1:Math.max(v.VDD*0.6,q.VG+2),y1:Math.max(q.VG/v.RS*1.15,q.ID*1.6),xl:'V_{GS} (V)',yl:'I_{D} (mA)',w:520,h:280,label:'Bias line and transfer curve',
+    curves:[{pts:sweep(v.VT,Math.max(v.VDD*0.6,q.VG+2),80,x=>c*Math.pow(x-v.VT,2)),cls:'ac'},{pts:[[0,q.VG/v.RS],[q.VG,0]],cls:'dc'}],marks:[{x:q.VGS,y:q.ID}],texts:[{x:q.VGS,y:q.ID,s:'Q',cls:'bad',a:'start',dx:9,dy:-8},{x:0.1,y:q.VG/v.RS,s:'bias line: V_{GS} = V_{G} − I_{D}R_{S}',cls:'dc',a:'start',dy:12},{x:v.VT+0.3,y:c*Math.pow(1.2,2),s:'transfer curve',cls:'ac',a:'start',dy:-4}]});},
+  run(v){const q=mosBias(v);if(!q)return [{warn:'V_{G} is below V_{T}: the transistor is cut off.'}];const vov=q.VGS-v.VT,ok=q.VDS>=vov;
+    const o=[{k:'V_{G} = V_{DD}R₂/(R₁+R₂)',v:fmt3(q.VG)+' V'},{k:'V_{GSQ}',v:fmt3(q.VGS)+' V'},{k:'I_{DQ}',v:fmt3(q.ID)+' mA'},{k:'V_{DSQ} = V_{DD} − I_{D}(R_{D}+R_{S})',v:fmt3(q.VDS)+' V'},{k:'V_{OV}',v:fmt3(vov)+' V'},{k:'Region',v:ok?pill('Saturation ✓','var(--ac)'):pill('Triode ✗','var(--bad)')},{k:'g_{m}',v:fmt3(2*v.cv*v.K*vov)+' mS'}];
+    if(!ok)o.push({warn:'V_{DS} < V_{OV}: the saturation assumption fails. Redo the calculation with the triode equation.'});
+    o.push({note:'Quadratic used: (cR_{S})x² + x − (V_{G} − V_{T}) = 0 with x = V_{GS} − V_{T}. Keep the root with x > 0. The other root is non-physical.'});return o;}
+});
+function mosBias(v){const VG=v.VDD*v.R2/(v.R1+v.R2),c=v.cv*v.K;if(VG<=v.VT)return null;const a=c*v.RS,x=(-1+Math.sqrt(1+4*a*(VG-v.VT)))/(2*a),ID=c*x*x;return {VG,VGS:v.VT+x,ID,VDS:v.VDD-ID*(v.RD+v.RS)};}
+
+WID.mosamp=h=>widget(h,{title:'MOSFET CS / CD / CG analyser',intro:'Defaults are Worked Problem 9 (CS). For CD use g_{m}=5, R_{S}=2.2, R_{L}=10, R_{G}=220. For CG use g_{m}=6, R_{D}=4.7, R_{L}=10, r_{s}=0.05, R_{S}=1, r_{o}=50. Set r_{o}=0 for “neglected”.',
+  fields:[{id:'cfg',label:'Configuration',type:'sel',opts:[['cs2','CS (with R_{S})'],['cd','CD (source follower)'],['cg','CG']],val:'cs2'},{id:'gm',label:'g_{m}',val:4,unit:'mS'},{id:'RD',label:'R_{D}',val:6.8,unit:'kΩ'},{id:'RS',label:'R_{S}',val:0.47,unit:'kΩ'},{id:'RL',label:'R_{L}',val:20,unit:'kΩ'},{id:'RG',label:'R_{G} = R₁∥R₂',val:100,unit:'kΩ'},{id:'rs',label:'r_{s} (source)',val:0.6,unit:'kΩ'},{id:'rd',label:'r_{o} (0 = infinite)',val:0,unit:'kΩ'}],
+  run:v=>fetAmpRun(v.cfg,v,true).concat([{note:'Source follower: Z_{o} = R_{S}∥(1/g_{m}) ≈ 1/g_{m}. Your notes write (R_{S}∥R_{L})∥Z_{s} for CD; both give ≈ 1/g_{m} when g_{m}R ≫ 1.'}])});
+
+WID.mosdesign=h=>widget(h,{title:'MOSFET CS design (2N7000 example)',intro:'Default values are from your notes: A_{v} ≥ 50, V_{DD} = 12 V, 2N7000 (I_{D(on)} = 1 A at V_{GS(on)} = 10 V, V_{T} = 2 V), R₁∥R₂ = 100 kΩ, f_{L} = 20 Hz, f_{H} = 20 kHz.',
+  fields:[{id:'VDD',label:'V_{DD}',val:12,unit:'V'},{id:'A',label:'|A_{v}| wanted',val:50,unit:''},{id:'IDon',label:'I_{D(on)}',val:1000,unit:'mA'},{id:'VGSon',label:'V_{GS(on)}',val:10,unit:'V'},{id:'VT',label:'V_{T}',val:2,unit:'V'},{id:'RGp',label:'R₁∥R₂',val:100,unit:'kΩ'},{id:'fL',label:'f_{L}',val:20,unit:'Hz'},{id:'fH',label:'f_{H}',val:20000,unit:'Hz'}],
+  run(v){const k=v.IDon/Math.pow(v.VGSon-v.VT,2),VOV=v.VDD/v.A,ID=k*VOV*VOV,RD=0.5*v.VDD/ID,RS=0.1*v.VDD/ID,VGS=v.VT+VOV,VG=VGS+0.1*v.VDD,r=VG/v.VDD;
+    if(VG>=v.VDD)return [{warn:'V_{G} is too high for this supply.'}];const R1=v.RGp/r,R2=v.RGp/(1-r),TP=2*Math.PI,cap=(f,R)=>1/(TP*f*0.1*R*1e3),gm=2*k*VOV;
+    return [{k:'k = I_{D(on)}/(V_{GS(on)}−V_{T})²',v:fmt3(k)+' mA/V²'},{k:'V_{OV} = V_{DD}/A_{v}',v:fmt3(VOV)+' V'},{k:'I_{DQ} = kV_{OV}²',v:fmt3(ID*1e3)+' µA'},{k:'R_{D} = 0.5V_{DD}/I_{DQ}',v:fmt3(RD)+' kΩ'},{k:'R_{S} = 0.1V_{DD}/I_{DQ}',v:fmt3(RS)+' kΩ'},{k:'V_{GS} = V_{T}+V_{OV}',v:fmt3(VGS)+' V'},{k:'V_{G} = V_{GS}+0.1V_{DD}',v:fmt3(VG)+' V'},
+      {k:'R₁ = (R₁∥R₂)/(V_{G}/V_{DD})',v:fmt3(R1)+' kΩ'},{k:'R₂ = (R₁∥R₂)/(1−V_{G}/V_{DD})',v:fmt3(R2)+' kΩ'},{k:'C₁ ≥ 1/(2πf_{L}·0.1·R₁∥R₂)',v:eng(cap(v.fL,v.RGp),'F')},{k:'C₂ ≥ (source bypass, R_{S})',v:eng(cap(v.fL,RS),'F')},{k:'C₃ ≥ (output, R_{D})',v:eng(cap(v.fL,RD),'F')},{k:'C₄ = 1/(2πf_{H}R_{D})',v:eng(1/(TP*v.fH*RD*1e3),'F')},{k:'g_{m} = 2kV_{OV}',v:fmt3(gm)+' mS'},{k:'A_{v} = g_{m}R_{D}',v:fmt3(gm*RD)},
+      {note:'Round R and C to standard values, then recompute. In your notes R_{D} = 6.8 k and R_{S} = 1.5 k, which gives A_{v} = 50.92.'}];}
+});
+
+WID.mosinv=h=>widget(h,{title:'Inverters: resistor-load design and CMOS power',intro:'Defaults are the numerical example in your notes (V = 5 V, K = 0.5 mA/V², V_{T} = 1 V, V_{OL} = 0.2 V → R ≈ 12.3 kΩ).',
+  fields:[{id:'VDD',label:'V_{DD}',val:5,unit:'V'},{id:'K',label:'K',val:0.5,unit:'mA/V²'},{id:'VT',label:'V_{T}',val:1,unit:'V'},{id:'VOL',label:'Required V_{OL}',val:0.2,unit:'V'},{id:'CL',label:'Load C_{L}',val:20,unit:'pF'},{id:'f',label:'Switching frequency',val:1,unit:'MHz'},{id:'Ron',label:'Effective R_{on}',val:1,unit:'kΩ'}],
+  run(v){const ID=0.5*v.K*(2*(v.VDD-v.VT)*v.VOL-v.VOL*v.VOL),R=(v.VDD-v.VOL)/ID;
+    return [{k:'I_{D} (triode) = ½K[2(V_{GS}−V_{T})V_{DS} − V_{DS}²]',v:fmt3(ID)+' mA'},{k:'R = (V_{DD}−V_{OL})/I_{D}',v:fmt3(R)+' kΩ'},{k:'Resistor-load: power while LOW',v:fmt3(v.VDD*ID)+' mW'},{k:'CMOS static power',v:'0 W (one device always OFF)'},{k:'CMOS dynamic P = C_{L}V_{DD}²f',v:fmt3(v.CL*v.VDD*v.VDD*v.f*1e-6)+' mW'},{k:'Transition ≈ 0.69·R_{on}·C_{L}',v:fmt3(0.69*v.Ron*v.CL*1e-3)+' ns'},
+      {note:'A resistor-load inverter burns static power whenever its output is LOW and has a weak LOW level. CMOS removes both problems.'}];}
+});
+
+WID.powermos=h=>widget(h,{title:'Power MOSFET loss and junction temperature',intro:'First-order estimate: P_{cond} = D·I_{D}²·R_{DS(on)} (hot), P_{sw} = f_{s}·½V_{DS}I_{D}(t_{r}+t_{f}), P_{gate} = Q_{g}V_{drive}f_{s}.',
+  fields:[{id:'VDS',label:'V_{DS} (off-state)',val:48,unit:'V'},{id:'ID',label:'I_{D} (on)',val:20,unit:'A'},{id:'Ron',label:'R_{DS(on)} at 25 °C',val:10,unit:'mΩ'},{id:'hot',label:'Hot factor for R_{DS(on)}',val:1.6,unit:'×'},{id:'D',label:'Duty ratio',val:0.5,unit:''},{id:'fs',label:'f_{s}',val:100,unit:'kHz'},{id:'tsw',label:'t_{r} + t_{f}',val:40,unit:'ns'},{id:'Qg',label:'Q_{g}',val:60,unit:'nC'},{id:'Vdr',label:'V_{drive}',val:10,unit:'V'},{id:'Ta',label:'T_{A}',val:40,unit:'°C'},{id:'th',label:'R_{θJA}',val:12,unit:'°C/W'},{id:'Tjm',label:'T_{J(max)}',val:150,unit:'°C'}],
+  run(v){const pc=v.D*v.ID*v.ID*v.Ron*1e-3*v.hot,ps=v.fs*1e3*0.5*v.VDS*v.ID*v.tsw*1e-9,pg=v.Qg*1e-9*v.Vdr*v.fs*1e3,pt=pc+ps+pg,Tj=v.Ta+pt*v.th;
+    const o=[{k:'Conduction loss',v:fmt3(pc)+' W'},{k:'Switching loss',v:fmt3(ps)+' W'},{k:'Gate-drive power',v:fmt3(pg)+' W'},{k:'Total loss',v:fmt3(pt)+' W'},{k:'T_{J} = T_{A} + P·R_{θJA}',v:fmt3(Tj)+' °C'},{k:'Margin to T_{J(max)}',v:fmt3(v.Tjm-Tj)+' °C'}];
+    if(Tj>v.Tjm)o.push({warn:'Junction temperature exceeds T_{J(max)}. Reduce losses (lower f_{s}, lower R_{DS(on)} device) or improve the heat sink (lower R_{θJA}).'});
+    else o.push({note:'Try raising f_{s} to 500 kHz: switching loss grows linearly with frequency, conduction loss does not.'});return o;}
+});
+
+/* ---------- page wiring ---------- */
+function init(){
+  document.querySelectorAll('[data-dg]').forEach(el=>{const f=DG[el.dataset.dg];if(f)el.innerHTML=f();else el.textContent='diagram: '+el.dataset.dg;});
+  document.querySelectorAll('[data-w]').forEach(el=>{const f=WID[el.dataset.w];if(f)f(el);});
+  const main=$('main');
+  /* the diagram helper already formatted its own text; widget text is formatted; format the rest of the page */
+  mathify(main);
+
+  /* theme toggle */
+  $('#themeBtn').addEventListener('click',()=>{const r=document.documentElement,cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';});
+
+  /* chips + progress */
+  const chips=[...document.querySelectorAll('#chips a')];let done=[];
+  try{done=JSON.parse(localStorage.getItem('fet-guide-done')||'[]');}catch(e){}
+  const paint=()=>{chips.forEach(a=>{const id=a.getAttribute('href').slice(1);a.classList.toggle('done',done.includes(id));});
+    document.querySelectorAll('input[data-done]').forEach(i=>{i.checked=done.includes(i.dataset.done);});};
+  document.querySelectorAll('input[data-done]').forEach(i=>i.addEventListener('change',()=>{const id=i.dataset.done;done=done.filter(x=>x!==id);if(i.checked)done.push(id);try{localStorage.setItem('fet-guide-done',JSON.stringify(done));}catch(e){}paint();}));
+  paint();
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){chips.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));
+      const on=chips.find(a=>a.classList.contains('on')),nav=on&&on.parentElement;if(on&&nav&&nav.scrollWidth>nav.clientWidth){const l=on.offsetLeft-(nav.clientWidth-on.offsetWidth)/2;if(Math.abs(nav.scrollLeft-l)>40)nav.scrollLeft=l;}}});},{rootMargin:'-20% 0px -70% 0px'});
+    document.querySelectorAll('section.sec').forEach(s=>io.observe(s));
+  }
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>

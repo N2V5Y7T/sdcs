@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Power Amplifiers Study Guide · Unit 5</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout concept: engineer's graph-paper notebook. Sticky chip bar, single reading column, every topic = intuition > diagram > mechanism > derivation > example > try-it > exam skeleton. */
+:root{
+  --bg:#EEF2F5; --grid:rgba(18,32,41,.045); --surface:#FFFFFF; --surface2:#E7EDF2; --fg:#112029; --muted:#4A5E6C; --line:#C6D2DA;
+  --accent:#0B5FD3; --accent-ink:#FFFFFF; --dc:#B84E06; --ac:#087A5A; --bad:#B82633; --wire:#1B2B36; --fill:#DCE8F6;
+  --display:"Space Grotesk","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{
+  margin:0;font:16px/1.65 var(--body);color:var(--fg);
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  background-attachment:fixed;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 4rem;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.wrap{max-width:880px;margin:0 auto}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,3.6vw,2rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.2rem;font-weight:600;margin:2.2rem 0 .5rem}
+h4{font-size:1.02rem;font-weight:600;margin:1.4rem 0 .3rem;color:var(--accent)}
+p{margin:.65rem 0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,.mono{font-family:var(--mono);font-size:.9em}
+sub,sup{line-height:0}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);
+  margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.bar .in{max-width:1140px;margin:0 auto;display:flex;align-items:center;gap:.75rem;min-height:52px}
+.brand{font:700 .95rem var(--display);color:var(--fg);text-decoration:none;white-space:nowrap}
+.chips{display:flex;gap:.35rem;overflow-x:auto;flex:1;min-width:0;scrollbar-width:thin;padding:.4rem 0}
+.chips a{white-space:nowrap;font:500 .8rem var(--body);text-decoration:none;color:var(--muted);padding:.25rem .6rem;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.chips a:hover{color:var(--fg);border-color:var(--accent)}
+.chips a.done::before{content:"✓ ";color:var(--ac)}
+.chips a.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#themeBtn{font:500 .8rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:.3rem .6rem;cursor:pointer}
+
+/* hero */
+.hero{padding:2.6rem 0 1.2rem}
+.kicker{font:500 .75rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:1.08rem;color:var(--muted);max-width:65ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.65rem;margin:1.4rem 0}
+.topic{display:block;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.75rem .9rem;transition:border-color .15s}
+.topic:hover{border-color:var(--accent)}
+.topic b{display:block;font:600 .95rem var(--display)}
+.topic span{font-size:.8rem;color:var(--muted)}
+.topic .q{display:inline-block;margin-top:.35rem;font:500 .68rem var(--mono);color:var(--dc)}
+
+/* sections */
+section.sec{
+  padding:2.8rem 0 .5rem;border-top:2px solid var(--fg);margin-top:2.6rem;
+  
+  
+}
+.sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem .8rem;margin-bottom:.4rem}
+.secno{font:500 .8rem var(--mono);color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0 1rem}
+.tag{font:500 .72rem var(--mono);padding:.15rem .5rem;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--muted)}
+.tag.hot{background:var(--dc);color:#fff;border-color:var(--dc)}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1rem 1.15rem;margin:1rem 0}
+.card.intuition{border-left:4px solid var(--ac)}
+.card.exam{border-left:4px solid var(--dc);background:rgba(184,78,6,.04)}
+.card.watch{border-left:4px solid var(--bad);background:rgba(184,38,51,.04)}
+.card.try{border-left:4px solid var(--accent);background:rgba(11,95,211,.04)}
+.card .label{display:block;font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.card.intuition .label{color:var(--ac)}
+.card.exam .label{color:var(--dc)}
+.card.watch .label{color:var(--bad)}
+.card.try .label{color:var(--accent)}
+
+/* equations & steps */
+.eq{font-family:var(--mono);font-size:.95rem;background:var(--surface2);padding:.65rem .95rem;border-radius:6px;margin:.75rem 0;overflow-x:auto}
+.eq.key{background:var(--fill);border-left:3.5px solid var(--accent)}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .18em;line-height:1.35}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .35em}
+.frac>span:last-child{padding:0 .35em}
+.steps{counter-reset:s;list-style:none;padding:0;margin:.8rem 0}
+.steps>li{counter-increment:s;position:relative;padding-left:2.2rem;margin:.7rem 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:.05rem;width:1.55rem;height:1.55rem;border-radius:50%;background:var(--fg);color:var(--bg);font:600 .78rem/1.55rem var(--mono);text-align:center}
+
+/* tables */
+.tw{overflow-x:auto;margin:.9rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:540px}
+th,td{padding:.55rem .75rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface2);font:600 .78rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+
+/* diagrams */
+figure{margin:1.2rem 0}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:.4rem}
+svg.dg{display:block;width:100%;height:auto;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+svg.dg path{fill:none;stroke:var(--wire);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+svg.dg path.fl{fill:var(--wire);stroke:none}
+svg.dg path.dc{stroke:var(--dc)}svg.dg path.ac{stroke:var(--ac)}svg.dg path.ac2{stroke:var(--accent)}svg.dg path.bad{stroke:var(--bad)}
+svg.dg path.dash{stroke-dasharray:5 4}
+svg.dg path.thin{stroke-width:1;stroke:var(--line)}
+svg.dg path.shade{fill:var(--fill);stroke:none;opacity:.85}
+svg.dg path.shadeb{fill:var(--bad);stroke:none;opacity:.14}
+svg.dg path.shadeg{fill:var(--ac);stroke:none;opacity:.14}
+svg.dg circle.dot{fill:var(--wire);stroke:none}
+svg.dg circle.node{fill:var(--surface);stroke:var(--wire);stroke-width:1.6}
+svg.dg circle.sym{fill:var(--surface);stroke:var(--wire);stroke-width:1.7}
+svg.dg circle.q{fill:var(--bad);stroke:none}
+svg.dg polygon{stroke:var(--wire);stroke-width:1.7;fill:var(--surface)}
+svg.dg rect.box{fill:var(--surface2);stroke:var(--wire);stroke-width:1.7}
+svg.dg text{fill:var(--fg);font:12.5px var(--mono)}
+svg.dg text.s{font-size:11px;fill:var(--muted)}
+svg.dg text.b{font-weight:600;font-size:13px}
+svg.dg text.dc{fill:var(--dc)}svg.dg text.ac{fill:var(--ac)}svg.dg text.ac2{fill:var(--accent)}svg.dg text.bad{fill:var(--bad)}
+
+/* widgets */
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.15rem;margin:1.3rem 0}
+.wlabel{display:inline-block;font:600 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.12rem .55rem;border-radius:4px;background:var(--dc);color:var(--bg);margin-bottom:.5rem}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem .95rem;margin:.65rem 0}
+.fld{display:flex;flex-direction:column;gap:.15rem;font-size:.82rem;color:var(--muted);min-width:0}
+.fld .row{display:flex;gap:.4rem;align-items:center}
+.fld input[type=number],.fld select{font:500 .95rem var(--mono);width:100%;min-width:0;padding:.32rem .48rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.fld input[type=range]{width:100%;accent-color:var(--accent)}
+.fld .u{font:.8rem var(--mono);white-space:nowrap}
+.fld output{font:600 .85rem var(--mono);color:var(--fg)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.55rem;margin-top:.85rem}
+.res div{background:var(--surface2);border-radius:8px;padding:.55rem .75rem;min-width:0}
+.res small{display:block;font:500 .7rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.res b{font:600 1.05rem var(--mono);overflow-wrap:anywhere}
+.res .note{grid-column:1/-1;background:none;padding:0;font-size:.85rem;color:var(--muted)}
+.res .warn{grid-column:1/-1;background:var(--bad);color:var(--bg);font-size:.85rem;border-radius:8px;padding:.5rem .7rem}
+details{margin:.5rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:.1rem .85rem}
+summary{cursor:pointer;padding:.55rem 0;font-weight:500}
+details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:.45rem}
+.done-row{display:flex;align-items:center;gap:.5rem;margin:1.6rem 0 .5rem;font-size:.9rem;color:var(--muted)}
+.done-row input{width:1.1rem;height:1.1rem;accent-color:var(--ac)}
+footer{margin-top:3.2rem;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:1.2rem}
+@media (max-width:560px){.brand{display:none}.eq{font-size:.88rem}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.sqrt{display:inline-flex;align-items:baseline;vertical-align:middle;margin:0 .15em;line-height:1}
+.radic{font-size:1.25em;line-height:.9;padding-right:1px;font-family:var(--display),serif;transform:translateY(1px)}
+.radicand{border-top:1.6px solid currentColor;padding:.05em .25em 0 .15em;display:inline-block;line-height:1.25}
+</style>
+</head>
+<body>
+<header class="bar"><div class="in">
+  <a class="brand" href="#top">Power Amplifiers · Unit 5</a>
+  <nav class="chips" id="chips" aria-label="Topics">
+    <a href="#s0">Start</a>
+    <a href="#s1">Need &amp; Chain</a>
+    <a href="#s2">Classes A-D</a>
+    <a href="#s3">Series Class A</a>
+    <a href="#s4">Xfmr Class A</a>
+    <a href="#s5">Class A Design</a>
+    <a href="#s6">Class B Push-Pull</a>
+    <a href="#s7">Crossover &amp; AB</a>
+    <a href="#s8">Class B Design</a>
+    <a href="#s9">Comp-Symmetry</a>
+    <a href="#s10">Comp-Sym Design</a>
+    <a href="#s11">Quasi &amp; THD</a>
+    <a href="#s12">Exam Map &amp; Formulas</a>
+  </nav>
+  <button id="themeBtn" type="button" aria-label="Switch light or dark theme">Theme</button>
+</div></header>
+
+<main class="wrap" id="top">
+<div class="hero">
+  <div class="kicker">Semiconductor Devices &amp; Circuits · Unit 5 (NEP 2020)</div>
+  <h1>Power Amplifiers &amp; Large-Signal Analysis, explained from the ground up</h1>
+  <p class="lead">Complete, self-contained study guide for Unit 5 according to the Bharati Vidyapeeth (DU) COE Pune curriculum and Dr. R. B. Ghongade’s lectures. Master audio amplifier chains, conduction angle classifications (A, B, AB, C, D), series-fed &amp; transformer-coupled stages, push-pull operation, composite load lines, crossover distortion elimination, complementary-symmetry &amp; quasi-complementary topologies, end-to-end design calculations, and harmonic distortion analysis.</p>
+  <div class="grid">
+    <a class="topic" href="#s1"><b>1 · Need &amp; Signal Chain</b><span>Microphone to loudspeaker, voltage vs power amp</span><span class="q">Core Concept</span></a>
+    <a class="topic" href="#s2"><b>2 · Classification (A, B, AB, C, D)</b><span>Conduction angles, efficiency limits, transfer curves</span><span class="q">Winter 2025 SDC-II Q3</span></a>
+    <a class="topic" href="#s3"><b>3 · Series-Fed Class A</b><span>DC load line, centering Q-point, 25% max efficiency</span><span class="q">Winter 2025 Q5 OR</span></a>
+    <a class="topic" href="#s4"><b>4 · Transformer-Coupled Class A</b><span>Reflected load R'<sub>L</sub>, 2V<sub>CC</sub> swing, 50% max efficiency</span><span class="q">Winter 2025 Q5 OR</span></a>
+    <a class="topic" href="#s5"><b>5 · Class A Design Example</b><span>50 mW into 4Ω, complete 11-step design walkthrough</span><span class="q">Dr. Ghongade Notes</span></a>
+    <a class="topic" href="#s6"><b>6 · Class B Push-Pull</b><span>180° conduction, even harmonic cancellation, 78.5% η</span><span class="q">Summer 2026 Q5</span></a>
+    <a class="topic" href="#s7"><b>7 · Crossover Distortion &amp; AB</b><span>0.7V threshold dead-band, diode compensation string</span><span class="q">Winter 2025 Q5</span></a>
+    <a class="topic" href="#s8"><b>8 · Class B Design Example</b><span>4W into 16Ω, transformer &amp; transistor ratings</span><span class="q">Dr. Ghongade Notes</span></a>
+    <a class="topic" href="#s9"><b>9 · Complementary Symmetry AB</b><span>Capacitor-coupled OTL, CE driver, NPN/PNP pair</span><span class="q">High Frequency Exam</span></a>
+    <a class="topic" href="#s10"><b>10 · Comp-Symmetry Design</b><span>1W into 50Ω, V<sub>CC</sub>=32V, standard components</span><span class="q">Dr. Ghongade Notes</span></a>
+    <a class="topic" href="#s11"><b>11 · Quasi-Comp &amp; THD</b><span>Darlington + Sziklai pair, 3-point harmonic analysis</span><span class="q">Winter 2025 SDC-II</span></a>
+    <a class="topic" href="#s12"><b>12 · Exam Map &amp; Formulas</b><span>Complete 10-mark PYQ model answers &amp; master sheet</span><span class="q">100% Exam Match</span></a>
+  </div>
+</div>
+<!-- ============ S0: START HERE ============ -->
+<section class="sec" id="s0">
+  <div class="sechead"><span class="secno">S0 · Orientation</span></div>
+  <h2>Start Here: Core Intuitions of Power Amplifiers</h2>
+  <div class="tags"><span class="tag hot">Core Foundations</span><span class="tag">Large-Signal Physics</span><span class="tag">Efficiency vs Distortion</span></div>
+
+  <div class="card intuition"><span class="label">Intuition 1 · Small Signal vs Large Signal: Why Models Break Down</span>
+  <p>In small-signal amplifiers (Units 1 to 4), input signals are tiny (a few millivolts). The transistor operates over a microscopic slice of its dynamic characteristics where curves can be treated as perfectly straight lines. Linear models like <i>h-parameters</i> or <i>r<sub>e</sub></i> work beautifully. But in <b>power amplifiers</b> (large-signal amplifiers), the base voltage swings across the entire active region—from near cut-off right up to saturation. Transistor non-linearities dominate, collector current swings reach several Amperes, and internal power dissipation creates intense heat. Efficiency [[P_{ac}|P_{dc}]] and thermal dissipation become the governing design parameters rather than voltage gain.</p></div>
+
+  <div class="card intuition"><span class="label">Intuition 2 · The Universal Efficiency vs Distortion Trade-off</span>
+  <p>Every power amplifier is governed by an inescapable physics compromise between <b>conduction angle</b> and <b>efficiency</b>:</p>
+  <ul>
+    <li><b>Class A (θ<sub>c</sub> = 360°):</b> Transistor stays ON during the entire AC cycle. Zero crossover distortion, purest audio reproduction. But because it draws heavy DC quiescent current even when completely idle, theoretical efficiency is capped at 25% (series-fed) or 50% (transformer-coupled). Up to 75% of power is wasted as pure heat.</li>
+    <li><b>Class B (θ<sub>c</sub> = 180°):</b> Biased exactly at cut-off. Zero quiescent idle current! Theoretical efficiency leaps to 78.5%. But because silicon transistors need 0.7V of base-emitter voltage to turn on, a dead zone appears at every zero crossing—causing harsh <i>crossover distortion</i>.</li>
+    <li><b>Class AB (180° &lt; θ<sub>c</sub> &lt; 360°):</b> Biased slightly above cut-off (idle current ~5% to 10% of peak). Eliminates the 0.7V dead band while delivering 50% to 70% efficiency. This is the bedrock of modern commercial audio power stages.</li>
+    <li><b>Class C (θ<sub>c</sub> &lt; 180°):</b> Conducts only in brief pulses (~90°). Extremely high efficiency (~85%), but severe distortion makes it unusable for direct audio. Essential for RF transmitters where resonant LC tank circuits restore sinusoidal purity via flywheel effect.</li>
+    <li><b>Class D (Switching / PWM):</b> Transistors operate strictly as ON/OFF switches (saturation or cut-off). Because either voltage across the switch is zero or current through it is zero, theoretical internal dissipation is zero! Achieves 90% to 98% efficiency.</li>
+  </ul></div>
+
+  <div class="card intuition"><span class="label">Intuition 3 · The Miracle of Push-Pull Symmetry</span>
+  <p>In single-ended amplifiers, non-linear transfer curves introduce substantial second-harmonic (even-order) distortion. In a <b>push-pull pair</b>, two matched transistors are driven with anti-phase signals (180° apart) into a center-tapped transformer or complementary load. When their collector currents are subtracted in the load winding:
+  <br><b>i<sub>net</sub> = i<sub>C1</sub> − i<sub>C2</sub> = 2·I<sub>1</sub>·sin(ωt) + 2·I<sub>3</sub>·sin(3ωt) + ...</b>
+  <br><b>All even harmonics (2nd, 4th, 6th) and DC core-magnetizing currents cancel out identically!</b> Furthermore, power supply ripple is rejected, and core saturation is completely avoided.</p></div>
+
+  <div class="card intuition"><span class="label">Intuition 4 · Impedance Matching &amp; Damping Factor</span>
+  <p>Loudspeakers have low voice-coil impedances: typically <b>4 Ω, 8 Ω, or 16 Ω</b>. A standard common-emitter amplifier has an output impedance of several kilo-ohms. Connecting an 8 Ω speaker directly to a 2 kΩ collector resistor would cause 99.6% of signal power to be lost inside the amplifier! Power amplifiers solve this either through an <b>impedance matching transformer</b> with turns ratio [[N_{1}|N_{2}]] = √[[R'_{L}|R_{L}]], or via a <b>complementary emitter follower</b> whose output impedance is naturally tiny (&lt; 0.5 Ω), providing massive damping factor to prevent speaker cone ringing.</p></div>
+</section>
+
+<!-- ============ S1: NEED & BLOCK DIAGRAM ============ -->
+<section class="sec" id="s1">
+  <div class="sechead"><span class="secno">Topic 1</span></div>
+  <h2>Need of Power Amplifiers &amp; System Signal Chain</h2>
+  <div class="tags"><span class="tag">Audio Engineering Architecture</span><span class="tag">Voltage vs Power Amplifiers</span><span class="tag">Impedance Matching</span></div>
+
+  <div class="card intuition"><span class="label">System Perspective</span>
+  <p>Why can't a microphone drive a loudspeaker directly? Why do audio systems require multiple cascaded stages? Let's trace the signal journey from acoustic wave to amplified sound.</p></div>
+
+  <figure><div data-dg="audioBlockDiagram"></div><figcaption>Figure 1.1 · Complete audio amplification system block diagram: Transducer → Voltage Preamp → Driver Stage → Large-Signal Power Amplifier → Loudspeaker.</figcaption></figure>
+
+  <h3>1.1 Walkthrough of the Signal Chain</h3>
+  <ol class="steps">
+    <li><b>Input Transducer (Microphone):</b> Converts acoustic pressure waves into electrical signals. Output voltage is minute—typically <b>few microvolts (µV) to millivolts (mV)</b> (e.g. 1 mV to 10 mV). The source impedance is high (typically 600 Ω to 50 kΩ), and available power is on the order of picowatts (pW).</li>
+    <li><b>Small-Signal Voltage Amplifier (Preamplifier):</b> Designed for maximum voltage gain (A<sub>v</sub> ≈ 100 to 1000) with minimal noise figure. It boosts the delicate mV input up to <b>1 V to 2 V</b>. However, its collector resistor is relatively large (several kΩ), meaning it cannot supply more than a few milliamperes of current without clipping or collapsing.</li>
+    <li><b>Driver / Phase Splitter Stage:</b> Serves as an impedance buffer between the high-gain preamp and the heavy-current power transistors. In push-pull designs, it produces two equal-amplitude, perfectly 180° anti-phase drive signals (v<sub>1</sub> and v<sub>2</sub> = −v<sub>1</sub>).</li>
+    <li><b>Large-Signal Power Amplifier (Output Stage):</b> Takes the 1V–2V signal and provides massive <b>current gain (A<sub>i</sub> &gt;&gt; 1)</b> while preserving voltage swing. Its output impedance is extremely low (&lt; 1 Ω), enabling it to deliver Amperes of peak current and tens to hundreds of Watts into the low speaker impedance without voltage sagging.</li>
+    <li><b>Output Transducer (Loudspeaker):</b> Electromagnetic voice coil suspended in a permanent magnet field. Typical voice-coil resistances are <b>4 Ω, 8 Ω, 16 Ω, or 32 Ω</b>. Converts high-current electrical power into mechanical cone vibrations, projecting acoustic power into the room.</li>
+  </ol>
+
+  <h3>1.2 Fundamental Differences: Voltage vs Power Amplifiers</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Design Parameter</th><th>Small-Signal Voltage Amplifier</th><th>Large-Signal Power Amplifier</th></tr></thead>
+    <tbody>
+      <tr><td><b>Primary Objective</b></td><td>Achieve maximum voltage gain A<sub>v</sub> = V<sub>o</sub>/V<sub>i</sub></td><td>Deliver maximum AC power P<sub>ac</sub> = V<sub>rms</sub>·I<sub>rms</sub> to load</td></tr>
+      <tr><td><b>Input Signal Level</b></td><td>Tiny (microvolts to millivolts)</td><td>Substantial (1 V to several Volts peak)</td></tr>
+      <tr><td><b>Collector Current (I<sub>C</sub>)</b></td><td>Small (typically 0.5 mA to 5 mA)</td><td>Large (hundreds of mA to tens of Amperes)</td></tr>
+      <tr><td><b>Operating Region</b></td><td>Microscopic linear region around Q-point</td><td>Wide excursion across full load line (cut-off to saturation)</td></tr>
+      <tr><td><b>Mathematical Modeling</b></td><td>Linear two-port models (h-parameters, r<sub>e</sub>)</td><td>Graphical load line analysis &amp; harmonic series</td></tr>
+      <tr><td><b>Transistor Construction</b></td><td>Small surface area, thin base, low power rating (&lt; 500 mW)</td><td>Broad base-collector junction area, metal TO-3/TO-220 cases (&gt; 10W to 150W)</td></tr>
+      <tr><td><b>Output Impedance (Z<sub>out</sub>)</b></td><td>Relatively high (comparable to R<sub>C</sub>, 1 kΩ to 10 kΩ)</td><td>Extremely low (&lt; 0.5 Ω) to drive 4Ω–16Ω loads</td></tr>
+      <tr><td><b>Collector Efficiency (η)</b></td><td>Unimportant (idle power is negligible, few mW)</td><td>Critical (determines battery life, heat dissipation, heatsink size)</td></tr>
+      <tr><td><b>Thermal Design / Heatsink</b></td><td>No heatsink required (air cooling sufficient)</td><td>Extensive aluminum finned heatsinks with thermal paste mandatory</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-Mark Answer Skeleton · Voltage vs Power Amplifiers</span>
+  <ol>
+    <li><b>Introduction &amp; Block Diagram (3 marks):</b> Draw the complete audio system block diagram (Mic → Voltage Amp → Driver → Power Amp → Speaker). State the signal levels (µV/mV → 1–2V → Watts).</li>
+    <li><b>Functional Definition (2 marks):</b> Define power amplifier as a large-signal converter that transforms DC power supplied by the bias source into AC signal power delivered to a low-impedance load with high collector circuit efficiency.</li>
+    <li><b>Detailed Comparison Table (3 marks):</b> Reproduce at least 6 key distinguishing parameters from the comparison table (Objective, I<sub>C</sub> range, Z<sub>out</sub>, efficiency, heatsink, modeling).</li>
+    <li><b>Impedance Mismatch Problem (2 marks):</b> Explain mathematically why connecting an 8 Ω speaker directly to a 2 kΩ collector stage causes 99% signal loss, necessitating impedance transformation.</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why are h-parameters invalid for designing large-signal power amplifiers?</summary>
+  <p>h-parameters (h<sub>ie</sub>, h<sub>fe</sub>, h<sub>oe</sub>, h<sub>re</sub>) are strictly small-signal differential derivatives evaluated at a static operating point (e.g. h<sub>fe</sub> = ∂i<sub>C</sub>/∂i<sub>B</sub>). In a power amplifier, the operating point swings wildly from cut-off to saturation, where h<sub>fe</sub> drops drastically, base-emitter resistance changes non-linearly, and junction temperatures rise. Therefore, graphical load line analysis and large-signal parameters must be used.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s1"> Mark topic 1 as done</label>
+</section>
+
+<!-- ============ S2: AMPLIFIER CLASSES ============ -->
+<section class="sec" id="s2">
+  <div class="sechead"><span class="secno">Topic 2</span></div>
+  <h2>Amplifier Classification: Conduction Angle &amp; Operating Region</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 SDC-II Q3 (10 Marks)</span><span class="tag">Conduction Angle θc</span><span class="tag">Efficiency Spectrum</span></div>
+
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>The classification of an amplifier is defined solely by its <b>conduction angle θ<sub>c</sub></b>—the portion of the 360° input sine-wave cycle during which collector current flows through the active transistor. By shifting the DC Q-point along the dynamic transfer curve from the center of the active region down past cut-off, we trade off harmonic fidelity for electrical efficiency.</p></div>
+
+  <figure><div data-dg="conductionAngles"></div><figcaption>Figure 2.1 · Dynamic transfer curves (i<sub>C</sub> vs i<sub>B</sub>), Q-point placement, and collector current conduction waveforms for Classes A, B, AB, C, and D.</figcaption></figure>
+
+  <h3>2.1 Comprehensive Analysis of Amplifier Classes</h3>
+  <ol class="steps">
+    <li><b>Class A Amplifier (θ<sub>c</sub> = 360° or 2π radians):</b>
+      <ul>
+        <li><b>Bias Point:</b> Biased in the center of the linear active region: V<sub>CEQ</sub> ≈ [[V_{CC}|2]] (series-fed) or V<sub>CEQ</sub> = V<sub>CC</sub> (transformer-coupled).</li>
+        <li><b>Collector Current:</b> Flows continuously for the entire 360° cycle of the input signal (never drops to zero).</li>
+        <li><b>Output Waveform:</b> Faithful reproduction of input signal with minimal harmonic distortion.</li>
+        <li><b>Collector Efficiency:</b> Very poor. Maximum theoretical efficiency is <b>25%</b> for series-fed resistive load and <b>50%</b> for transformer-coupled load.</li>
+        <li><b>Thermal Behavior:</b> Heavy idle current dissipation (P<sub>Q</sub> = V<sub>CEQ</sub>·I<sub>CQ</sub>). The transistor runs hottest when NO audio signal is playing!</li>
+        <li><b>Application:</b> High-fidelity audiophile preamplifiers, low-power RF driver stages, instrumentation amplifiers.</li>
+      </ul>
+    </li>
+    <li><b>Class B Amplifier (θ<sub>c</sub> = 180° or π radians):</b>
+      <ul>
+        <li><b>Bias Point:</b> Biased precisely at cut-off: I<sub>CQ</sub> = 0, V<sub>BEQ</sub> ≈ 0 V.</li>
+        <li><b>Collector Current:</b> Flows for exactly one half-cycle (180°) of the AC input signal. Transistor is completely turned OFF during the negative half.</li>
+        <li><b>Output Waveform:</b> A single transistor delivers only half-wave pulses. A push-pull pair (two transistors operating 180° out of phase) is required to reconstruct the complete sine wave.</li>
+        <li><b>Collector Efficiency:</b> High. Maximum theoretical efficiency is [[π|4]] ≈ <b>78.54%</b>.</li>
+        <li><b>Distortion:</b> Suffers from <i>crossover distortion</i> near zero crossings due to the 0.7 V cut-in threshold of silicon BJTs.</li>
+        <li><b>Thermal Behavior:</b> Zero quiescent power dissipation when signal is absent. Transistor dissipation is proportional to output level.</li>
+        <li><b>Application:</b> Battery-operated intercoms, public address systems where battery conservation is critical.</li>
+      </ul>
+    </li>
+    <li><b>Class AB Amplifier (180° &lt; θ<sub>c</sub> &lt; 360°):</b>
+      <ul>
+        <li><b>Bias Point:</b> Biased slightly above cut-off (small quiescent current I<sub>CQ</sub> ≈ 5% to 10% of peak collector current I<sub>p</sub>).</li>
+        <li><b>Collector Current:</b> Flows for more than half a cycle but less than the full cycle (typically 200° to 220°).</li>
+        <li><b>Output Waveform:</b> Both transistors conduct simultaneously near the zero crossing, creating a seamless hand-off that completely eliminates crossover distortion.</li>
+        <li><b>Collector Efficiency:</b> Typically <b>50% to 70%</b> (theoretical upper limit 78.5%).</li>
+        <li><b>Advantages:</b> Combines the linearity and purity of Class A with the high efficiency and low idle power of Class B.</li>
+        <li><b>Application:</b> The universal industry standard for consumer Hi-Fi audio amplifiers, studio monitors, guitar power amps.</li>
+      </ul>
+    </li>
+    <li><b>Class C Amplifier (θ<sub>c</sub> &lt; 180°, typically 80° to 120°):</b>
+      <ul>
+        <li><b>Bias Point:</b> Biased well below cut-off using reverse base-emitter bias (V<sub>BEQ</sub> &lt; 0 V).</li>
+        <li><b>Collector Current:</b> Flows in narrow pulses during the positive peak of the input cycle.</li>
+        <li><b>Collector Efficiency:</b> Highest among linear-biased circuits, typically <b>80% to 90%</b>.</li>
+        <li><b>Distortion:</b> Severe non-linear distortion. Completely unusable for direct audio amplification.</li>
+        <li><b>Application:</b> Radio Frequency (RF) power transmitters (AM, FM, mobile transmitters). A parallel LC resonant tank circuit forms the collector load, which rings sinusoidally via the "flywheel effect" to reconstruct a pure carrier wave.</li>
+      </ul>
+    </li>
+    <li><b>Class D Amplifier (Switching / Pulse-Width Modulation):</b>
+      <ul>
+        <li><b>Operating Principle:</b> Non-linear switching amplifier. The audio input is compared against a high-frequency triangular wave (e.g. 250 kHz to 1 MHz) to generate a Pulse-Width Modulated (PWM) square wave.</li>
+        <li><b>Transistor State:</b> Output MOSFETs operate strictly as rapid electronic switches: either fully ON (saturation, where V<sub>DS</sub> ≈ 0 V) or fully OFF (cut-off, where I<sub>D</sub> = 0 A).</li>
+        <li><b>Efficiency:</b> Since P<sub>loss</sub> = V<sub>DS</sub> · I<sub>D</sub> is approximately zero in both states, theoretical efficiency approaches <b>100%</b> (practical commercial circuits achieve <b>90% to 98%</b>).</li>
+        <li><b>Reconstruction:</b> A passive low-pass LC Butterworth filter removes the high-frequency switching carrier, delivering the pure amplified audio signal to the loudspeaker.</li>
+        <li><b>Application:</b> Modern smartphones, automotive audio systems, active subwoofers, ultra-compact portable Bluetooth speakers.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h3>2.2 Master Comparison Table of Amplifier Classes</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Classification Criteria</th><th>Class A</th><th>Class B</th><th>Class AB</th><th>Class C</th><th>Class D</th></tr></thead>
+    <tbody>
+      <tr><td><b>Operating Point (Q-Point)</b></td><td>Center of active region</td><td>Exactly at cut-off</td><td>Slightly above cut-off</td><td>Well below cut-off</td><td>Switching (Cut-off / Sat.)</td></tr>
+      <tr><td><b>Conduction Angle (θ<sub>c</sub>)</b></td><td>360° (2π)</td><td>180° (π)</td><td>180° &lt; θ<sub>c</sub> &lt; 360° (~210°)</td><td>&lt; 180° (typically 90°)</td><td>Switching pulses (PWM)</td></tr>
+      <tr><td><b>Theoretical Max Efficiency (η)</b></td><td>25% (series), 50% (xfmr)</td><td>78.54% ([[π|4]])</td><td>50% to 78.5%</td><td>85% to 90%</td><td>95% to 100%</td></tr>
+      <tr><td><b>Practical Efficiency</b></td><td>15% to 35%</td><td>60% to 70%</td><td>50% to 65%</td><td>75% to 85%</td><td>88% to 95%</td></tr>
+      <tr><td><b>Harmonic Distortion</b></td><td>Lowest (almost none)</td><td>Severe crossover distortion</td><td>Very low (crossover eliminated)</td><td>Extremely high</td><td>Filter-dependent</td></tr>
+      <tr><td><b>Quiescent Current (I<sub>CQ</sub>)</b></td><td>Large (constant I<sub>CQ</sub>)</td><td>Zero (I<sub>CQ</sub> = 0)</td><td>Small (~5% to 10% I<sub>p</sub>)</td><td>Zero</td><td>Zero (switch leakage only)</td></tr>
+      <tr><td><b>Transistors for Full Wave</b></td><td>Single transistor</td><td>Two (push-pull pair)</td><td>Two (push-pull pair)</td><td>Single (with LC tank)</td><td>Two or four (half/full H-bridge)</td></tr>
+      <tr><td><b>Primary Applications</b></td><td>Audiophile Hi-Fi, RF drivers</td><td>Low-power PA systems</td><td>Universal audio power amps</td><td>RF transmitters &amp; tuned amps</td><td>Subwoofers, mobile, smart TVs</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Skeleton · Winter 2025 SDC-II Q3</span>
+  <ol>
+    <li><b>Define Conduction Angle (2 marks):</b> State the formal definition of θ<sub>c</sub> and how the Q-point location determines the conduction interval for Class A, B, and C.</li>
+    <li><b>Transfer Characteristics &amp; Waveforms (4 marks):</b> Draw the dynamic transfer curves (i<sub>C</sub> vs i<sub>B</sub> or v<sub>in</sub>) showing Q-point placement and resulting collector current output waveforms for Class A (360°), Class B (180°), and Class C (&lt;180°).</li>
+    <li><b>Analytical Comparison (4 marks):</b> Provide a clear table comparing Class A, B, and C across at least 5 parameters: Q-point, conduction angle, theoretical efficiency derivation limits (25/50% vs 78.5% vs &gt;85%), distortion levels, and typical applications.</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why can't a Class C amplifier be used directly as an audio power amplifier?</summary>
+  <p>In Class C, current flows for only a fraction of the cycle (θ<sub>c</sub> &lt; 180°), clipping more than half of the input audio waveform completely. In RF amplifiers, an LC resonant circuit tuned to the carrier frequency reconstructs the missing portions via electromagnetic oscillation (flywheel effect). In audio, the signal spans three decades of frequencies (20 Hz to 20 kHz), making tuned LC reconstruction impossible; the output would sound intolerably distorted.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s2"> Mark topic 2 as done</label>
+</section>
+
+<!-- ============ S3: SERIES-FED CLASS A ============ -->
+<section class="sec" id="s3">
+  <div class="sechead"><span class="secno">Topic 3</span></div>
+  <h2>Series-Fed Class A Power Amplifier</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 Q5 OR (10 Marks)</span><span class="tag">DC Load Line</span><span class="tag">Efficiency Derivation (25%)</span><span class="tag">Figure of Merit = 2</span></div>
+
+  <div class="card intuition"><span class="label">Circuit Concept</span>
+  <p>The series-fed Class A amplifier is the simplest large-signal topology: the load resistor R<sub>L</sub> is connected directly in series with the collector of an NPN power BJT. Because current flows continuously through both R<sub>L</sub> and the transistor, it provides our foundational benchmark for power, dissipation, and efficiency limits.</p></div>
+
+  <figure><div data-dg="classASeriesSchematic"></div><figcaption>Figure 3.1 · Series-fed Class A power amplifier circuit schematic (left) and DC load line with centered operating Q-point (right).</figcaption></figure>
+
+  <h3>3.1 Circuit Equations &amp; Load Line Analysis</h3>
+  <p>Applying Kirchhoff's Voltage Law (KVL) to the collector-emitter output loop:</p>
+  <div class="eq">V_{CC} − I_{C} R_{L} − V_{CE} = 0 &rArr; I_{C} = [[V_{CC} − V_{CE}|R_{L}]] = − [[1|R_{L}]] V_{CE} + [[V_{CC}|R_{L}]]</div>
+  <p>This is the equation of a straight line (the <b>DC Load Line</b>) plotted on the I<sub>C</sub> versus V<sub>CE</sub> output characteristics:</p>
+  <ul>
+    <li><b>Cut-off Point (Point A):</b> When transistor is cut off, I<sub>C</sub> = 0 $&rArr;$ V<sub>CE(cut-off)</sub> = V<sub>CC</sub>. Coordinates: <b>(V<sub>CC</sub>, 0)</b>.</li>
+    <li><b>Saturation Point (Point B):</b> When transistor saturates, V<sub>CE</sub> = 0 $&rArr;$ I<sub>C(sat)</sub> = [[V_{CC}|R_{L}]]. Coordinates: <b>(0, [[V_{CC}|R_{L}]])</b>.</li>
+    <li><b>Optimal Q-Point for Maximum Symmetrical Swing:</b> To prevent premature clipping on either peak, the quiescent operating point Q must be located at the precise midpoint of the load line:</li>
+  </ul>
+  <div class="eq key">V_{CEQ} = [[V_{CC}|2]],    I_{CQ} = [[V_{CC}|2 R_{L}]]</div>
+
+  <h3>3.2 Derivation of Maximum AC Output Power (P<sub>ac(max)</sub>)</h3>
+  <p>When an AC input signal is applied, the operating point swings symmetrically up and down along the load line. Under maximum undistorted excursion:</p>
+  <ul>
+    <li>Peak-to-peak output voltage swing: V<sub>opp</sub> = V<sub>CE(max)</sub> − V<sub>CE(min)</sub> = V<sub>CC</sub> − 0 = V<sub>CC</sub>.</li>
+    <li>Peak output voltage: V<sub>p</sub> = [[V_{opp}|2]] = [[V_{CC}|2]].</li>
+    <li>RMS output voltage: V<sub>rms</sub> = [[V_{p}|√2]] = [[V_{CC}|2√2]].</li>
+    <li>Peak-to-peak output current swing: I<sub>opp</sub> = I<sub>C(max)</sub> − I<sub>C(min)</sub> = [[V_{CC}|R_{L}]] − 0 = [[V_{CC}|R_{L}]].</li>
+    <li>Peak output current: I<sub>p</sub> = [[I_{opp}|2]] = [[V_{CC}|2 R_{L}]].</li>
+    <li>RMS output current: I<sub>rms</sub> = [[I_{p}|√2]] = [[V_{CC}|2√2 R_{L}]].</li>
+  </ul>
+  <p>The AC power delivered to the load resistor R<sub>L</sub> is:</p>
+  <div class="eq">P_{ac} = V_{rms} &middot; I_{rms} = [[V_{opp}|2<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2</span></span>]] &middot; [[I_{opp}|2<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2</span></span>]] = [[(V_{max} − V_{min})(I_{max} − I_{min})|8]]</div>
+  <p>Expressed purely in terms of peak-to-peak voltage across load resistance R<sub>L</sub>:</p>
+  <div class="eq key">P_{ac(max)} = [[V_{opp}^2|8 R_{L}]] = [[(V_{CC})^2|8 R_{L}]] = [[V_{CC}^2|8 R_{L}]]</div>
+
+  <h3>3.3 Derivation of DC Input Power (P<sub>dc</sub>)</h3>
+  <p>The DC power supplied by the battery source V<sub>CC</sub> is the product of supply voltage and average DC current drawn from it. Because the output current swings sinusoidally around the quiescent bias level I<sub>CQ</sub>, the average (DC) collector current remains constant at I<sub>CQ</sub>:</p>
+  <div class="eq key">P_{dc} = V_{CC} &middot; I_{CQ} = V_{CC} &middot; [[V_{CC}|2 R_{L}]] = [[V_{CC}^2|2 R_{L}]]</div>
+
+  <h3>3.4 Derivation of Maximum Collector Efficiency (η<sub>max</sub>)</h3>
+  <p>Collector circuit efficiency η is defined as the ratio of AC output power delivered to the load to the total DC power supplied by the source:</p>
+  <div class="eq key">&eta;_{max} = [[P_{ac(max)}|P_{dc}]] &times; 100% = [[[[V_{CC}^2|8 R_{L}]]|[[V_{CC}^2|2 R_{L}]]]] &times; 100% = [[2|8]] &times; 100% = <b>25%</b></div>
+  <p><b>Physical Conclusion:</b> In a series-fed Class A amplifier, even under optimal, zero-saturation conditions, <b>at most 25% of the DC power supplied is converted into audio output power</b>. The remaining 75% is entirely dissipated as waste heat in the transistor and load resistor.</p>
+
+  <h3>3.5 Power Dissipation &amp; Figure of Merit (FM)</h3>
+  <p>The power dissipated within the transistor itself is the difference between total DC input power and AC power delivered to the external load:</p>
+  <div class="eq">P_{D} = P_{dc} − P_{ac}</div>
+  <ul>
+    <li><b>Quiescent Condition (Zero Input Signal, P<sub>ac</sub> = 0):</b>
+      <div class="eq">P_{Q(max)} = V_{CEQ} &middot; I_{CQ} = [[V_{CC}|2]] &middot; [[V_{CC}|2 R_{L}]] = [[V_{CC}^2|4 R_{L}]]</div>
+      <b>The transistor dissipates its maximum possible power when idling!</b> As the audio signal level increases, AC power is delivered to the load, and the internal dissipation of the transistor actually <i>decreases</i>.
+    </li>
+    <li><b>Figure of Merit (FM):</b> Defined as the ratio of maximum transistor power dissipation to maximum AC output power:
+      <div class="eq key">FM = [[P_{Q(max)}|P_{ac(max)}]] = [[[[V_{CC}^2|4 R_{L}]]|[[V_{CC}^2|8 R_{L}]]]] = <b>2</b></div>
+      <b>Physical Significance:</b> The transistor must be rated to safely dissipate at least <b>twice</b> the maximum AC power it can deliver to the load (e.g. to produce 10 W of audio power, you must select a transistor rated for at least 20 W of continuous thermal dissipation).
+    </li>
+  </ul>
+
+  <h3>3.6 Practical Efficiency with Saturation Voltage V<sub>ce(min)</sub></h3>
+  <p>In a real power transistor, collector voltage cannot drop to zero; it is bounded by the collector saturation voltage V<sub>CE(sat)</sub> = V_{ce(min)} (typically 0.5 V to 2 V). The practical voltage swing becomes V<sub>opp</sub> = V<sub>CC</sub> − V<sub>ce(min)</sub>, reducing efficiency to:</p>
+  <div class="eq">&eta; = 25% &middot; ([[V_{CC} − V_{ce(min)}|V_{CC}]])^2   or   &eta; = [[(V_{max} − V_{min})^2|8 &middot; V_{CC} &middot; V_{CEQ}]] &times; 100%</div>
+
+  <div class="card try"><span class="label">Interactive Simulation · Class A Efficiency Analyzer</span>
+  <p>Compare series-fed versus transformer-coupled Class A performance under real saturation voltages:</p>
+  <div data-w="classAEff"></div></div>
+
+  <div class="card exam"><span class="label">10-Mark Answer Skeleton · Series-Fed Class A Amplifier</span>
+  <ol>
+    <li><b>Circuit Diagram &amp; Operation (2 marks):</b> Draw the circuit schematic of series-fed Class A amplifier. Explain role of R<sub>B</sub>, R<sub>L</sub>, C<sub>1</sub>, and V<sub>CC</sub>.</li>
+    <li><b>DC Load Line Analysis (2 marks):</b> Derive cut-off point (V<sub>CC</sub>, 0) and saturation point (0, V<sub>CC</sub>/R<sub>L</sub>). State condition for Q-point centering at (V<sub>CC</sub>/2, V<sub>CC</sub>/2R<sub>L</sub>).</li>
+    <li><b>Power Derivations (4 marks):</b> Formulate V<sub>rms</sub>, I<sub>rms</sub>, derive P<sub>ac(max)</sub> = V<sub>CC</sub><sup>2</sup> / (8R<sub>L</sub>), derive P<sub>dc</sub> = V<sub>CC</sub><sup>2</sup> / (2R<sub>L</sub>), and prove η<sub>max</sub> = 25%.</li>
+    <li><b>Power Dissipation &amp; FM (2 marks):</b> Prove P<sub>Q(max)</sub> = V<sub>CC</sub><sup>2</sup> / (4R<sub>L</sub>) at zero signal. Calculate Figure of Merit FM = P<sub>Q</sub> / P<sub>ac</sub> = 2.</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why does a Class A amplifier run cooler when playing loud audio than when silent?</summary>
+  <p>The total DC power P<sub>dc</sub> drawn from the supply is constant at V<sub>CC</sub> · I<sub>CQ</sub> regardless of signal level. Transistor dissipation is P<sub>D</sub> = P<sub>dc</sub> − P<sub>ac</sub>. When silent (P<sub>ac</sub> = 0), all DC power is converted to heat inside the transistor (P<sub>Q</sub> = V<sub>CC</sub><sup>2</sup> / 4R<sub>L</sub>). When audio plays at full volume, 25% of that power is transferred to the external speaker as sound and voice-coil heat, leaving only 75% inside the amplifier.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s3"> Mark topic 3 as done</label>
+</section>
+<!-- ============ S4: TRANSFORMER-COUPLED CLASS A ============ -->
+<section class="sec" id="s4">
+  <div class="sechead"><span class="secno">Topic 4</span></div>
+  <h2>Transformer-Coupled Class A Power Amplifier</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 Q5 OR (10 Marks)</span><span class="tag">Impedance Matching</span><span class="tag">2VCC Voltage Swing</span><span class="tag">50% Max Efficiency</span></div>
+
+  <div class="card intuition"><span class="label">Why Use a Transformer?</span>
+  <p>The series-fed Class A amplifier suffered two crippling weaknesses: (1) low efficiency (25%) because DC current burned power continuously in R<sub>L</sub>, and (2) inability to drive low-impedance loads (4Ω–16Ω) directly. The <b>transformer-coupled Class A amplifier</b> solves both: the primary winding has near-zero DC resistance (eliminating quiescent DC resistive loss), while its step-down turns ratio transforms the tiny speaker impedance into an optimal large reflected load R'<sub>L</sub>. Most remarkably, <b>the collector voltage swings all the way up to 2·V<sub>CC</sub></b> due to inductive energy storage!</p></div>
+
+  <figure><div data-dg="classAXfmrSchematic"></div><figcaption>Figure 4.1 · Transformer-coupled Class A circuit schematic (left) and load lines showing vertical DC load line and 2·V<sub>CC</sub> AC swing (right).</figcaption></figure>
+
+  <h3>4.1 Reflected Load Impedance (R'<sub>L</sub>)</h3>
+  <p>Let the output transformer have N<sub>1</sub> primary turns and N<sub>2</sub> secondary turns, giving turns ratio n = [[N_{1}|N_{2}]]. Across ideal transformer terminals:</p>
+  <div class="eq">[[V_{1}|V_{2}]] = [[N_{1}|N_{2}]] = n &rArr; V_{1} = n V_{2},    [[I_{1}|I_{2}]] = [[N_{2}|N_{1}]] = [[1|n]] &rArr; I_{1} = [[I_{2}|n]]</div>
+  <p>The effective AC load impedance seen looking into the primary winding is:</p>
+  <div class="eq key">R'_{L} = [[V_{1}|I_{1}]] = [[n V_{2}|I_{2} / n]] = n^2 &middot; [[V_{2}|I_{2}]] = ([[N_{1}|N_{2}]])^2 &middot; R_{L}</div>
+  <p>If primary winding wire has non-zero DC resistance R<sub>py</sub>, the total AC load is R''<sub>L</sub> = R'<sub>L</sub> + R<sub>py</sub>.</p>
+
+  <h3>4.2 DC &amp; AC Load Line Dynamics: Why Voltage Reaches 2·V<sub>CC</sub></h3>
+  <ol class="steps">
+    <li><b>Vertical DC Load Line:</b> The DC winding resistance of the transformer primary is negligible (R<sub>dc</sub> ≈ 0 Ω). Applying KVL under DC conditions:
+      <div class="eq">V_{CEQ} = V_{CC} − I_{CQ} &middot; R_{dc} &approx; V_{CC}</div>
+      The DC load line is a perfectly <b>vertical line</b> at V<sub>CE</sub> = V<sub>CC</sub>! Unlike the series-fed stage where V<sub>CEQ</sub> = V<sub>CC</sub>/2, the transistor now enjoys the full supply voltage V<sub>CC</sub> at rest.
+    </li>
+    <li><b>AC Load Line:</b> For AC signals, the primary presents impedance R'<sub>L</sub>. The AC load line passes through the quiescent point Q(V<sub>CC</sub>, I_{CQ}) with slope −[[1|R'_{L}]].</li>
+    <li><b>The Inductive 2·V<sub>CC</sub> Mechanism:</b> When the input AC signal drives base current downwards toward cut-off (I<sub>C</sub> drops from I<sub>CQ</sub> to 0), the magnetic field in the transformer primary core collapses. According to Lenz's Law, the inductor induces a voltage v<sub>L</sub> = L·[[di|dt]] that <i>opposes</i> the decay of current, effectively adding in series with the battery V<sub>CC</sub>:
+      <div class="eq key">V_{CE(max)} = V_{CC} + I_{CQ} &middot; R'_{L} = V_{CC} + V_{CC} = <b>2 &middot; V_{CC}</b></div>
+      The collector-emitter voltage swings symmetrically from <b>0 V up to 2·V<sub>CC</sub></b>!
+    </li>
+    <li><b>Symmetrical Current Excursion:</b> When V<sub>CE</sub> drops to zero during the opposite peak, collector current reaches:
+      <div class="eq">I_{C(max)} = 2 &middot; I_{CQ} = [[2 V_{CC}|R'_{L}]]</div>
+    </li>
+  </ol>
+
+  <h3>4.3 Derivation of Maximum AC Output Power (P<sub>ac(max)</sub>)</h3>
+  <p>Under full symmetric swing, peak-to-peak output voltage and current are:</p>
+  <div class="eq">V_{opp} = V_{CE(max)} − V_{CE(min)} = 2 V_{CC} − 0 = 2 V_{CC},    I_{opp} = I_{C(max)} − I_{C(min)} = [[2 V_{CC}|R'_{L}]]</div>
+  <p>The AC power delivered to the transformer primary winding (and transferred to load) is:</p>
+  <div class="eq key">P_{ac(max)} = [[V_{opp}^2|8 R'_{L}]] = [[(2 V_{CC})^2|8 R'_{L}]] = [[4 V_{CC}^2|8 R'_{L}]] = [[V_{CC}^2|2 R'_{L}]]</div>
+
+  <h3>4.4 Derivation of DC Input Power (P<sub>dc</sub>)</h3>
+  <p>The average DC current drawn from the battery is simply the constant bias current I_{CQ} = [[V_{CC}|R'_{L}]]:</p>
+  <div class="eq key">P_{dc} = V_{CC} &middot; I_{CQ} = V_{CC} &middot; [[V_{CC}|R'_{L}]] = [[V_{CC}^2|R'_{L}]]</div>
+
+  <h3>4.5 Derivation of Maximum Efficiency (η<sub>max</sub> = 50%)</h3>
+  <div class="eq key">&eta;_{max} = [[P_{ac(max)}|P_{dc}]] &times; 100% = [[[[V_{CC}^2|2 R'_{L}]]|[[V_{CC}^2|R'_{L}]]]] &times; 100% = [[1|2]] &times; 100% = <b>50%</b></div>
+  <p><b>Conclusion:</b> By eliminating resistive DC collector loss and doubling voltage swing to 2·V<sub>CC</sub>, <b>transformer coupling doubles the theoretical efficiency of Class A from 25% to 50%!</b></p>
+
+  <h3>4.6 Transistor Dissipation &amp; Figure of Merit</h3>
+  <ul>
+    <li>Quiescent power dissipation (idle, zero AC signal):
+      <div class="eq">P_{Q(max)} = V_{CEQ} &middot; I_{CQ} = V_{CC} &middot; [[V_{CC}|R'_{L}]] = [[V_{CC}^2|R'_{L}]]</div>
+    </li>
+    <li>Figure of Merit:
+      <div class="eq key">FM = [[P_{Q(max)}|P_{ac(max)}]] = [[[[V_{CC}^2|R'_{L}]]|[[V_{CC}^2|2 R'_{L}]]]] = <b>2</b></div>
+    </li>
+  </ul>
+
+  <h3>4.7 Advantages &amp; Disadvantages</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Advantages</th><th>Disadvantages</th></tr></thead>
+    <tbody>
+      <tr><td><b>Double Efficiency (50%):</b> Twice as efficient as series-fed Class A.</td><td><b>Heavy &amp; Bulky:</b> Iron-core transformers add substantial weight and physical volume.</td></tr>
+      <tr><td><b>Impedance Matching:</b> Readily matches any speaker impedance (4Ω, 8Ω) by selecting turns ratio.</td><td><b>Cost:</b> Quality audio transformers with low leakage inductance are expensive.</td></tr>
+      <tr><td><b>DC Isolation:</b> Direct current cannot flow through speaker voice coil.</td><td><b>Core Saturation:</b> Continuous DC quiescent current I<sub>CQ</sub> flows through primary, magnetizing core and causing low-frequency distortion.</td></tr>
+      <tr><td><b>Low Distortion:</b> Preserves Class A low-distortion waveform reproduction.</td><td><b>Bandwidth Limits:</b> Core losses and interwinding capacitance restrict high-frequency response.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Answer Skeleton · Winter 2025 Q5 OR (ii)</span>
+  <ol>
+    <li><b>Circuit Diagram (2 marks):</b> Draw the transformer-coupled Class A circuit with voltage divider bias (R<sub>1</sub>, R<sub>2</sub>), emitter stabilization (R<sub>E</sub>, C<sub>E</sub>), and output transformer (N<sub>1</sub>:N<sub>2</sub>).</li>
+    <li><b>Load Line &amp; Inductive Swing (3 marks):</b> Explain why DC load line is vertical at V<sub>CE</sub> = V<sub>CC</sub>. Explain Lenz's Law mechanism that forces V<sub>CE(max)</sub> to reach 2·V<sub>CC</sub>.</li>
+    <li><b>Mathematical Derivations (3 marks):</b> Derive R'<sub>L</sub> = (N<sub>1</sub>/N<sub>2</sub>)<sup>2</sup>·R<sub>L</sub>, P<sub>ac(max)</sub> = V<sub>CC</sub><sup>2</sup>/(2R'<sub>L</sub>), P<sub>dc</sub> = V<sub>CC</sub><sup>2</sup>/R'<sub>L</sub>, and prove η<sub>max</sub> = 50%.</li>
+    <li><b>Advantages &amp; Limitations (2 marks):</b> Highlight impedance matching benefit and core saturation drawback due to continuous DC bias.</li>
+  </ol></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s4"> Mark topic 4 as done</label>
+</section>
+
+<!-- ============ S5: CLASS A DESIGN EXAMPLE ============ -->
+<section class="sec" id="s5">
+  <div class="sechead"><span class="secno">Topic 5</span></div>
+  <h2>Complete Design Example: Transformer-Coupled Class A Amplifier</h2>
+  <div class="tags"><span class="tag hot">Dr. Ghongade Teaching Notes</span><span class="tag">Exact Numerical Walkthrough</span><span class="tag">Standard Components</span></div>
+
+  <div class="card intuition"><span class="label">Design Specifications</span>
+  <p><b>Target Problem (from Dr. Ghongade's notes, pages 11–13):</b><br>
+  Design a transformer-coupled Class A power amplifier to deliver <b>P<sub>o</sub> = 50 mW</b> to a <b>R<sub>L</sub> = 4 Ω</b> loudspeaker.
+  <br>Given: Supply Voltage <b>V<sub>CC</sub> = 9 V</b>, Lower cutoff frequency <b>f<sub>L</sub> = 50 Hz</b>, Transformer efficiency <b>η<sub>xfmr</sub> = 70%</b>. Transistor power BJT with <b>h<sub>fe</sub> ≈ 20</b>.</p></div>
+
+  <h3>Step-by-Step Design Execution</h3>
+  <ol class="steps">
+    <li><b>Calculate Reflected AC Power Delivered to Transformer Primary (P'<sub>ac</sub>):</b>
+      <p>Because the transformer has an internal conversion efficiency of 70%, the primary winding must receive more power than what reaches the speaker:</p>
+      <div class="eq">P'_{ac} = [[P_{o}|&eta;_{xfmr}]] = [[50 mW|0.70]] = <b>71.43 mW</b></div>
+    </li>
+    <li><b>Compute Required Reflected Load Resistance (R'<sub>L</sub>):</b>
+      <p>Using the maximum AC power relation for transformer-coupled Class A:</p>
+      <div class="eq">P'_{ac} = [[V_{CC}^2|2 R'_{L}]] &rArr; R'_{L} = [[V_{CC}^2|2 P'_{ac}]] = [[(9 V)^2|2 &times; 71.43 &times; 10^{-3} W]] = [[81|0.14286]] = <b>566.99 &Omega; &approx; 567 &Omega;</b></div>
+    </li>
+    <li><b>Determine Transformer Turns Ratio ([[N_{1}|N_{2}]]):</b>
+      <div class="eq">R'_{L} = ([[N_{1}|N_{2}]])^2 R_{L} &rArr; [[N_{1}|N_{2}]] = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">[[R'_{L}|R_{L}]]</span></span> = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">[[567 &Omega;|4 &Omega;]]</span></span> = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">141.75</span></span> = 11.9 &approx; <b>12</b></div>
+      <b>Specification:</b> Step-down transformer with turns ratio <b>12 : 1</b>.
+    </li>
+    <li><b>Calculate Quiescent Collector Current (I<sub>CQ</sub>):</b>
+      <div class="eq">P'_{ac} = [[V_{CC} &middot; I_{CQ}|2]] &rArr; I_{CQ} = [[2 P'_{ac}|V_{CC}]] = [[2 &times; 71.43 &times; 10^{-3} W|9 V]] = <b>15.87 mA</b></div>
+    </li>
+    <li><b>Design Emitter Resistor (R<sub>E</sub>):</b>
+      <p>Following standard thermal stability design practice, allocate 10% of V<sub>CC</sub> across the emitter resistor:</p>
+      <div class="eq">V_{E} = [[V_{CC}|10]] = [[9 V|10]] = 0.9 V</div>
+      <div class="eq">R_{E} = [[V_{E}|I_{CQ}]] = [[0.9 V|15.87 mA]] = 56.7 &Omega; &rArr; Select standard value  <b>R_{E} = 56 &Omega;</b></div>
+    </li>
+    <li><b>Transistor Parameter Ratings:</b>
+      <p>Since the device is a power BJT, its current gain is typically low (h<sub>fe</sub> ≈ 20). Transistor must satisfy:</p>
+      <ul>
+        <li>Breakdown Voltage: BV<sub>CEO</sub> ≥ 2·V<sub>CC</sub> = 2 × 9V = <b>18 V</b> (accounting for inductive swing).</li>
+        <li>Peak Collector Current: I<sub>C(max)</sub> ≥ 2·I<sub>CQ</sub> = 2 × 15.87 mA = <b>31.74 mA</b>.</li>
+        <li>Power Dissipation Rating: P<sub>D(max)</sub> ≥ 2·P'<sub>ac</sub> = 2 × 71.43 mW = <b>142.8 mW</b>.</li>
+      </ul>
+    </li>
+    <li><b>Design Lower Bias Resistor (R<sub>2</sub>):</b>
+      <p>To ensure robust bias stability against temperature and transistor batch variation, the voltage divider current I<sub>2</sub> is designed to be much larger than base current (rule of thumb: R<sub>2</sub> ≈ 10·R<sub>E</sub>):</p>
+      <div class="eq">R_{2} = 10 &middot; R_{E} = 10 &times; 56 &Omega; = <b>560 &Omega; (standard E12 value)</b></div>
+    </li>
+    <li><b>Determine Base Voltage (V<sub>B</sub>) &amp; Divider Current (I<sub>2</sub>):</b>
+      <div class="eq">V_{B} = V_{E} + V_{BE} = 0.9 V + 0.7 V = <b>1.6 V</b></div>
+      <div class="eq">I_{2} = [[V_{B}|R_{2}]] = [[1.6 V|560 &Omega;]] = <b>2.86 mA</b></div>
+    </li>
+    <li><b>Design Upper Bias Resistor (R<sub>1</sub>):</b>
+      <p>Neglecting small base current I<sub>B</sub> ≈ I<sub>CQ</sub>/h<sub>fe</sub> = 15.87mA/20 = 0.79 mA compared to I<sub>2</sub>:</p>
+      <div class="eq">R_{1} = [[V_{CC} − V_{B}|I_{2}]] = [[9 V − 1.6 V|2.86 mA]] = [[7.4 V|2.86 mA]] = 2.59 k&Omega; &rArr; Select standard  <b>R_{1} = 2.7 k&Omega;</b></div>
+    </li>
+    <li><b>Design Capacitors (C<sub>1</sub> and C<sub>2</sub>):</b>
+      <p>Determine small-signal BJT dynamic resistances:</p>
+      <div class="eq">h_{ie} = h_{fe} &middot; [[V_{T}|I_{CQ}]] = 20 &times; [[25 mV|15.87 mA]] = <b>31.5 &Omega;</b></div>
+      <div class="eq">h_{ib} = [[h_{ie}|1 + h_{fe}]] = [[31.5 &Omega;|21]] = <b>1.5 &Omega;</b></div>
+      <p><b>Emitter Bypass Capacitor (C<sub>2</sub>):</b> Designed so reactance X<sub>C2</sub> equals h_{ib} at lowest operating frequency f<sub>L</sub> = 50 Hz:</p>
+      <div class="eq">C_{2} = [[1|2 &pi; f_{L} h_{ib}]] = [[1|2 &pi; &times; 50 Hz &times; 1.5 &Omega;]] = 2.12 &times; 10^{-3} F &rArr; Select standard  <b>C_{2} = 2200 &mu;F</b></div>
+      <p><b>Input Coupling Capacitor (C<sub>1</sub>):</b> Designed with X<sub>C1</sub> ≤ h_{ie}/10:</p>
+      <div class="eq">C_{1} = [[1|2 &pi; f_{L} (h_{ie}/10)]] = [[1|2 &pi; &times; 50 Hz &times; 3.15 &Omega;]] = 1010 &mu;F &rArr; Select standard  <b>C_{1} = 1000 &mu;F</b></div>
+    </li>
+    <li><b>Calculate Collector Voltage Gain (A<sub>v</sub>):</b>
+      <div class="eq key">A_{v} = − [[h_{fe} &middot; R'_{L}|h_{ie}]] = − [[20 &times; 567 &Omega;|31.5 &Omega;]] = <b>−360</b></div>
+    </li>
+  </ol>
+
+  <div class="card intuition"><span class="label">Summary of Final Component Selections</span>
+  <p>V<sub>CC</sub> = 9V, Transistor: BV<sub>CEO</sub> ≥ 18V, I<sub>C</sub> ≥ 35mA, P<sub>D</sub> ≥ 150mW; Transformer: N<sub>1</sub>:N<sub>2</sub> = 12:1; R<sub>E</sub> = 56 Ω, R<sub>2</sub> = 560 Ω, R<sub>1</sub> = 2.7 kΩ, C<sub>1</sub> = 1000 µF, C<sub>2</sub> = 2200 µF; Gain A<sub>v</sub> = −360.</p></div>
+  <label class="done-row"><input type="checkbox" data-done="s5"> Mark topic 5 as done</label>
+</section>
+
+<!-- ============ S6: CLASS B PUSH-PULL ============ -->
+<section class="sec" id="s6">
+  <div class="sechead"><span class="secno">Topic 6</span></div>
+  <h2>Transformer-Coupled Class B Push-Pull Amplifier</h2>
+  <div class="tags"><span class="tag hot">Summer 2026 Q5 (10 Marks)</span><span class="tag">Winter 2025 Q5 (10 Marks)</span><span class="tag">78.5% Efficiency</span><span class="tag">Even Harmonic Cancellation</span></div>
+
+  <div class="card intuition"><span class="label">Push-Pull Operating Principle</span>
+  <p>Class A wasted enormous power idling at full bias current. <b>Class B eliminates quiescent current entirely</b> by biasing transistors at cut-off (I<sub>CQ</sub> = 0). Since one transistor can only conduct for 180° (one half-cycle), we connect two matched transistors in a symmetrical <b>push-pull circuit</b>: one "pushes" current through the load during the positive half-cycle, while the other "pulls" current during the negative half-cycle. The output transformer seamlessly recombines both halves into an amplified replica of the original sine wave!</p></div>
+
+  <figure><div data-dg="classBPushPullSchematic"></div><figcaption>Figure 6.1 · Transformer-coupled Class B push-pull amplifier circuit with center-tapped transformers, anti-phase base drive, and composite load line.</figcaption></figure>
+
+  <h3>6.1 Mathematical Proof of Even-Order Harmonic Cancellation</h3>
+  <p>Transistor dynamic transfer characteristics are non-linear, introducing harmonic distortion. Because the two transistors Q<sub>1</sub> and Q<sub>2</sub> are identical and driven with 180° anti-phase signals, their collector currents can be expanded in Fourier series:</p>
+  <div class="eq">i_{C1} = I_{0} + I_{1} sin(&omega; t) + I_{2} cos(2&omega; t) + I_{3} sin(3&omega; t) + I_{4} cos(4&omega; t) + &hellip;</div>
+  <p>Since Q<sub>2</sub> receives an identical signal delayed by π radians (180°):</p>
+  <div class="eq">i_{C2} = I_{0} + I_{1} sin(&omega; t − &pi;) + I_{2} cos(2(&omega; t − &pi;)) + I_{3} sin(3(&omega; t − &pi;)) + &hellip;</div>
+  <p>Recalling that sin(θ − π) = −sin(θ), cos(2θ − 2π) = +cos(2θ), and sin(3θ − 3π) = −sin(3θ):</p>
+  <div class="eq">i_{C2} = I_{0} − I_{1} sin(&omega; t) + I_{2} cos(2&omega; t) − I_{3} sin(3&omega; t) + I_{4} cos(4&omega; t) − &hellip;</div>
+  <p>In the center-tapped output transformer primary, current i_{C1} flows downward through the upper winding while i_{C2} flows upward through the lower winding. The net primary magnetizing current inducing voltage in the secondary is the <i>difference</i> between the two:</p>
+  <div class="eq key">i_{net} = i_{C1} − i_{C2} = 2 I_{1} sin(&omega; t) + 2 I_{3} sin(3&omega; t) + 2 I_{5} sin(5&omega; t) + &hellip;</div>
+  <p><b>Profound Conclusions:</b></p>
+  <ul>
+    <li><b>All even-order harmonic distortion terms (I<sub>2</sub>, I<sub>4</sub>, I<sub>6</sub>) cancel out completely!</b> Second-harmonic distortion, which dominates in single-ended amplifiers, is totally eliminated.</li>
+    <li><b>All DC bias terms (I<sub>0</sub>) cancel out identically!</b> Net DC magnetization of the transformer core is zero, preventing core saturation and allowing smaller, lighter magnetic cores.</li>
+    <li><b>Power supply hum/ripple is cancelled:</b> Any ripple voltage on +V<sub>CC</sub> enters the center tap and induces equal and opposite magnetic fluxes in both primary halves, cancelling at the secondary.</li>
+  </ul>
+
+  <h3>6.2 Derivation of Maximum Collector Efficiency (η<sub>max</sub> = 78.5%)</h3>
+  <ol class="steps">
+    <li><b>DC Input Power (P<sub>dc</sub>):</b>
+      <p>The power supply provides current pulses drawn alternately by Q<sub>1</sub> and Q<sub>2</sub>. The total supply current waveform is a <b>full-wave rectified sine wave</b> with peak amplitude I<sub>p</sub>:</p>
+      <div class="eq">I_{dc} = I_{ave} = [[2|&pi;]] &middot; I_{p} &approx; 0.6366 &middot; I_{p}</div>
+      <p>The total DC power delivered by the DC supply V<sub>CC</sub> is:</p>
+      <div class="eq key">P_{dc} = V_{CC} &middot; I_{dc} = [[2|&pi;]] &middot; V_{CC} &middot; I_{p} &approx; 0.6366 &middot; V_{CC} &middot; I_{p}</div>
+    </li>
+    <li><b>AC Output Power (P<sub>ac</sub>):</b>
+      <p>Let V<sub>p</sub> and I<sub>p</sub> be peak signal voltage and current across one half of the transformer primary. The AC power delivered to the reflected primary load R'<sub>L</sub> is:</p>
+      <div class="eq">P_{ac} = V_{rms} &middot; I_{rms} = [[V_{p}|<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2</span></span>]] &middot; [[I_{p}|<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2</span></span>]] = [[1|2]] V_{p} &middot; I_{p}</div>
+      <p>Under maximum undistorted excursion, the peak AC voltage swings to the supply rail: V<sub>p</sub> ≈ V<sub>CC</sub>:</p>
+      <div class="eq key">P_{ac(max)} = [[1|2]] V_{CC} &middot; I_{p} = [[V_{CC}^2|2 R'_{L}]]</div>
+    </li>
+    <li><b>Maximum Collector Efficiency (η<sub>max</sub>):</b>
+      <div class="eq key">&eta;_{max} = [[P_{ac(max)}|P_{dc}]] &times; 100% = [[[[1|2]] V_{CC} I_{p}|[[2|&pi;]] V_{CC} I_{p}]] &times; 100% = [[&pi;|4]] &times; 100% = <b>78.54%</b></div>
+    </li>
+  </ol>
+
+  <h3>6.3 Derivation of Maximum Transistor Power Dissipation</h3>
+  <p>Total power dissipated as heat in both transistors combined is P<sub>D</sub> = P<sub>dc</sub> − P<sub>ac</sub>:</p>
+  <div class="eq">P_{D} = [[2|&pi;]] V_{CC} I_{p} − [[1|2]] V_{p} I_{p} = [[2|&pi;]] [[V_{CC} V_{p}|R'_{L}]] − [[V_{p}^2|2 R'_{L}]]</div>
+  <p>To find the peak output swing V<sub>p</sub> that causes maximum transistor heating, differentiate P<sub>D</sub> with respect to V<sub>p</sub> and set to zero:</p>
+  <div class="eq">[[d P_{D}|d V_{p}]] = [[2|&pi;]] [[V_{CC}|R'_{L}]] − [[V_{p}|R'_{L}]] = 0 &rArr; <b>V_{p} = [[2|&pi;]] V_{CC} &approx; 0.636 &middot; V_{CC}</b></div>
+  <p><b>Critical Insight:</b> Transistors do NOT run hottest at maximum volume! <b>Maximum heating occurs at roughly 63.6% of full voltage swing</b>. Substituting V<sub>p</sub> = (2/π)·V<sub>CC</sub> into the dissipation equation yields:</p>
+  <div class="eq key">P_{D(max)} = [[2 V_{CC}^2|&pi;^2 R'_{L}]] &approx; 0.2026 &middot; [[V_{CC}^2|R'_{L}]]</div>
+  <p>Because the load is shared equally between two transistors, the <b>maximum dissipation per transistor (P<sub>Q</sub>)</b> is:</p>
+  <div class="eq key">P_{Q(max)} = [[P_{D(max)}|2]] = [[V_{CC}^2|&pi;^2 R'_{L}]] &approx; 0.1013 &middot; [[V_{CC}^2|R'_{L}]] &approx; [[1|5]] P_{ac(max)}</div>
+
+  <div class="card try"><span class="label">Interactive Simulation · Class B Power &amp; Efficiency</span>
+  <p>Explore Class B push-pull operation, dissipation peaks, and real-world efficiency with saturation limits:</p>
+  <div data-w="classBEff"></div></div>
+
+  <div class="card exam"><span class="label">10-Mark Answer Skeleton · Summer 2026 Q5 &amp; Winter 2025 Q5</span>
+  <ol>
+    <li><b>Definition &amp; Schematic (3 marks):</b> Define Push-Pull as a balanced circuit where two active devices conduct on opposite half-cycles into a common center-tapped load. Draw schematic with input transformer T<sub>1</sub> and output transformer T<sub>2</sub>.</li>
+    <li><b>Circuit Operation (2 marks):</b> Explain anti-phase base drive. Trace current flow through Q<sub>1</sub> on positive half and Q<sub>2</sub> on negative half.</li>
+    <li><b>Four Major Advantages (2 marks):</b> (1) High efficiency (78.5%), (2) zero idle current, (3) complete cancellation of even harmonics, (4) elimination of core DC saturation.</li>
+    <li><b>Efficiency Derivation (3 marks):</b> Show I<sub>dc</sub> = (2/π)·I<sub>p</sub>, derive P<sub>dc</sub> = (2/π)·V<sub>CC</sub>·I<sub>p</sub>, derive P<sub>ac</sub> = (1/2)·V<sub>CC</sub>·I<sub>p</sub>, and calculate η = π/4 = 78.54%.</li>
+  </ol></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s6"> Mark topic 6 as done</label>
+</section>
+
+<!-- ============ S7: CROSSOVER DISTORTION & CLASS AB ============ -->
+<section class="sec" id="s7">
+  <div class="sechead"><span class="secno">Topic 7</span></div>
+  <h2>Crossover Distortion &amp; Class AB Biasing</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 SDC-II Distortions (10 Marks)</span><span class="tag">0.7V Cut-in Threshold</span><span class="tag">Diode Thermal Tracking</span></div>
+
+  <div class="card intuition"><span class="label">The Root Cause of Crossover Distortion</span>
+  <p>In theoretical Class B, we assumed transistors turn on the instant base voltage goes positive. In real silicon BJTs, <b>no collector current flows until the base-emitter voltage exceeds the forward cut-in threshold V<sub>BE(cut-in)</sub> ≈ 0.6 V to 0.7 V</b>. When the input signal swings between −0.7 V and +0.7 V, <i>neither transistor conducts</i>. This creates a flat zero-voltage plateau (dead zone) at every zero crossing of the output waveform called <b>crossover distortion</b>.</p></div>
+
+  <figure><div data-dg="crossoverWaveform"></div><figcaption>Figure 7.1 · Origin of crossover distortion in pure Class B (left) and its elimination via Class AB diode pre-biasing (right).</figcaption></figure>
+
+  <h3>7.1 Why Crossover Distortion is Particularly Harmful</h3>
+  <ul>
+    <li><b>Harmonic Signature:</b> Crossover notches introduce sharp corners into the waveform, generating high concentrations of <b>high-order odd harmonics (3rd, 5th, 7th, 9th)</b>. Unlike mellow 2nd harmonics, high-order odd harmonics sound metallic, harsh, and grating to the human ear.</li>
+    <li><b>Inverse Volume Behavior:</b> At loud volumes, the 0.7 V dead band is a negligible fraction of a 30 V swing. But at low listening volumes (e.g. 1 V peak), the 0.7 V dead zone represents 70% of the entire waveform! Thus, crossover distortion becomes <i>worst at low volumes</i>—precisely when listeners expect quiet, clean sound.</li>
+  </ul>
+
+  <h3>7.2 Eliminating Crossover Distortion: Class AB Biasing</h3>
+  <p>To eliminate crossover distortion, we must pre-bias both transistors with a small forward voltage (V<sub>bias</sub> ≈ 0.7 V per junction) so that each transistor is idling just on the threshold of conduction. When the input AC signal passes through zero, one transistor seamlessly takes over from the other without any flat dead band.</p>
+  <ol class="steps">
+    <li><b>Diode Biasing in Transformer-Coupled Stages:</b>
+      <p>A silicon diode D<sub>1</sub> in series with current-limiting resistor R<sub>4</sub> is connected between +V<sub>CC</sub> and the center tap of the input transformer secondary. The 0.7 V drop across forward-biased diode D<sub>1</sub> pre-biases both transistor bases slightly positive relative to ground. Each transistor carries a tiny quiescent current I<sub>CQ</sub> (typically 5% to 10% of peak current I<sub>p</sub>).</p>
+    </li>
+    <li><b>Thermal Runaway Hazard:</b>
+      <p>As power transistors operate, their internal collector junctions heat up. For silicon BJTs, the base-emitter forward voltage drops at a rate of <b>−2 mV/°C</b> with rising temperature:</p>
+      <div class="eq">[[d V_{BE}|d T]] &approx; − 2 mV/^&deg;C</div>
+      <p>If a fixed resistive voltage divider is used for biasing, V<sub>bias</sub> remains constant while the transistor requires less V_{BE}. Consequently, quiescent collector current I<sub>CQ</sub> increases exponentially. Greater current generates more heat, which reduces V_{BE} further, triggering catastrophic <b>thermal runaway</b> and transistor destruction!</p>
+    </li>
+    <li><b>Diode Thermal Compensation (Thermal Tracking):</b>
+      <p>By mounting the bias diode D<sub>1</sub> directly on the <b>same aluminum heatsink</b> as the output power transistors, the diode temperature tracks the transistor temperature. As heatsink temperature rises, the forward drop across D<sub>1</sub> drops at the identical rate of −2 mV/°C, automatically reducing the bias voltage applied to the bases. Quiescent current remains perfectly stable across the entire temperature operating range.</p>
+    </li>
+  </ol>
+
+  <div class="card exam"><span class="label">10-Mark Answer Skeleton · Crossover Distortion &amp; Class AB</span>
+  <ol>
+    <li><b>Definition &amp; Origin (3 marks):</b> Explain why crossover distortion occurs in Class B due to the 0.7 V V<sub>BE</sub> threshold. Draw input sine wave showing ±0.7V threshold bands and resulting output waveform with flat dead-zone notches.</li>
+    <li><b>Harmonic Impact (2 marks):</b> State that crossover distortion generates severe high-order odd harmonics and explain why distortion percentage worsens as listening volume drops.</li>
+    <li><b>Class AB Diode Biasing (3 marks):</b> Draw the Class AB circuit with diode D<sub>1</sub> and resistor R<sub>4</sub>. Explain how the 0.7 V diode drop eliminates the dead zone.</li>
+    <li><b>Thermal Runaway &amp; Compensation (2 marks):</b> Explain the −2 mV/°C V<sub>BE</sub> temperature coefficient. Describe how mounting diode D<sub>1</sub> on the common heatsink prevents thermal runaway.</li>
+  </ol></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s7"> Mark topic 7 as done</label>
+</section>
+<!-- ============ S8: CLASS B DESIGN EXAMPLE ============ -->
+<section class="sec" id="s8">
+  <div class="sechead"><span class="secno">Topic 8</span></div>
+  <h2>Complete Design Example: Transformer-Coupled Class B Push-Pull Amplifier</h2>
+  <div class="tags"><span class="tag hot">Dr. Ghongade Teaching Notes</span><span class="tag">Exact Numerical Walkthrough</span><span class="tag">15% Safety Factor</span></div>
+
+  <div class="card intuition"><span class="label">Design Specifications</span>
+  <p><b>Target Problem (from Dr. Ghongade's notes, pages 20–21):</b><br>
+  A Class B push-pull amplifier circuit is required to deliver <b>P<sub>o</sub> = 4 W</b> of audio power into a <b>R<sub>L</sub> = 16 Ω</b> loudspeaker.
+  <br>Specify the output transformer and power transistors.
+  <br>Given: Supply Voltage <b>V<sub>CC</sub> = 30 V</b>, Transformer efficiency <b>η<sub>xfmr</sub> = 80%</b>.</p></div>
+
+  <h3>Step-by-Step Design Execution</h3>
+  <ol class="steps">
+    <li><b>Calculate Total AC Power Delivered to Transformer Primary (P'<sub>o</sub>):</b>
+      <p>Accounting for the 80% transformer conversion efficiency:</p>
+      <div class="eq">P'_{o} = [[P_{o}|&eta;_{xfmr}]] = [[4 W|0.80]] = <b>5 W</b></div>
+    </li>
+    <li><b>Determine Peak Primary Voltage Swing (V<sub>p</sub>):</b>
+      <p>Assuming negligible transistor saturation drop:</p>
+      <div class="eq">V_{p} &approx; V_{CC} = <b>30 V</b></div>
+    </li>
+    <li><b>Compute Primary Reflected Load Impedance (R'<sub>L</sub>):</b>
+      <p>Each transistor feeds one half of the primary winding, presenting reflected load R'<sub>L</sub>:</p>
+      <div class="eq">P'_{o} = [[V_{p}^2|2 R'_{L}]] &rArr; R'_{L} = [[V_{p}^2|2 P'_{o}]] = [[(30 V)^2|2 &times; 5 W]] = [[900|10]] = <b>90 &Omega;</b></div>
+    </li>
+    <li><b>Calculate Total Primary Center-to-Center Resistance (R''<sub>L</sub>):</b>
+      <p>The total primary winding has 2·N<sub>1</sub> turns, meaning total end-to-end impedance is four times that of each half:</p>
+      <div class="eq key">R''_{L} = 4 &middot; R'_{L} = 4 &times; 90 &Omega; = <b>360 &Omega; C.T. (Center-Tapped)</b></div>
+    </li>
+    <li><b>Determine Transformer Turns Ratio ([[N_{1}|N_{2}]]):</b>
+      <p>For each half of the primary to the secondary load:</p>
+      <div class="eq">[[N_{1}|N_{2}]] = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">[[R'_{L}|R_{L}]]</span></span> = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">[[90 &Omega;|16 &Omega;]]</span></span> = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">5.625</span></span> = <b>2.37</b></div>
+      <b>Complete Transformer Specification:</b>
+      <ul>
+        <li>Rated Audio Power: <b>4 W</b></li>
+        <li>Secondary Load Impedance: <b>16 Ω</b></li>
+        <li>Primary Center-Tapped Impedance: <b>360 Ω C.T.</b></li>
+        <li>Turns Ratio: <b>(2.37 + 2.37) : 1</b> (or total primary-to-secondary turns ratio 4.74 : 1)</li>
+      </ul>
+    </li>
+    <li><b>Calculate Peak Collector Current (I<sub>p</sub>):</b>
+      <div class="eq">I_{p} = [[2 P'_{o}|V_{p}]] = [[2 &times; 5 W|30 V]] = 0.333 A = <b>333 mA</b></div>
+    </li>
+    <li><b>Compute Total DC Input Power (P<sub>i(dc)</sub>):</b>
+      <p>Average current drawn from +V<sub>CC</sub> is I<sub>ave</sub> = 0.636·I<sub>p</sub>:</p>
+      <div class="eq">P_{i(dc)} = V_{CC} &times; 0.636 &middot; I_{p} = 30 V &times; 0.636 &times; 333 mA = <b>6.35 W</b></div>
+    </li>
+    <li><b>Calculate Maximum Heat Dissipation Per Transistor (P<sub>Q</sub>):</b>
+      <p>Power dissipated across both output transistors combined is P<sub>i(dc)</sub> − P'<sub>o</sub>:</p>
+      <div class="eq">P_{Q} = 0.5 [P_{i(dc)} − P'_{o}] = 0.5 &times; [6.35 W − 5 W] = 0.5 &times; 1.35 W = <b>0.68 W</b></div>
+    </li>
+    <li><b>Determine Final Transistor Selection Ratings (with 15% Factor of Safety):</b>
+      <p>In rigorous engineering practice, transistors must never operate at their absolute maximum stress ratings. Adding a 15% safety margin:</p>
+      <ul>
+        <li><b>Collector-Emitter Breakdown Voltage:</b>
+          <div class="eq">BV_{CEO} &ge; 2 &middot; V_{CC} + 15% = 2 &times; 30 V &times; 1.15 = 60 V + 9 V = <b>&ge; 69 V</b></div>
+        </li>
+        <li><b>Peak Collector Current Rating:</b>
+          <div class="eq">I_{C(max)} &ge; I_{p} + 15% = 333 mA &times; 1.15 = <b>&ge; 383 mA</b></div>
+        </li>
+        <li><b>Continuous Power Dissipation Rating:</b>
+          <div class="eq">P_{D(max)} &ge; P_{Q} + 15% = 0.68 W &times; 1.15 = <b>&ge; 0.78 W</b></div>
+        </li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="card intuition"><span class="label">Design Summary</span>
+  <p>To safely deliver 4 W into 16 Ω: Transformer = 360 Ω C.T. to 16 Ω (turns ratio 2.37+2.37:1, 4W rating); Transistors = Matched pair NPN BJTs with BV<sub>CEO</sub> ≥ 70 V, I<sub>C</sub> ≥ 400 mA, P<sub>D</sub> ≥ 1 W.</p></div>
+  <label class="done-row"><input type="checkbox" data-done="s8"> Mark topic 8 as done</label>
+</section>
+
+<!-- ============ S9: COMPLEMENTARY SYMMETRY CLASS AB ============ -->
+<section class="sec" id="s9">
+  <div class="sechead"><span class="secno">Topic 9</span></div>
+  <h2>Complementary-Symmetry Capacitor-Coupled Class AB Amplifier</h2>
+  <div class="tags"><span class="tag hot">Output Transformerless (OTL)</span><span class="tag">NPN/PNP Pair</span><span class="tag">Thermal Tracking String</span><span class="tag">Capacitor Reservoir</span></div>
+
+  <div class="card intuition"><span class="label">Why Transformerless (OTL)?</span>
+  <p>Transformers are heavy, bulky, expensive, and introduce frequency distortion and phase shift that ruin high-fidelity sound. The <b>Complementary Symmetry Output Transformerless (OTL)</b> amplifier eliminates transformers entirely! It pairs one <b>NPN transistor (Q<sub>2</sub>)</b> and one <b>PNP transistor (Q<sub>3</sub>)</b> having matched electrical characteristics as complementary emitter followers. Operating directly from a single DC supply, it drives the loudspeaker through a single large electrolytic capacitor C<sub>o</sub>.</p></div>
+
+  <figure><div data-dg="compSymSchematic"></div><figcaption>Figure 9.1 · Complete complementary-symmetry capacitor-coupled Class AB power amplifier schematic with CE preamplifier driver, diode thermal tracking string, and complementary emitter followers.</figcaption></figure>
+
+  <h3>9.1 Circuit Topology &amp; Stage Breakdown</h3>
+  <ol class="steps">
+    <li><b>Pre-Amplifier Driver Stage (Q<sub>1</sub>):</b> An NPN transistor configured as a Common Emitter (CE) amplifier with voltage divider bias (R<sub>1</sub>, R<sub>2</sub>) and emitter degeneration (R<sub>E1</sub>, C<sub>E</sub>). It provides all the necessary <b>voltage gain</b> to amplify the input signal.</li>
+    <li><b>Bias Compensating String (D<sub>1</sub>, R<sub>B</sub>, D<sub>2</sub>):</b> Connected directly in series with the collector load resistor R<sub>C</sub> of Q<sub>1</sub>. It establishes a precisely controlled DC voltage difference V<sub>B</sub> between the base of NPN Q<sub>2</sub> and the base of PNP Q<sub>3</sub>:
+      <div class="eq key">V_{B} = V_{D1} + V_{RB} + V_{D2} &approx; 0.7 V + 0.2 V + 0.7 V = <b>1.6 V</b></div>
+      This 1.6 V forward-biases both base-emitter junctions (V<sub>BE2</sub> + V<sub>EB3</sub> ≈ 1.4 V) plus drops across small degeneration resistors, holding both output transistors slightly ON to completely eliminate crossover distortion.</li>
+    <li><b>Thermal Tracking Diodes (D<sub>1</sub>, D<sub>2</sub>):</b> Diodes D<sub>1</sub> and D<sub>2</sub> are thermally bonded to the common heatsink shared with Q<sub>2</sub> and Q<sub>3</sub>. When heatsink temperature rises, diode drops decrease at −2 mV/°C, automatically decreasing V<sub>B</sub> and preventing thermal runaway. Trimpot R<sub>B</sub> allows precise manual calibration of quiescent bias current.</li>
+    <li><b>Complementary Emitter Followers (Q<sub>2</sub>, Q<sub>3</sub>):</b>
+      <ul>
+        <li><b>Q<sub>2</sub> (NPN):</b> Collector tied to +V<sub>CC</sub>; emitter drives midpoint node through small resistor R<sub>E2</sub>.</li>
+        <li><b>Q<sub>3</sub> (PNP):</b> Collector tied to ground; emitter drives midpoint node through small resistor R<sub>E3</sub>.</li>
+        <li>They provide <b>unity voltage gain (A<sub>v</sub> ≈ 1)</b>, massive <b>current gain (A<sub>i</sub> ≈ h<sub>fe</sub>)</b>, and very <b>low output impedance (&lt; 0.5 Ω)</b>.</li>
+      </ul>
+    </li>
+    <li><b>Emitter Resistors (R<sub>E2</sub>, R<sub>E3</sub>):</b> Small current-limiting resistors (typically 0.1·R<sub>L</sub> ≈ 1 Ω to 5 Ω) that provide local negative current feedback, stabilizing quiescent current against device temperature variations.</li>
+    <li><b>Output Coupling Capacitor (C<sub>o</sub>) as Energy Reservoir:</b>
+      <p>The midpoint between R<sub>E2</sub> and R<sub>E3</sub> is biased to exactly <b>[[V_{CC}|2]]</b>. Capacitor C<sub>o</sub> charges to V<sub>CC</sub>/2, blocking DC from the speaker while acting as an AC energy reservoir:</p>
+      <ul>
+        <li><b>Positive Half-Cycle:</b> Input drives Q<sub>1</sub> collector voltage upward. Q<sub>2</sub> (NPN) conducts while Q<sub>3</sub> (PNP) is reverse-biased OFF. Current flows from +V<sub>CC</sub> through Q<sub>2</sub>, R<sub>E2</sub>, C<sub>o</sub>, and loudspeaker R<sub>L</sub> to ground—delivering audio power while topping up the charge on C<sub>o</sub>.</li>
+        <li><b>Negative Half-Cycle:</b> Input drives Q<sub>1</sub> collector downward. Q<sub>2</sub> turns OFF while Q<sub>3</sub> (PNP) turns ON. <b>No current is drawn from +V<sub>CC</sub>!</b> Instead, capacitor C<sub>o</sub> acts as the power supply, discharging stored energy through load R<sub>L</sub>, ground, and Q<sub>3</sub> back to C<sub>o</sub>.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <label class="done-row"><input type="checkbox" data-done="s9"> Mark topic 9 as done</label>
+</section>
+
+<!-- ============ S10: COMP-SYMMETRY DESIGN EXAMPLE ============ -->
+<section class="sec" id="s10">
+  <div class="sechead"><span class="secno">Topic 10</span></div>
+  <h2>Complete Design Example: Complementary-Symmetry Class AB Amplifier</h2>
+  <div class="tags"><span class="tag hot">Dr. Ghongade Teaching Notes</span><span class="tag">Exact Numerical Walkthrough</span><span class="tag">Capacitor Selection</span></div>
+
+  <div class="card intuition"><span class="label">Design Specifications</span>
+  <p><b>Target Problem (from Dr. Ghongade's notes, pages 23–25):</b><br>
+  Design a complementary-symmetry Class AB power amplifier to deliver <b>P<sub>o</sub> = 1 W</b> into a <b>R<sub>L</sub> = 50 Ω</b> load.
+  <br>Determine the required supply voltage V<sub>CC</sub>, and calculate component values: R<sub>C</sub>, R<sub>B</sub>, R<sub>E2</sub>, R<sub>E3</sub>, C<sub>o</sub>, and C<sub>E</sub>.
+  <br>Given: Transistor current gain <b>h<sub>FE(min)</sub> = 50</b> for Q<sub>2</sub> and Q<sub>3</sub>; Lower cutoff frequency <b>f<sub>L</sub> = 50 Hz</b>; Small-signal resistance <b>h<sub>ib</sub> = 2 Ω</b>.</p></div>
+
+  <h3>Step-by-Step Design Execution</h3>
+  <ol class="steps">
+    <li><b>Calculate Peak Load Voltage (V<sub>p</sub>):</b>
+      <div class="eq">P_{o} = [[V_{p}^2|2 R_{L}]] &rArr; V_{p} = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2 &middot; R_{L} &middot; P_{o}</span></span> = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2 &times; 50 &Omega; &times; 1 W</span></span> = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">100</span></span> = <b>10 V</b></div>
+    </li>
+    <li><b>Calculate Peak Load Current (I<sub>p</sub>):</b>
+      <div class="eq">I_{p} = [[V_{p}|R_{L}]] = [[10 V|50 &Omega;]] = 0.2 A = <b>200 mA</b></div>
+    </li>
+    <li><b>Select Emitter Stabilization Resistors (R<sub>E2</sub>, R<sub>E3</sub>):</b>
+      <p>Standard design rule allocates 10% of load resistance to emitter resistors:</p>
+      <div class="eq">R_{E2} = R_{E3} = 0.1 &middot; R_{L} = 0.1 &times; 50 &Omega; = 5 &Omega; &rArr; Select standard value  <b>R_{E2} = R_{E3} = 4.7 &Omega;</b></div>
+    </li>
+    <li><b>Select Quiescent Output Current (I<sub>CQ2</sub>):</b>
+      <p>To eliminate crossover distortion while maintaining high efficiency, set quiescent current to 10% of peak load current:</p>
+      <div class="eq">I_{CQ2} = 0.1 &middot; I_{p} = 0.1 &times; 200 mA = <b>20 mA</b></div>
+    </li>
+    <li><b>Determine Bias Voltage Drop Across Diode String (V<sub>B</sub>):</b>
+      <div class="eq">V_{B} = V_{BE2} + I_{CQ2}(R_{E2} + R_{E3}) + V_{BE3}</div>
+      <div class="eq">V_{B} = 0.7 V + 20 mA &times; (4.7 &Omega; + 4.7 &Omega;) + 0.7 V = 1.4 V + 0.188 V = 1.588 V &approx; <b>1.6 V</b></div>
+    </li>
+    <li><b>Calculate Driver Base Current &amp; Collector Resistor (R<sub>C</sub>):</b>
+      <p>Maximum base current required by Q<sub>2</sub> under full positive swing:</p>
+      <div class="eq">I_{B2(max)} = [[I_{p}|h_{FE(min)}]] = [[200 mA|50]] = <b>4 mA</b></div>
+      <p>Design rule: Ensure driver current through R<sub>C</sub> never falls below 1 mA during positive peak:</p>
+      <div class="eq">I_{RC(min)} = I_{B2(max)} + 1 mA = 4 mA + 1 mA = <b>5 mA</b></div>
+      <p>Allocating minimum peak headroom V_{RC(min)} = 4 V across R<sub>C</sub>:</p>
+      <div class="eq">R_{C} = [[V_{RC(min)}|I_{RC(min)}]] = [[4 V|5 mA]] = 800 &Omega; &rArr; Select standard  <b>R_{C} = 680 &Omega;</b></div>
+    </li>
+    <li><b>Calculate Total DC Supply Voltage (V<sub>CC</sub>):</b>
+      <div class="eq">V_{CC} = 2 [ V_{p} + V_{RE2} + V_{BE2} + V_{RC(min)} ]</div>
+      <div class="eq">V_{CC} = 2 [ 10 V + (200mA &times; 4.7&Omega;) + 0.7 V + 4 V ] &approx; 2 &times; [10 + 0.94 + 0.7 + 4] = 31.28 V &rArr; Select  <b>V_{CC} = 32 V</b></div>
+    </li>
+    <li><b>Determine Driver Collector Voltage (V<sub>C1</sub>) &amp; Trimpot (R<sub>B</sub>):</b>
+      <div class="eq">V_{C1} = 0.5(V_{CC} − V_{B}) = 0.5(32 V − 1.6 V) = <b>15.2 V</b></div>
+      <div class="eq">I_{C1} = [[V_{C1}|R_{C}]] = [[15.2 V|680 &Omega;]] = <b>22.4 mA</b></div>
+      <p>Since diodes D<sub>1</sub> and D<sub>2</sub> each drop 0.7 V, the remaining bias voltage is dropped across trimpot R<sub>B</sub>:</p>
+      <div class="eq">R_{B} = [[V_{B} − V_{D1} − V_{D2}|I_{C1}]] = [[1.6 V − 0.7 V − 0.7 V|22.4 mA]] = [[0.2 V|22.4 mA]] = 8.9 &Omega; &rArr; Use  <b>20 &Omega; Potentiometer</b></div>
+    </li>
+    <li><b>Output Transistor Ratings &amp; Heat Dissipation:</b>
+      <ul>
+        <li>Breakdown Voltage: V_{CE(max)} = V_{CC} = <b>32 V</b>.</li>
+        <li>Peak Current Rating: I_{C(max)} = 1.1·I_{p} = 1.1 × 200 mA = <b>220 mA</b>.</li>
+        <li>Average DC Power Input (current drawn only on positive half-cycle, I<sub>ave</sub> = 0.5 × 0.636 × 1.1·I<sub>p</sub> ≈ 0.35·I<sub>p</sub>):
+          <div class="eq">P_{i(dc)} = 0.35 &middot; V_{CC} &middot; I_{p} = 0.35 &times; 32 V &times; 0.2 A = <b>2.24 W</b></div>
+        </li>
+        <li>Dissipation per transistor:
+          <div class="eq">P_{T} = 0.5(P_{i(dc)} − P_{o}) = 0.5 &times; (2.24 W − 1 W) = <b>0.62 W</b></div>
+        </li>
+      </ul>
+    </li>
+    <li><b>Design Coupling &amp; Bypass Capacitors (C<sub>o</sub> and C<sub>E</sub>):</b>
+      <p><b>Output Coupling Capacitor (C<sub>o</sub>):</b> Designed so reactance X<sub>Co</sub> ≤ 0.1·R<sub>L</sub> at lowest frequency f<sub>L</sub> = 50 Hz:</p>
+      <div class="eq">C_{o} = [[1|2 &pi; f_{L} (0.1 R_{L})]] = [[1|2 &pi; &times; 50 Hz &times; 5 &Omega;]] = 636.6 &mu;F &rArr; Select standard  <b>C_{o} = 680 &mu;F</b></div>
+      <p><b>Driver Emitter Bypass Capacitor (C<sub>E</sub>):</b> Using given h<sub>ib</sub> = 2 Ω:</p>
+      <div class="eq">C_{E} = [[1|2 &pi; f_{L} h_{ib}]] = [[1|2 &pi; &times; 50 Hz &times; 2 &Omega;]] = 1591.5 &mu;F &rArr; Select standard  <b>C_{E} = 1800 &mu;F</b></div>
+    </li>
+  </ol>
+
+  <div class="card try"><span class="label">Interactive Simulation · Complementary-Symmetry Designer</span>
+  <p>Design your own custom complementary-symmetry Class AB power stage with automatic E12 standard component selection:</p>
+  <div data-w="compSymDesign"></div></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s10"> Mark topic 10 as done</label>
+</section>
+
+<!-- ============ S11: ADVANCED TOPOLOGIES & DISTORTIONS ============ -->
+<section class="sec" id="s11">
+  <div class="sechead"><span class="secno">Topic 11</span></div>
+  <h2>Advanced Topologies, Harmonic Distortion &amp; Thermal Physics</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 SDC-II Distortions (10 Marks)</span><span class="tag">Quasi-Complementary Lin Stage</span><span class="tag">THD Mathematics</span><span class="tag">Heatsink Thermal Resistance</span></div>
+
+  <div class="card intuition"><span class="label">Engineering Reality: The PNP Problem</span>
+  <p>While complementary symmetry looks perfect on paper, in reality <b>high-power PNP transistors were historically difficult, expensive, and fragile</b> compared to robust silicon NPN devices (like the legendary 2N3055). To solve this, H.C. Lin invented the <b>Quasi-Complementary Symmetry</b> topology: using low-power complementary driver transistors to control two identical, rugged, high-power <i>NPN</i> output transistors!</p></div>
+
+  <h3>11.1 Quasi-Complementary Symmetry (Lin Topology)</h3>
+  <figure><div data-dg="quasiCompSchematic"></div><figcaption>Figure 11.1 · Quasi-complementary output stage: Upper NPN Darlington pair and lower PNP-NPN Sziklai complementary feedback pair.</figcaption></figure>
+  <p>The quasi-complementary output configuration splits into two composite transistor pairs:</p>
+  <ul>
+    <li><b>Upper Push Branch (Darlington Pair):</b> Consists of an NPN driver transistor (Q<sub>2</sub>) feeding an NPN power output transistor (Q<sub>4</sub>).
+      <br>Effective Current Gain: β<sub>eff</sub> ≈ β<sub>2</sub> · β<sub>4</sub>.
+      <br>Base-to-Output Threshold: <b>V<sub>BE(total)</sub> = V<sub>BE2</sub> + V<sub>BE4</sub> ≈ 0.7 V + 0.7 V = 1.4 V</b>.
+    </li>
+    <li><b>Lower Pull Branch (Sziklai Pair / Complementary Feedback Pair CFP):</b> Consists of a low-power PNP driver transistor (Q<sub>3</sub>) feeding an NPN power output transistor (Q<sub>5</sub>).
+      <br>Effective Operation: The combination acts externally as an equivalent high-power PNP transistor, but the heavy collector current flows through the rugged NPN device Q<sub>5</sub>!
+      <br>Base-to-Output Threshold: <b>Only ONE forward base-emitter drop: V<sub>in</sub> = V<sub>EB3</sub> ≈ 0.7 V</b>.
+    </li>
+    <li><b>Asymmetry &amp; Modern Solution:</b> Because the upper Darlington requires 1.4 V while the lower Sziklai requires 0.7 V, a small diode or asymmetric resistor string is used to ensure identical turn-on thresholds, eliminating crossover notches. Both power output transistors connected to the chassis heatsink are identical NPN types!</li>
+  </ul>
+
+  <h3>11.2 Harmonic Distortion &amp; Mathematical Analysis (THD)</h3>
+  <p>When large-signal voltage swings drive a transistor into non-linear transfer characteristics, the output collector current deviates from a pure sine wave, producing harmonic distortion:</p>
+  <div class="eq">i_{C} = I_{CQ} + I_{0} + I_{1} cos(&omega; t) + I_{2} cos(2&omega; t) + I_{3} cos(3&omega; t) + I_{4} cos(4&omega; t) + &hellip;</div>
+  <p>where I<sub>1</sub> is the fundamental audio amplitude, and I<sub>2</sub>, I<sub>3</sub>, I<sub>4</sub>... are harmonic distortion amplitudes.</p>
+
+  <h4>Three-Point Harmonic Analysis (Second Harmonic Distortion D<sub>2</sub>)</h4>
+  <p>For single-ended amplifiers where second-harmonic distortion dominates, evaluate collector currents at three key angles: ωt = 0° (peak), ωt = 90° (quiescent), and ωt = 180° (trough):</p>
+  <ul>
+    <li>At ωt = 0°: i_{C} = I_{max} = I_{CQ} + I_{0} + I_{1} + I_{2}</li>
+    <li>At ωt = 90°: i_{C} = I_{CQ}</li>
+    <li>At ωt = 180°: i_{C} = I_{min} = I_{CQ} + I_{0} − I_{1} + I_{2}</li>
+  </ul>
+  <p>Solving these simultaneous equations yields the harmonic amplitudes:</p>
+  <div class="eq">I_{0} = I_{2} = [[I_{max} + I_{min} − 2 I_{CQ}|4]],    I_{1} = [[I_{max} − I_{min}|2]]</div>
+  <p>The <b>Second Harmonic Distortion (D<sub>2</sub>)</b> is:</p>
+  <div class="eq key">D_{2} = |[[I_{2}|I_{1}]]| = |[[I_{max} + I_{min} − 2 I_{CQ}|2(I_{max} − I_{min})]]| &times; 100%</div>
+
+  <h4>Total Harmonic Distortion (THD) Definition</h4>
+  <p>When higher-order harmonics are present (using 5-point analysis), Total Harmonic Distortion represents the combined RMS value of all unwanted harmonics relative to the fundamental:</p>
+  <div class="eq key">THD = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">D_{2}^2 + D_{3}^2 + D_{4}^2 + D_{5}^2 + &hellip;</span></span> &times; 100% = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">([[I_{2}|I_{1}]])^2 + ([[I_{3}|I_{1}]])^2 + ([[I_{4}|I_{1}]])^2 + &hellip;</span></span> &times; 100%</div>
+  <p>The total AC power delivered to the load including harmonic contamination is:</p>
+  <div class="eq">P_{total} = P_{1} (1 + D_{2}^2 + D_{3}^2 + D_{4}^2 + &hellip;) = P_{1} (1 + THD^2)</div>
+  <p>where P<sub>1</sub> = (1/2)·I<sub>1</sub><sup>2</sup>·R<sub>L</sub> is the true fundamental audio power.</p>
+
+  <figure><div data-dg="thdWaveform"></div><figcaption>Figure 11.2 · Time-domain waveform distortion (left) and harmonic frequency spectrum bar chart (right).</figcaption></figure>
+
+  <h3>11.3 Classification of All Distortions in Power Amplifiers</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Distortion Type</th><th>Physical Cause</th><th>Auditory Character</th><th>Engineering Remedy</th></tr></thead>
+    <tbody>
+      <tr><td><b>Non-linear / Harmonic Distortion</b></td><td>Curvature of transistor dynamic transfer characteristics (i<sub>C</sub> vs v<sub>BE</sub>)</td><td>Adds octave multiples (2f, 3f); sounds muddy or congested</td><td>Negative feedback (reduces by 1+Aβ); push-pull cancels even harmonics</td></tr>
+      <tr><td><b>Crossover Distortion</b></td><td>0.7 V base-emitter threshold in Class B; dead-zone at zero crossing</td><td>High odd harmonics (5f, 7f, 9f); harsh, buzzy, metallic timbre</td><td>Class AB pre-biasing via forward diodes; emitter feedback resistors</td></tr>
+      <tr><td><b>Frequency Distortion</b></td><td>Reactive components: transformer leakage inductance, coupling capacitors</td><td>Tonal imbalance: bass drop-off or treble roll-off</td><td>Eliminate transformers (OTL); enlarge coupling capacitors</td></tr>
+      <tr><td><b>Phase Distortion</b></td><td>Unequal time delays across different audio frequency components</td><td>Blurs stereo soundstage imaging and transient attacks</td><td>Direct-coupled complementary symmetry circuits with flat phase response</td></tr>
+      <tr><td><b>Intermodulation Distortion (IMD)</b></td><td>Non-linear mixing of two simultaneous frequencies creating sum and difference tones (f<sub>1</sub> ± f<sub>2</sub>)</td><td>Extremely grating, discordant acoustic noise not musically related to original</td><td>Linearized input stages, robust negative feedback, symmetrical topologies</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>11.4 Thermal Physics &amp; Heatsink Design</h3>
+  <p>The heat generated at the semiconductor collector-base junction must travel through the transistor casing and mounting hardware into the ambient air. This thermal flow obeys an exact electrical Ohm's Law analogy:</p>
+  <div class="eq key">T_{J} − T_{A} = P_{D} &middot; &theta;_{JA} = P_{D} &middot; (&theta;_{JC} + &theta;_{CS} + &theta;_{SA})</div>
+  <ul>
+    <li>T<sub>J</sub> = Maximum safe semiconductor junction temperature (typically 150°C to 200°C for Silicon).</li>
+    <li>T<sub>A</sub> = Maximum expected ambient air temperature (typically 25°C to 50°C).</li>
+    <li>P<sub>D</sub> = Power dissipated by the transistor as heat (Watts).</li>
+    <li>θ<sub>JC</sub> = Thermal resistance from junction to transistor case (°C/W, given by manufacturer datasheet).</li>
+    <li>θ<sub>CS</sub> = Thermal resistance across mica insulating washer and thermal silicone grease (°C/W, typically 0.5 °C/W).</li>
+    <li>θ<sub>SA</sub> = Thermal resistance of the aluminum finned heatsink to ambient air (°C/W).</li>
+  </ul>
+  <p>To ensure the transistor never exceeds its safe junction temperature, the <b>maximum allowable heatsink thermal resistance</b> is calculated as:</p>
+  <div class="eq key">&theta;_{SA(max)} = [[T_{J(max)} − T_{A}|P_{D}]] − (&theta;_{JC} + &theta;_{CS})</div>
+
+  <div class="card try"><span class="label">Interactive Simulation · Total Harmonic Distortion (THD) Calculator</span>
+  <p>Calculate harmonic distortion percentages, THD, and power penalty from measured spectral components:</p>
+  <div data-w="thdCalc"></div></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s11"> Mark topic 11 as done</label>
+</section>
+<!-- ============ S12: EXAM MAP & FORMULAS ============ -->
+<section class="sec" id="s12">
+  <div class="sechead"><span class="secno">Topic 12</span></div>
+  <h2>Previous Year Exam Papers (PYQ) Map &amp; Master Formula Sheet</h2>
+  <div class="tags"><span class="tag hot">Bharati Vidyapeeth University PYQ</span><span class="tag">Summer 2026 &amp; Winter 2025</span><span class="tag">10-Mark Model Solutions</span></div>
+
+  <div class="card intuition"><span class="label">Exam Preparation Strategy</span>
+  <p>In Bharati Vidyapeeth SDC Semester III end-semester examinations, Unit 5 questions consistently carry <b>10 marks</b>, structured as a main question and an internal OR alternative. The questions evaluate your ability to: (1) define and compare amplifier classes, (2) derive collector circuit efficiencies (25%, 50%, 78.5%), (3) explain push-pull operation and harmonic cancellation, (4) diagnose crossover distortion, and (5) solve numerical problems on efficiency and complete circuit designs.</p></div>
+
+  <h3>12.1 Detailed Exam Paper Map Table</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Exam Session &amp; Paper Code</th><th>Question Number &amp; Exact Text</th><th>Marks</th><th>Target Topics &amp; Model Solution</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Summer 2026</b><br>SDC Sem III (NEP 2020)</td>
+        <td><b>Q5 (a):</b> What are the advantages of Class B amplifier over Class A amplifiers? Using suitable equations and diagrams, discuss the efficiency of Class B amplifiers.</td>
+        <td>10</td>
+        <td><a href="#s6">Topic 6.1</a> &amp; <a href="#s6">Topic 6.2</a><br><i>See Model Solution 1 below</i></td>
+      </tr>
+      <tr>
+        <td><b>Summer 2026</b><br>SDC Sem III (NEP 2020)</td>
+        <td><b>Q5 (a) OR:</b> In a Class B amplifier, V<sub>ce(min)</sub> = 2V and V<sub>CC</sub> = 15V. Find the collector circuit efficiency.</td>
+        <td>10</td>
+        <td><a href="#s6">Topic 6.2</a><br><i>See Model Solution 2 below (η = 68.07%)</i></td>
+      </tr>
+      <tr>
+        <td><b>Winter 2025 (11/12/2025)</b><br>SDC Sem III (W-29238-2025)</td>
+        <td><b>Q5 (a):</b> How will you define Push Pull amplifier? With neat diagram, explain operation of Class B push pull amplifier. Also discuss advantages.</td>
+        <td>10</td>
+        <td><a href="#s6">Topic 6</a> &amp; <a href="#s7">Topic 7</a><br><i>See Model Solution 3 below</i></td>
+      </tr>
+      <tr>
+        <td><b>Winter 2025 (11/12/2025)</b><br>SDC Sem III (W-29238-2025)</td>
+        <td><b>Q5 (a) OR:</b> In a Class A amplifier, V<sub>ce(max)</sub> = 15V, V<sub>ce(min)</sub> = 1V. Find overall efficiency for (i) series-fed load, (ii) transformer coupled load.</td>
+        <td>10</td>
+        <td><a href="#s3">Topic 3</a> &amp; <a href="#s4">Topic 4</a><br><i>See Model Solution 4 below ((i) 23.33%, (ii) 43.75%)</i></td>
+      </tr>
+      <tr>
+        <td><b>Winter 2025 (11/12/2025)</b><br>SDC-II Sem III (W-25332-2025)</td>
+        <td><b>Q3:</b> Differentiate between Class A, Class B and Class C power amplifiers.</td>
+        <td>10</td>
+        <td><a href="#s2">Topic 2</a><br><i>See Model Solution 5 below</i></td>
+      </tr>
+      <tr>
+        <td><b>Winter 2025 (11/12/2025)</b><br>SDC-II Sem III (W-25332-2025)</td>
+        <td><b>Q3 OR:</b> Explain various distortions occurred in power amplifiers.</td>
+        <td>10</td>
+        <td><a href="#s11">Topic 11.2</a> &amp; <a href="#s11">Topic 11.3</a><br><i>See Model Solution 6 below</i></td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h3>12.2 Full 10-Mark Model Exam Solutions</h3>
+
+  <div class="card exam"><span class="label">Model Solution 1 · Summer 2026 Q5 (a) [10 Marks]</span>
+  <p><b>Question:</b> What are the advantages of Class B amplifier over Class A amplifiers? Using suitable equations and diagrams, discuss the efficiency of Class B amplifiers.</p>
+  <p><b>Answer Architecture:</b></p>
+  <ol class="steps">
+    <li><b>Advantages of Class B over Class A (3 marks):</b>
+      <ul>
+        <li><b>Higher Efficiency:</b> Class B reaches a maximum theoretical efficiency of 78.54% (practical 65–70%), compared to only 25% for series-fed Class A and 50% for transformer-coupled Class A.</li>
+        <li><b>Zero Quiescent Dissipation:</b> Transistors are biased at cut-off (I<sub>CQ</sub> = 0). When no audio signal is present, the amplifier draws negligible DC power, eliminating standby battery drain.</li>
+        <li><b>Smaller Heatsinks &amp; Device Economy:</b> Transistor power dissipation is shared between two devices, peaking at only ~20% of V<sub>CC</sub><sup>2</sup>/R'<sub>L</sub> at 63.6% swing, allowing much smaller heatsinks.</li>
+        <li><b>Even Harmonic Cancellation:</b> Push-pull operation cancels 2nd, 4th, and all even harmonics, drastically reducing harmonic distortion.</li>
+      </ul>
+    </li>
+    <li><b>Circuit Diagram &amp; Operation (2 marks):</b>
+      <p>Draw the center-tapped transformer-coupled Class B push-pull schematic (<a href="#s6">Figure 6.1</a>). Show that input transformer T<sub>1</sub> applies anti-phase signals v<sub>1</sub> and v<sub>2</sub> = −v<sub>1</sub>. Transistor Q<sub>1</sub> conducts for positive 180°, and Q<sub>2</sub> conducts for negative 180°.</p>
+    </li>
+    <li><b>Collector Circuit Efficiency Derivation (5 marks):</b>
+      <p><b>Step 1: DC Input Power (P<sub>dc</sub>):</b> Supply current is a full-wave rectified sine wave drawn by both transistors:</p>
+      <div class="eq">I_{dc} = [[2|&pi;]] &middot; I_{p} &rArr; P_{dc} = V_{CC} &middot; I_{dc} = [[2|&pi;]] V_{CC} &middot; I_{p}</div>
+      <p><b>Step 2: AC Output Power (P<sub>ac</sub>):</b> Peak voltage across each half of the primary is V<sub>p</sub> ≈ V<sub>CC</sub>:</p>
+      <div class="eq">P_{ac(max)} = [[V_{rms}^2|R'_{L}]] = [[(V_{p}/<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2</span></span>)^2|R'_{L}]] = [[1|2]] V_{p} I_{p} = [[1|2]] V_{CC} I_{p}</div>
+      <p><b>Step 3: Maximum Efficiency:</b></p>
+      <div class="eq key">&eta;_{max} = [[P_{ac(max)}|P_{dc}]] &times; 100% = [[[[1|2]] V_{CC} I_{p}|[[2|&pi;]] V_{CC} I_{p}]] &times; 100% = [[&pi;|4]] &times; 100% = <b>78.54%</b></div>
+    </li>
+  </ol></div>
+
+  <div class="card exam"><span class="label">Model Solution 2 · Summer 2026 Q5 (a) OR [10 Marks Numerical]</span>
+  <p><b>Question:</b> In a Class B amplifier, V<sub>ce(min)</sub> = 2V and V<sub>CC</sub> = 15V. Find the collector circuit efficiency.</p>
+  <p><b>Step-by-Step Solution:</b></p>
+  <ol class="steps">
+    <li><b>Given Parameters:</b>
+      <br>Supply Voltage V<sub>CC</sub> = 15 V
+      <br>Minimum collector saturation voltage V<sub>ce(min)</sub> = 2 V
+    </li>
+    <li><b>Determine Peak Output Voltage Swing (V<sub>p</sub>):</b>
+      <p>Because the collector voltage cannot drop below V<sub>ce(min)</sub> = 2 V, the maximum peak AC voltage swing across the primary load is:</p>
+      <div class="eq">V_{p} = V_{CC} − V_{ce(min)} = 15 V − 2 V = <b>13 V</b></div>
+    </li>
+    <li><b>Formulate AC Output Power (P<sub>ac</sub>):</b>
+      <div class="eq">P_{ac} = [[1|2]] V_{p} &middot; I_{p} = [[1|2]] &times; (13 V) &middot; I_{p} = 6.5 &middot; I_{p} Watts</div>
+    </li>
+    <li><b>Formulate DC Input Power (P<sub>dc</sub>):</b>
+      <p>The DC power drawn from the 15 V supply depends on supply voltage and average current:</p>
+      <div class="eq">P_{dc} = V_{CC} &middot; I_{dc} = V_{CC} &middot; ([[2|&pi;]] I_{p}) = 15 V &times; [[2|&pi;]] &middot; I_{p} = [[30|&pi;]] &middot; I_{p} &approx; 9.5493 &middot; I_{p} Watts</div>
+    </li>
+    <li><b>Calculate Collector Circuit Efficiency (η):</b>
+      <div class="eq key">&eta; = [[P_{ac}|P_{dc}]] &times; 100% = [[6.5 &middot; I_{p}|9.5493 &middot; I_{p}]] &times; 100% = <b>68.07%</b></div>
+      <p><b>Alternative Verification via Generalized Formula:</b></p>
+      <div class="eq">&eta; = [[&pi;|4]] &middot; ([[V_{CC} − V_{ce(min)}|V_{CC}]]) &times; 100% = 78.54% &times; ([[13|15]]) = 78.54% &times; 0.8667 = <b>68.07%</b></div>
+      <p><b>Final Answer:</b> The collector circuit efficiency is <b>68.07%</b>.</p>
+    </li>
+  </ol></div>
+
+  <div class="card exam"><span class="label">Model Solution 4 · Winter 2025 Q5 (a) OR [10 Marks Numerical]</span>
+  <p><b>Question:</b> In a Class A amplifier, V<sub>ce(max)</sub> = 15V, V<sub>ce(min)</sub> = 1V. Find overall efficiency for (i) series-fed load, (ii) transformer coupled load.</p>
+  <p><b>Step-by-Step Solution:</b></p>
+  <p><b>Common Given Data:</b> V<sub>ce(max)</sub> = 15 V, V<sub>ce(min)</sub> = 1 V.
+  <br>Peak-to-peak voltage swing: V<sub>opp</sub> = V<sub>ce(max)</sub> − V<sub>ce(min)</sub> = 15 V − 1 V = 14 V.</p>
+
+  <ol class="steps">
+    <li><b>Part (i): Series-Fed Resistive Load:</b>
+      <ul>
+        <li>In a series-fed Class A amplifier, the maximum collector voltage cannot exceed the DC supply voltage:
+          <div class="eq">V_{CC} = V_{ce(max)} = 15 V</div>
+        </li>
+        <li>The quiescent operating point is located midway between saturation and cut-off:
+          <div class="eq">V_{CEQ} = [[V_{ce(max)} + V_{ce(min)}|2]] = [[15 V + 1 V|2]] = <b>8 V</b></div>
+        </li>
+        <li>The AC output power delivered to load resistor R<sub>L</sub> is:
+          <div class="eq">P_{ac} = [[(V_{ce(max)} − V_{ce(min)})^2|8 R_{L}]] = [[(14 V)^2|8 R_{L}]] = [[196|8 R_{L}]] = [[24.5|R_{L}]]</div>
+        </li>
+        <li>The quiescent collector current is:
+          <div class="eq">I_{CQ} = [[V_{CC} − V_{CEQ}|R_{L}]] = [[15 V − 8 V|R_{L}]] = [[7 V|R_{L}]]</div>
+        </li>
+        <li>The DC power drawn from the supply is:
+          <div class="eq">P_{dc} = V_{CC} &middot; I_{CQ} = 15 V &times; [[7 V|R_{L}]] = [[105|R_{L}]]</div>
+        </li>
+        <li>Overall Efficiency for Series-Fed Load:
+          <div class="eq key">&eta;_{series} = [[P_{ac}|P_{dc}]] &times; 100% = [[[[24.5|R_{L}]]|[[105|R_{L}]]]] &times; 100% = [[24.5|105]] &times; 100% = <b>23.33%</b></div>
+          <p><i>(Formula verification: η = 25% · ((15−1)/(15+1)) = 25% · (14/15) · (7/8) = 23.33%).</i></p>
+        </li>
+      </ul>
+    </li>
+    <li><b>Part (ii): Transformer-Coupled Load:</b>
+      <ul>
+        <li>In a transformer-coupled amplifier, the DC load line is vertical at V<sub>CC</sub> (since winding DC resistance is negligible). Therefore, the supply voltage equals the quiescent voltage:
+          <div class="eq">V_{CC} = V_{CEQ} = [[V_{ce(max)} + V_{ce(min)}|2]] = [[15 V + 1 V|2]] = <b>8 V</b></div>
+        </li>
+        <li>The peak AC voltage swing across the primary reflected load R'<sub>L</sub> is:
+          <div class="eq">V_{p} = [[V_{ce(max)} − V_{ce(min)}|2]] = [[15 V − 1 V|2]] = <b>7 V</b></div>
+        </li>
+        <li>The AC power delivered to the reflected load is:
+          <div class="eq">P_{ac} = [[V_{p}^2|2 R'_{L}]] = [[(7 V)^2|2 R'_{L}]] = [[49|2 R'_{L}]] = [[24.5|R'_{L}]]</div>
+        </li>
+        <li>The quiescent current required to sustain this swing without clipping is:
+          <div class="eq">I_{CQ} = [[V_{p}|R'_{L}]] = [[7 V|R'_{L}]]</div>
+        </li>
+        <li>The DC power drawn from the 8V supply is:
+          <div class="eq">P_{dc} = V_{CC} &middot; I_{CQ} = 8 V &times; [[7 V|R'_{L}]] = [[56|R'_{L}]]</div>
+        </li>
+        <li>Overall Efficiency for Transformer-Coupled Load:
+          <div class="eq key">&eta;_{xfmr} = [[P_{ac}|P_{dc}]] &times; 100% = [[[[24.5|R'_{L}]]|[[56|R'_{L}]]]] &times; 100% = [[24.5|56]] &times; 100% = <b>43.75%</b></div>
+          <p><i>(Formula verification: η = 50% · [[V_{max} − V_{min}|V_{max} + V_{min}]] = 50% · [[14|16]] = 50% · 0.875 = <b>43.75%</b>).</i></p>
+        </li>
+      </ul>
+    </li>
+  </ol>
+  <p><b>Summary of Results:</b>
+  <br>(i) Series-Fed Efficiency = <b>23.33%</b>
+  <br>(ii) Transformer-Coupled Efficiency = <b>43.75%</b></p>
+  </div>
+
+  <h3>12.3 Master Formula Sheet</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Concept / Topology</th><th>Mathematical Governing Equations</th><th>Key Design Constants &amp; Limits</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Series-Fed Class A</b></td>
+        <td>V_{CEQ} = [[V_{CC}|2]],   I_{CQ} = [[V_{CC}|2 R_{L}]],   P_{ac} = [[V_{opp}^2|8 R_{L}]],   P_{dc} = [[V_{CC}^2|2 R_{L}]]</td>
+        <td>Max Efficiency &eta;_{max} = <b>25%</b><br>Figure of Merit FM = P_{Q}/P_{ac} = <b>2</b></td>
+      </tr>
+      <tr>
+        <td><b>Transformer-Coupled Class A</b></td>
+        <td>R'_{L} = ([[N_{1}|N_{2}]])^2 R_{L},   V_{CE(max)} = 2 V_{CC},   P_{ac(max)} = [[V_{CC}^2|2 R'_{L}]],   P_{dc} = [[V_{CC}^2|R'_{L}]]</td>
+        <td>Max Efficiency &eta;_{max} = <b>50%</b><br>Zero DC resistive loss in primary</td>
+      </tr>
+      <tr>
+        <td><b>Class B Push-Pull (Ideal)</b></td>
+        <td>I_{dc} = [[2|&pi;]] I_{p} &approx; 0.636 I_{p},   P_{dc} = [[2|&pi;]] V_{CC} I_{p},   P_{ac(max)} = [[1|2]] V_{CC} I_{p}</td>
+        <td>Max Efficiency &eta;_{max} = [[&pi;|4]] = <b>78.54%</b><br>Zero quiescent idle current</td>
+      </tr>
+      <tr>
+        <td><b>Class B Transistor Dissipation</b></td>
+        <td>P_{D(total)} = [[2|&pi;]] [[V_{CC} V_{p}|R'_{L}]] − [[V_{p}^2|2 R'_{L}]],   Peak at  V_{p} = [[2|&pi;]] V_{CC} &approx; 0.636 V_{CC}</td>
+        <td>P_{Q(max)} = [[V_{CC}^2|&pi;^2 R'_{L}]] &approx; 0.1013 [[V_{CC}^2|R'_{L}]] &approx; [[1|5]] P_{ac}</td>
+      </tr>
+      <tr>
+        <td><b>Class B with V<sub>ce(min)</sub></b></td>
+        <td>V_{p} = V_{CC} − V_{ce(min)},   &eta; = [[&pi;|4]] &middot; ([[V_{CC} − V_{ce(min)}|V_{CC}]]) &times; 100%</td>
+        <td>Efficiency decreases linearly with saturation voltage ratio</td>
+      </tr>
+      <tr>
+        <td><b>Class A Practical Efficiency</b></td>
+        <td>&eta;_{series} = [[(V_{max} − V_{min})^2|8 V_{CC} V_{CEQ}]],   &eta;_{xfmr} = 50% &middot; [[V_{max} − V_{min}|V_{max} + V_{min}]]</td>
+        <td>Evaluates real swing bounded by V<sub>ce(min)</sub> and cut-off</td>
+      </tr>
+      <tr>
+        <td><b>Comp-Symmetry Class AB</b></td>
+        <td>V_{p} = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">2 R_{L} P_{o}</span></span>,   I_{p} = [[V_{p}|R_{L}]],   R_{E2,3} = 0.1 R_{L},   V_{B} &approx; 1.6 V<br>V_{CC} = 2 [V_{p} + V_{RE2} + V_{BE2} + V_{RC(min)}]</td>
+        <td>C_{o} = [[1|2 &pi; f_{L} (0.1 R_{L})]],   C_{E} = [[1|2 &pi; f_{L} h_{ib}]]<br>Center midpoint at V_{CC}/2</td>
+      </tr>
+      <tr>
+        <td><b>Second Harmonic Distortion</b></td>
+        <td>I_{0} = I_{2} = [[I_{max} + I_{min} − 2 I_{CQ}|4]],   I_{1} = [[I_{max} − I_{min}|2]],   D_{2} = |[[I_{2}|I_{1}]]| = |[[I_{max} + I_{min} − 2 I_{CQ}|2(I_{max} − I_{min})]]|</td>
+        <td>Derived from 3-point dynamic load line evaluation</td>
+      </tr>
+      <tr>
+        <td><b>Total Harmonic Distortion (THD)</b></td>
+        <td>THD = <span class="sqrt"><span class="radic">&radic;</span><span class="radicand">D_{2}^2 + D_{3}^2 + D_{4}^2 + &hellip;</span></span> &times; 100%,   P_{total} = P_{1} (1 + THD^2)</td>
+        <td>Measures combined RMS harmonic contamination</td>
+      </tr>
+      <tr>
+        <td><b>Heatsink Thermal Equation</b></td>
+        <td>T_{J} − T_{A} = P_{D} (&theta;_{JC} + &theta;_{CS} + &theta;_{SA}),   &theta;_{SA(max)} = [[T_{J(max)} − T_{A}|P_{D}]] − (&theta;_{JC} + &theta;_{CS})</td>
+        <td>Electrical Ohm's law thermal analogue: Voltage = Temp, Current = Power</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <footer>Unit 5 Power Amplifiers Study Guide · Designed for B.Tech Sem III Students of Bharati Vidyapeeth (DU) COE Pune · Verified against Dr. R. B. Ghongade’s Curriculum.</footer>
+</section>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const par=(a,b)=>a*b/(a+b);
+const F=n=>Math.round(n*10)/10;
+
+function fmt3(x){return String(parseFloat(Number(x).toPrecision(3)));}
+function eng(v,u){
+  u=u||'';
+  if(!isFinite(v))return '—';
+  if(v===0)return '0 '+u;
+  const a=Math.abs(v),P=[[1e9,'G'],[1e6,'M'],[1e3,'k'],[1,''],[1e-3,'m'],[1e-6,'µ'],[1e-9,'n'],[1e-12,'p']];
+  for(const [m,s] of P){if(a>=m*0.9995)return fmt3(v/m)+' '+s+u;}
+  return v.toExponential(2)+' '+u;
+}
+function mk(s){
+  s=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function rBraced(str,cmd,f){
+    const p='\\'+cmd+'{';let idx;
+    while((idx=str.indexOf(p))!==-1){
+      const st=idx+p.length;let c=1,i=st;
+      while(i<str.length&&c>0){if(str[i]==='{')c++;else if(str[i]==='}')c--;i++;}
+      if(c===0){str=str.slice(0,idx)+f(str.slice(st,i-1))+str.slice(i);}else break;
+    }
+    return str;
+  }
+  s=rBraced(s,'text',x=>x);
+  s=rBraced(s,'mathbf',x=>'<b>'+x+'</b>');
+  s=rBraced(s,'sqrt',x=>'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">'+x+'</span></span>');
+  s=s.replace(/\\sqrt\s*(\d+)/g,'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">$1</span></span>');
+  
+  // Frac
+  let prev;
+  do{prev=s;s=s.replace(/_\{([^{}]+)\}/g,'<sub>$1</sub>').replace(/\^\{([^{}]+)\}/g,'<sup>$1</sup>');}while(s!==prev);
+  do{prev=s;s=s.replace(/\[\[([^\[\]|]+)\|([^\[\]]+)\]\]/g,'<span class="frac"><span>$1</span><span>$2</span></span>');}while(s!==prev);
+  s=s.replace(/\\left\s*([(\[{|])/g,'$1').replace(/\\right\s*([)\]}|])/g,'$1')
+     .replace(/\\left\b/g,'').replace(/\\right\b/g,'')
+     .replace(/\\implies\b/g,'&rArr;')
+     .replace(/\\approx\b/g,'&approx;')
+     .replace(/\\times\b/g,'&times;')
+     .replace(/\\cdot\b/g,'&middot;')
+     .replace(/\\Omega\b/g,'&Omega;')
+     .replace(/\\mu\b/g,'&mu;')
+     .replace(/\\pi\b/g,'&pi;')
+     .replace(/\\theta\b/g,'&theta;')
+     .replace(/\\eta\b/g,'&eta;')
+     .replace(/\\omega\b/g,'&omega;')
+     .replace(/\\ge\b/g,'&ge;')
+     .replace(/\\le\b/g,'&le;')
+     .replace(/\\pm\b/g,'&plusmn;')
+     .replace(/\\circ\b/g,'&deg;')
+     .replace(/\\dots\b/g,'&hellip;')
+     .replace(/\\quad\b/g,' ')
+     .replace(/\\qquad\b/g,'  ')
+     .replace(/\\parallel\b/g,'||')
+     .replace(/\\%/g,'%');
+  return s;
+}
+function mathify(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    if(!/_\{|\^\{|\[\[|\\sqrt|\\frac|\\implies|\\times|\\approx|\\mathbf|\\text|\\Omega|\\mu|\\le|\\ge|\\pi|&radic;|√/.test(n.nodeValue))return NodeFilter.FILTER_REJECT;
+    for(let p=n.parentNode;p&&p!==root;p=p.parentNode){const t=p.nodeName.toLowerCase();
+      if(t==='svg'||t==='script'||t==='style'||t==='textarea'||t==='input'||t==='option')return NodeFilter.FILTER_REJECT;}
+    return NodeFilter.FILTER_ACCEPT;}});
+  const list=[];while(w.nextNode())list.push(w.currentNode);
+  list.forEach(n=>{const sp=document.createElement('span');sp.innerHTML=mk(n.nodeValue);n.replaceWith(...sp.childNodes);});
+}
+
+/* ---------- SVG graphics library ---------- */
+const tx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/_\{([^{}]+)\}/g,'<tspan dy="3" font-size="9">$1</tspan><tspan dy="-3">​</tspan>');
+const W=(d,c)=>`<path${c?` class="${c}"`:''} d="${d}"/>`;
+const T=(x,y,s,c,a)=>`<text x="${x}" y="${y}" text-anchor="${a||'middle'}"${c?` class="${c}"`:''}>${tx(s)}</text>`;
+const dot=(x,y)=>`<circle class="dot" cx="${x}" cy="${y}" r="3"/>`;
+const term=(x,y)=>`<circle class="node" cx="${x}" cy="${y}" r="3.6"/>`;
+const G=(x,y,rot,inner)=>`<g transform="translate(${x} ${y})${rot?` rotate(${rot})`:''}">${inner}</g>`;
+function zig(len){const lead=8,n=3,seg=(len-2*lead)/(2*n);let d=`M0,0H${lead}`;for(let k=1;k<2*n;k++)d+=`L${F(lead+k*seg)},${k%2?-6:6}`;return d+`L${F(len-lead)},0H${len}`;}
+const R=(x,y,len,rot,c)=>G(x,y,rot||0,W(zig(len),c));
+const C=(x,y,len,rot,c)=>G(x,y,rot||0,W(`M0,0H${len/2-3}M${len/2-3},-10V10M${len/2+3},-10V10M${len/2+3},0H${len}`,c));
+const ACS=(x,y)=>`<circle class="sym" cx="${x}" cy="${y}" r="13"/>`+G(x,y,0,W('M-7,0q3.5,-8 7,0t7,0'));
+const GND=(x,y)=>G(x,y,0,W('M0,0V6M-9,6H9M-5,10H5M-2,14H2'));
+const NPN=(x,y)=>G(x,y,0,W('M-30,0H0M0,-16V16M0,-8L18,-20V-40M0,8L18,20V40')+W('M17,19.4L8.4,17.9L12.3,12Z','fl'));
+const PNP=(x,y)=>G(x,y,0,W('M-30,0H0M0,-16V16M0,-8L18,-20V-40M0,8L18,20V40')+W('M0,8L9.6,9.5L5.7,15.4Z','fl'));
+const DIODE=(x,y,rot)=>G(x,y,rot||0,W('M0,0H8M8,-8V8L22,0ZM22,-8V8M22,0H30'));
+function ARW(x1,y1,x2,y2,c){const a=Math.atan2(y2-y1,x2-x1),h=7;
+  const p1=[x2-h*Math.cos(a-0.4),y2-h*Math.sin(a-0.4)],p2=[x2-h*Math.cos(a+0.4),y2-h*Math.sin(a+0.4)];
+  return W(`M${x1},${y1}L${x2},${y2}M${F(p1[0])},${F(p1[1])}L${x2},${y2}L${F(p2[0])},${F(p2[1])}`,c);}
+const SVG=(w,h,inner,label)=>`<svg class="dg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${inner}</svg>`;
+
+const DG={};
+
+/* 1. Audio System Signal Chain */
+DG.audioBlockDiagram=()=>{
+  let s='';
+  // Microphone
+  s+=`<circle class="sym" cx="60" cy="110" r="28"/>`;
+  s+=W('M45,95V125M50,95V125M45,110H32M60,82V138');
+  s+=T(60,158,'Microphone','b');
+  s+=T(60,174,'µV to mV range','s');
+  s+=T(60,190,'High Z (~10kΩ)','s');
+  s+=ARW(88,110,135,110);
+  s+=T(112,100,'mV','dc');
+
+  // Box 1: Preamp
+  s+=`<rect class="box" x="140" y="55" width="160" height="110" rx="8"/>`;
+  s+=T(220,82,'Small-Signal Preamp','b');
+  s+=T(220,102,'Voltage Gain Av ≈ 100–1000','s');
+  s+=T(220,122,'Boosts mV → 1V–2V','ac');
+  s+=T(220,142,'High Rin, Low noise','s');
+  s+=ARW(300,110,345,110);
+  s+=T(322,100,'1–2V','dc');
+
+  // Box 2: Driver / Splitter
+  s+=`<rect class="box" x="350" y="55" width="150" height="110" rx="8"/>`;
+  s+=T(425,82,'Driver / Splitter','b');
+  s+=T(425,102,'Impedance Buffer','s');
+  s+=T(425,122,'Provides Base Drive','ac');
+  s+=T(425,142,'Anti-phase (Push-Pull)','s');
+  s+=ARW(500,110,545,110);
+  s+=T(522,100,'Drive','dc');
+
+  // Box 3: Power Amp
+  s+=`<rect class="box" x="550" y="55" width="160" height="110" rx="8"/>`;
+  s+=T(630,82,'Power Amplifier','b');
+  s+=T(630,102,'Current Gain Ai >> 1','s');
+  s+=T(630,122,'Delivers Amperes','ac');
+  s+=T(630,142,'Low Rout (< 0.5Ω)','s');
+  s+=ARW(710,110,745,110);
+  s+=T(728,100,'Amps','dc');
+
+  // Loudspeaker
+  s+=W('M750,110H762V92L788,72V148L762,128V110M788,90C798,98 798,122 788,130M794,82C810,95 810,125 794,138');
+  s+=T(780,165,'Loudspeaker','b');
+  s+=T(780,182,'RL = 4Ω – 32Ω','ac');
+  s+=T(780,198,'Acoustic Watts','s');
+
+  return SVG(820,230,s,'Audio Amplification Chain Block Diagram');
+};
+
+/* 2. Conduction Angles (Class A, B, AB, C, D) */
+DG.conductionAngles=()=>{
+  let s='';
+  const panels=[
+    {name:'Class A', ang:'θc = 360° (2π)', eff:'η ≤ 50% (25% ser)', desc:'Zero distortion, high idle heat', q:'Q at center'},
+    {name:'Class B', ang:'θc = 180° (π)', eff:'η ≤ 78.5%', desc:'Crossover distortion present', q:'Q at cut-off'},
+    {name:'Class AB', ang:'180° < θc < 360°', eff:'η ≈ 50–70%', desc:'Zero crossover, best audio', q:'Q slightly above cut-off'},
+    {name:'Class C', ang:'θc < 180° (~90°)', eff:'η ≈ 80–90%', desc:'Severe distortion, RF tank', q:'Q deep in cut-off'},
+    {name:'Class D', ang:'Switching (PWM)', eff:'η ≈ 90–98%', desc:'Transistors ON/OFF, LC filter', q:'Cut-off / Saturation'}
+  ];
+
+  panels.forEach((p,i)=>{
+    const x=10+i*160, y=15;
+    s+=`<rect class="box" x="${x}" y="${y}" width="152" height="235" rx="6"/>`;
+    s+=T(x+76,y+24,p.name,'b');
+    s+=T(x+76,y+42,p.ang,'ac');
+    s+=T(x+76,y+60,p.eff,'dc');
+    
+    // Mini graph box
+    const gx=x+16, gy=y+75, gw=120, gh=90;
+    s+=`<rect x="${gx}" y="${gy}" width="${gw}" height="${gh}" fill="var(--bg)" stroke="var(--line)" rx="4"/>`;
+    s+=W(`M${gx+10},${gy+gh-15}H${gx+gw-10}M${gx+20},${gy+gh-10}V${gy+10}`,'thin');
+    
+    // Waveforms
+    if(i===0){ // Class A full sine
+      s+=W(`M${gx+20},${gy+gh/2} Q${gx+45},${gy+15} ${gx+70},${gy+gh/2} T${gx+120},${gy+gh/2}`,'ac');
+      s+=`<circle class="q" cx="${gx+70}" cy="${gy+gh/2}" r="3.5"/>`;
+    }else if(i===1){ // Class B half sine
+      s+=W(`M${gx+20},${gy+gh-15} Q${gx+45},${gy+20} ${gx+70},${gy+gh-15} H${gx+120}`,'ac');
+      s+=`<circle class="q" cx="${gx+20}" cy="${gy+gh-15}" r="3.5"/>`;
+    }else if(i===2){ // Class AB slightly more than half
+      s+=W(`M${gx+20},${gy+gh-22} Q${gx+45},${gy+18} ${gx+70},${gy+gh-22} Q${gx+85},${gy+gh-10} ${gx+95},${gy+gh-15} H${gx+120}`,'ac');
+      s+=`<circle class="q" cx="${gx+20}" cy="${gy+gh-22}" r="3.5"/>`;
+    }else if(i===3){ // Class C narrow pulse
+      s+=W(`M${gx+20},${gy+gh-15} H${gx+40} Q${gx+55},${gy+20} ${gx+70},${gy+gh-15} H${gx+120}`,'ac');
+      s+=`<circle class="q" cx="${gx+20}" cy="${gy+gh-5}" r="3.5"/>`;
+    }else{ // Class D PWM pulses
+      s+=W(`M${gx+20},${gy+gh-15} V${gy+25} H${gx+35} V${gy+gh-15} H${gx+45} V${gy+25} H${gx+75} V${gy+gh-15} H${gx+85} V${gy+25} H${gx+110} V${gy+gh-15}`,'ac');
+    }
+    
+    s+=T(x+76,y+185,p.q,'s');
+    s+=T(x+76,y+205,p.desc.split(',')[0],'s');
+    s+=T(x+76,y+222,p.desc.split(',')[1]||'','s');
+  });
+
+  return SVG(820,265,s,'Amplifier Classification by Conduction Angle');
+};
+
+/* 3. Series-Fed Class A Schematic & DC Loadline */
+DG.classASeriesSchematic=()=>{
+  let s='';
+  // Schematic (left: 0 to 380)
+  s+=T(190,25,'Series-Fed Class A Circuit','b');
+  s+=W('M60,45H320M190,45V70');
+  s+=T(335,48,'+VCC','dc');
+  s+=R(190,70,60,90); // RL
+  s+=T(220,100,'RL','dc');
+  s+=W('M190,130V160'); // to collector
+  s+=NPN(190,200); // NPN at x=190, y=200
+  s+=T(215,190,'Q1','b');
+  s+=W('M190,240V270'); // emitter to GND
+  s+=GND(190,270);
+
+  // Base bias RB
+  s+=W('M100,45V100');
+  s+=R(100,100,60,90); // RB
+  s+=T(75,130,'RB');
+  s+=W('M100,160V200H160');
+  dot(100,45); dot(160,200);
+
+  // Input coupling
+  s+=C(80,200,40,0);
+  s+=T(100,185,'C1');
+  s+=term(80,200);
+  s+=T(60,204,'Vi','ac');
+
+  // Output coupling
+  s+=W('M190,160H240'); dot(190,160);
+  s+=C(240,160,40,0);
+  s+=T(260,145,'C2');
+  s+=term(280,160);
+  s+=T(300,164,'Vo','ac');
+
+  // Divider line
+  s+=W('M375,30V280','thin');
+
+  // Load Line (right: 400 to 800)
+  s+=T(600,25,'DC Load Line & Symmetrical Swing','b');
+  const ox=440, oy=250, gw=320, gh=200;
+  // Axes
+  s+=W(`M${ox},${oy}H${ox+gw}M${ox},${oy}V${oy-gh}`);
+  s+=T(ox+gw+15,oy+5,'VCE','b');
+  s+=T(ox-15,oy-gh+10,'IC','b');
+
+  // Saturation & Cutoff points
+  const satY = oy - 170, cutX = ox + 270;
+  s+=W(`M${ox},${satY}L${cutX},${oy}`,'dc'); // DC load line
+  s+=`<circle class="dot" cx="${ox}" cy="${satY}" r="4"/>`;
+  s+=T(ox+45,satY-6,'VCC/RL (sat)','dc');
+
+  s+=`<circle class="dot" cx="${cutX}" cy="${oy}" r="4"/>`;
+  s+=T(cutX,oy+18,'VCC (cut-off)','dc');
+
+  // Q-point at center
+  const qx = ox + 135, qy = oy - 85;
+  s+=`<circle class="q" cx="${qx}" cy="${qy}" r="5"/>`;
+  s+=T(qx+35,qy-8,'Q (VCEQ, ICQ)','b');
+  s+=W(`M${qx},${oy}V${qy}H${ox}`,'dash');
+  s+=T(qx,oy+18,'VCC/2','s');
+  s+=T(ox-30,qy+4,'VCC/2RL','s');
+
+  // Swing annotations
+  s+=ARW(ox+10,oy+28,cutX-10,oy+28,'ac');
+  s+=T(qx,oy+42,'Vopp = VCC (Max Symmetrical Swing)','ac');
+
+  return SVG(820,300,s,'Series-Fed Class A Schematic and DC Load Line');
+};
+
+/* 4. Transformer-Coupled Class A Schematic & Load Lines */
+DG.classAXfmrSchematic=()=>{
+  let s='';
+  // Schematic
+  s+=T(180,25,'Transformer-Coupled Class A Circuit','b');
+  s+=W('M50,45H310M170,45V65');
+  s+=T(325,48,'+VCC','dc');
+
+  // Transformer
+  s+=W('M170,65V80M170,80C160,85 160,95 170,100C160,105 160,115 170,120C160,125 160,135 170,140V160');
+  s+=W('M175,80V140M178,80V140','thin'); // core lines
+  s+=W('M183,80C193,85 193,95 183,100C193,105 193,115 183,120C193,125 193,135 183,140');
+  s+=W('M183,80H230V100M183,140H230V120');
+  s+=R(230,100,20,90); // RL
+  s+=T(255,115,'RL','dc');
+  s+=T(150,110,'N1'); s+=T(205,110,'N2');
+
+  // Transistor Q1
+  s+=NPN(170,200);
+  s+=T(195,190,'Q1','b');
+  s+=W('M170,240V250');
+  s+=R(170,250,30,90); // RE
+  s+=T(195,268,'RE');
+  s+=W('M170,280V290'); GND(170,290);
+
+  // Bypass CE
+  s+=W('M170,245H130V255');
+  s+=C(130,255,30,90);
+  s+=W('M130,285V290'); GND(130,290);
+  s+=T(110,270,'CE');
+  dot(170,245);
+
+  // Bias R1, R2
+  s+=W('M80,45V90'); dot(80,45);
+  s+=R(80,90,40,90); s+=T(60,110,'R1');
+  s+=W('M80,130V200H140'); dot(80,200);
+  s+=R(80,200,40,90); s+=T(60,220,'R2');
+  s+=W('M80,240V250'); GND(80,250);
+
+  // Input
+  s+=C(40,200,30,0); term(40,200); s+=T(25,204,'Vi','ac');
+
+  // Divider line
+  s+=W('M350,30V290','thin');
+
+  // Load Lines (right)
+  s+=T(585,25,'AC/DC Load Lines: 2·VCC Swing','b');
+  const ox=420, oy=260, gw=330, gh=210;
+  s+=W(`M${ox},${oy}H${ox+gw}M${ox},${oy}V${oy-gh}`);
+  s+=T(ox+gw+15,oy+5,'VCE','b'); s+=T(ox-15,oy-gh+10,'IC','b');
+
+  const vccX=ox+130, satY=oy-180, cut2X=ox+260;
+  // Vertical DC line
+  s+=W(`M${vccX},${oy}V${oy-gh+20}`,'dc');
+  s+=T(vccX,oy+18,'VCC','dc');
+  s+=T(vccX-30,oy-gh+35,'DC Load Line (Rdc≈0)','dc');
+
+  // AC Load line with slope -1/R'L
+  s+=W(`M${ox},${satY}L${cut2X},${oy}`,'ac');
+  s+=T(ox+40,satY-5,'2·ICQ','ac');
+  s+=`<circle class="dot" cx="${ox}" cy="${satY}" r="3.5"/>`;
+
+  s+=T(cut2X,oy+18,'2·VCC!','ac');
+  s+=`<circle class="dot" cx="${cut2X}" cy="${oy}" r="3.5"/>`;
+
+  // Q-point
+  const qy=oy-90;
+  s+=`<circle class="q" cx="${vccX}" cy="${qy}" r="5"/>`;
+  s+=T(vccX+40,qy-8,'Q(VCC, ICQ)','b');
+  s+=W(`M${vccX},${qy}H${ox}`,'dash');
+  s+=T(ox-25,qy+4,'ICQ','s');
+
+  s+=ARW(ox+10,oy+35,cut2X-5,oy+35,'bad');
+  s+=T(vccX,oy+50,'Peak-to-Peak Swing = 2·VCC (Lenz Induction)','bad');
+
+  return SVG(820,315,s,'Transformer-Coupled Class A Schematic and Load Lines');
+};
+
+/* 5. Class B Push-Pull Schematic & Operation */
+DG.classBPushPullSchematic=()=>{
+  let s='';
+  s+=T(410,25,'Transformer-Coupled Class B Push-Pull Amplifier','b');
+
+  // Input Transformer T1 (left)
+  s+=T(130,55,'Input Transformer T1','s');
+  s+=W('M80,100V130C70,135 70,145 80,150C70,155 70,165 80,170V200'); // pri
+  s+=term(80,100); term(80,200);
+  s+=T(50,150,'v_in','ac');
+  s+=W('M86,110V190M89,110V190','thin'); // core
+  // Secondary center-tapped
+  s+=W('M95,100C105,105 105,115 95,120C105,125 105,135 95,140C105,145 105,155 95,160C105,165 105,175 95,180C105,185 105,195 95,200');
+  s+=W('M95,150H130V220'); GND(130,220); dot(95,150); // center tap GND
+  s+=W('M95,100H180V120'); // to Q1 base
+  s+=W('M95,200H180V180'); // to Q2 base
+  s+=T(140,90,'v1 (+ve half)','ac');
+  s+=T(140,210,'v2 (−ve half)','bad');
+
+  // Upper Transistor Q1 (NPN)
+  s+=NPN(210,120);
+  s+=T(235,110,'Q1','b');
+  s+=W('M210,160V180H270'); // emitter to GND
+  dot(270,180);
+
+  // Lower Transistor Q2 (NPN)
+  s+=NPN(210,240);
+  s+=T(235,230,'Q2','b');
+  s+=W('M210,280V290H270V180'); GND(270,180); // emitter to GND
+
+  // Output Transformer T2 (right)
+  s+=T(530,55,'Output Transformer T2 (Push-Pull Combining)','s');
+  // Primary center-tapped
+  s+=W('M210,80H460V120C450,125 450,135 460,140C450,145 450,155 460,160C450,165 450,175 460,180C450,185 450,195 460,200C450,205 450,215 460,220C450,225 450,235 460,240V280H210V200');
+  // Center tap to +VCC
+  s+=W('M460,180H370V45H600'); dot(460,180);
+  s+=T(615,48,'+VCC','dc');
+  s+=T(390,170,'+VCC Center Tap','dc');
+
+  s+=W('M466,130V230M469,130V230','thin'); // core
+
+  // Secondary to RL
+  s+=W('M476,120C486,125 486,135 476,140C486,145 486,155 476,160C486,165 486,175 476,180C486,185 486,195 476,200C486,205 486,215 476,220C486,225 486,235 476,240');
+  s+=W('M476,120H550V160M476,240H550V200');
+  s+=R(550,160,40,90); // RL
+  s+=T(575,182,'RL','dc');
+
+  // Currents
+  s+=ARW(440,95,380,95,'ac'); s+=T(410,85,'i_C1 (half cycle 1)','ac');
+  s+=ARW(380,265,440,265,'bad'); s+=T(410,275,'i_C2 (half cycle 2)','bad');
+
+  // Full sine output
+  s+=W('M640,180 Q660,150 680,180 T720,180','ac');
+  s+=T(680,205,'Full Recombined Sine Wave','b');
+
+  return SVG(820,310,s,'Class B Push-Pull Circuit and Current Combining');
+};
+
+/* 6. Crossover Distortion Waveform */
+DG.crossoverWaveform=()=>{
+  let s='';
+  s+=T(410,25,'Origin & Elimination of Crossover Distortion','b');
+
+  // Left: Pure Input Sine with 0.7V threshold
+  const x1=50, y1=140, w1=200;
+  s+=T(x1+w1/2,48,'Input Signal & 0.7V Threshold','s');
+  s+=W(`M${x1},${y1}H${x1+w1}M${x1+w1/2},${y1-70}V${y1+70}`,'thin');
+  s+=W(`M${x1},${y1-18}H${x1+w1}M${x1},${y1+18}H${x1+w1}`,'dash');
+  s+=T(x1+w1+22,y1-16,'+0.7V','dc'); s+=T(x1+w1+22,y1+20,'−0.7V','dc');
+  s+=W(`M${x1},${y1} Q${x1+50},${y1-65} ${x1+100},${y1} T${x1+200},${y1}`);
+
+  // Middle: Class B with Dead Zone
+  const x2=320, y2=140, w2=200;
+  s+=T(x2+w2/2,48,'Class B Output (Flat Dead Band)','bad');
+  s+=W(`M${x2},${y2}H${x2+w2}M${x2+w2/2},${y2-70}V${y2+70}`,'thin');
+  // Distorted wave: flat between -0.7 and +0.7
+  s+=W(`M${x2},${y2} H${x2+15} Q${x2+50},${y2-65} ${x2+85},${y2} H${x2+115} Q${x2+150},${y2+65} ${x2+185},${y2} H${x2+200}`,'bad');
+  s+=`<rect x="${x2+85}" y="${y2-10}" width="30" height="20" fill="var(--bad)" opacity="0.2"/>`;
+  s+=T(x2+100,y2+25,'Dead Zone!','bad');
+
+  // Right: Class AB (Smooth Hand-off)
+  const x3=580, y3=140, w3=200;
+  s+=T(x3+w3/2,48,'Class AB Output (Linear Crossover)','ac');
+  s+=W(`M${x3},${y3}H${x3+w3}M${x3+w3/2},${y3-70}V${y3+70}`,'thin');
+  s+=W(`M${x3},${y3} Q${x3+50},${y3-65} ${x3+100},${y3} T${x3+200},${y3}`,'ac');
+  s+=T(x3+w3/2,y3+45,'Diodes pre-bias VBE > 0.7V','ac');
+
+  return SVG(820,220,s,'Crossover Distortion Mechanism and Class AB Elimination');
+};
+
+/* 7. Complementary Symmetry Class AB Schematic */
+DG.compSymSchematic=()=>{
+  let s='';
+  s+=T(410,25,'Complementary-Symmetry Capacitor-Coupled Class AB Amplifier','b');
+
+  // Rails
+  s+=W('M50,45H750M50,330H750');
+  s+=T(765,48,'+VCC','dc'); s+=T(765,334,'GND');
+
+  // Q1 CE Driver Stage
+  s+=W('M140,45V75'); dot(140,45);
+  s+=R(140,75,40,90); s+=T(115,95,'RC','dc');
+  s+=W('M140,115V135');
+
+  // Bias string D1, RB, D2
+  s+=DIODE(140,135,90); s+=T(165,150,'D1');
+  s+=W('M140,165V180');
+  s+=R(140,180,30,90); s+=T(115,195,'RB (pot)');
+  s+=W('M140,210V225');
+  s+=DIODE(140,225,90); s+=T(165,240,'D2');
+  s+=W('M140,255V270');
+
+  // Q1 transistor
+  s+=NPN(140,290);
+  s+=T(165,280,'Q1 (Driver)','b');
+  s+=W('M140,310V330');
+
+  // Q1 base bias R1, R2, Vi
+  s+=W('M80,45V130'); dot(80,45);
+  s+=R(80,130,40,90); s+=T(60,150,'R1');
+  s+=W('M80,170V290H110'); dot(80,290);
+  s+=R(80,290,40,90); s+=T(60,310,'R2');
+  s+=W('M80,330V330');
+  s+=C(40,290,30,0); term(40,290); s+=T(25,294,'Vi','ac');
+
+  // Node to Q2 Base (above D1)
+  s+=W('M140,125H360'); dot(140,125);
+  s+=T(250,115,'Drive to NPN','ac');
+
+  // Node to Q3 Base (below D2)
+  s+=W('M140,265H360'); dot(140,265);
+  s+=T(250,280,'Drive to PNP','bad');
+
+  // Output stage Q2 (NPN) and Q3 (PNP)
+  s+=NPN(390,125);
+  s+=T(415,115,'Q2 (NPN)','b');
+  s+=W('M390,85V45'); dot(390,45); // collector to +VCC
+
+  s+=PNP(390,265);
+  s+=T(415,280,'Q3 (PNP)','b');
+  s+=W('M390,305V330'); dot(390,330); // collector to GND
+
+  // Emitters to midpoint through RE2, RE3
+  s+=W('M390,165V180');
+  s+=R(390,180,20,90); s+=T(415,190,'RE2');
+  s+=W('M390,200V210'); dot(390,210); // Midpoint node
+  s+=R(390,210,20,90); s+=T(415,220,'RE3');
+  s+=W('M390,230V245');
+
+  // Midpoint annotation
+  s+=T(335,214,'Midpoint (VCC/2)','b');
+
+  // Output Capacitor Co & Speaker RL
+  s+=W('M390,210H490');
+  s+=C(490,210,40,0);
+  s+=T(510,195,'Co (680µF)');
+  s+=W('M530,210H600V235');
+  s+=R(600,235,40,90); // Speaker
+  s+=T(630,255,'RL (Speaker)','ac');
+  s+=W('M600,275V330'); dot(600,330);
+
+  return SVG(820,360,s,'Complementary Symmetry Class AB Power Amplifier Schematic');
+};
+
+/* 8. Quasi-Complementary Symmetry Stage */
+DG.quasiCompSchematic=()=>{
+  let s='';
+  s+=T(410,25,'Quasi-Complementary Symmetry Output Stage (Lin Topology)','b');
+
+  // Rails
+  s+=W('M80,45H720M80,290H720');
+  s+=T(735,48,'+VCC','dc'); s+=T(735,294,'GND');
+
+  // Upper Branch: NPN Darlington (Q2 driver + Q4 power NPN)
+  s+=`<rect class="box" x="140" y="60" width="240" height="105" rx="6"/>`;
+  s+=T(260,78,'Upper Branch: NPN Darlington Pair','b');
+  s+=NPN(210,115); s+=T(230,105,'Q2 (NPN)');
+  s+=W('M210,75V45'); dot(210,45); // Q2 col to +VCC
+  s+=W('M210,135H270V115'); // Q2 em to Q4 base
+  s+=NPN(300,115); s+=T(325,105,'Q4 (Power NPN)','ac');
+  s+=W('M300,75V45'); dot(300,45); // Q4 col to +VCC
+  s+=W('M300,135V175H450'); // Q4 em to midpoint
+
+  // Lower Branch: Sziklai CFP (Q3 PNP driver + Q5 power NPN)
+  s+=`<rect class="box" x="140" y="175" width="240" height="105" rx="6"/>`;
+  s+=T(260,193,'Lower Branch: Sziklai Pair (CFP)','b');
+  s+=PNP(210,230); s+=T(230,220,'Q3 (PNP)');
+  s+=W('M210,270V290'); dot(210,290); // Q3 col to GND
+  s+=W('M210,190V175H450'); // Q3 em to midpoint
+  s+=W('M210,250H270V230'); // Q3 col to Q5 base
+  s+=NPN(300,230); s+=T(325,220,'Q5 (Power NPN)','ac');
+  s+=W('M300,190V175H450'); // Q5 col to midpoint
+  s+=W('M300,270V290'); dot(300,290); // Q5 em to GND
+
+  // Midpoint to Speaker
+  dot(450,175);
+  s+=T(490,165,'VCC/2 Midpoint','b');
+  s+=W('M450,175H540');
+  s+=C(540,175,40,0); s+=T(560,160,'Co');
+  s+=W('M580,175H640V210');
+  s+=R(640,210,40,90); s+=T(670,230,'RL','dc');
+  s+=W('M640,250V290'); dot(640,290);
+
+  // Key highlight callout
+  s+=`<rect x="420" y="65" width="280" height="65" fill="var(--fill)" stroke="var(--accent)" rx="6"/>`;
+  s+=T(560,88,'Notice: BOTH Q4 and Q5 are NPN!','ac2');
+  s+=T(560,108,'Enables use of identical rugged 2N3055 BJTs','s');
+
+  return SVG(820,320,s,'Quasi-Complementary Symmetry Output Stage');
+};
+
+/* 9. Harmonic Distortion & THD */
+DG.thdWaveform=()=>{
+  let s='';
+  s+=T(410,25,'Harmonic Distortion Waveforms & Frequency Spectrum','b');
+
+  // Left: Waveforms (Pure vs Flattened vs Peaked)
+  const x1=50, y1=140, w1=280;
+  s+=T(x1+w1/2,50,'Time Domain: Distortion Flattening','b');
+  s+=W(`M${x1},${y1}H${x1+w1}M${x1},${y1-70}V${y1+70}`,'thin');
+  // Pure sine (green)
+  s+=W(`M${x1},${y1} Q${x1+70},${y1-65} ${x1+140},${y1} T${x1+280},${y1}`,'ac');
+  s+=T(x1+85,y1-70,'Pure Sine (Fundamental)','ac');
+
+  // Distorted clipped/flattened wave (red)
+  s+=W(`M${x1},${y1} Q${x1+40},${y1-50} ${x1+70},${y1-50} Q${x1+100},${y1-50} ${x1+140},${y1} Q${x1+180},${y1+50} ${x1+210},${y1+50} Q${x1+240},${y1+50} ${x1+280},${y1}`,'bad');
+  s+=T(x1+210,y1+68,'Flattened Peaks (2nd/3rd Harmonics)','bad');
+
+  // Right: Spectrum Bar Chart
+  const x2=420, y2=200, gw=340, gh=140;
+  s+=T(x2+gw/2,50,'Frequency Domain: Harmonic Spectrum','b');
+  s+=W(`M${x2},${y2}H${x2+gw}M${x2},${y2}V${y2-gh}`,'thin');
+  s+=T(x2+gw+15,y2+5,'Freq','s'); s+=T(x2-15,y2-gh+10,'%','s');
+
+  const bars=[
+    {label:'f0 (Fund)', h:110, val:'100%', c:'ac'},
+    {label:'2f0', h:35, val:'8%', c:'bad'},
+    {label:'3f0', h:20, val:'4%', c:'bad'},
+    {label:'4f0', h:10, val:'1.5%', c:'bad'},
+    {label:'5f0', h:6, val:'0.8%', c:'bad'}
+  ];
+
+  bars.forEach((b,i)=>{
+    const bx = x2 + 35 + i*55;
+    s+=`<rect x="${bx}" y="${y2-b.h}" width="32" height="${b.h}" fill="var(--${b.c})" rx="3"/>`;
+    s+=T(bx+16,y2-b.h-6,b.val,'s');
+    s+=T(bx+16,y2+16,b.label,'s');
+  });
+
+  return SVG(820,250,s,'Harmonic Distortion Waveform and Spectrum');
+};
+
+/* ---------- Interactive Widgets (WID) ---------- */
+function widget(el,cfg){
+  let s=`<div class="widget"><span class="wlabel">${cfg.title}</span><p class="lead" style="font-size:.85rem">${cfg.intro||''}</p><div class="wgrid">`;
+  cfg.fields.forEach(f=>{
+    s+=`<div class="fld"><label for="${f.id}_${el.id}">${f.label}</label><div class="row">`;
+    if(f.opts){
+      s+=`<select id="${f.id}_${el.id}">${f.opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join('')}</select>`;
+    }else{
+      s+=`<input type="number" id="${f.id}_${el.id}" value="${f.val}" step="${f.step||'any'}"><span class="u">${f.unit||''}</span>`;
+    }
+    s+=`</div></div>`;
+  });
+  s+=`</div><div class="res" id="res_${el.id}"></div></div>`;
+  el.innerHTML=s;
+
+  const update=()=>{
+    const vals={};
+    cfg.fields.forEach(f=>{
+      const inp=$(`#${f.id}_${el.id}`,el);
+      vals[f.id]=f.opts?inp.value:parseFloat(inp.value)*(f.scale||1);
+    });
+    const out=cfg.run(vals);
+    const r=$(`#res_${el.id}`,el);
+    r.innerHTML=out.map(item=>{
+      if(item.warn) return `<div class="warn">${item.warn}</div>`;
+      if(item.note) return `<div class="note">${item.note}</div>`;
+      return `<div><small>${item.k}</small><b>${item.v}</b></div>`;
+    }).join('');
+  };
+  cfg.fields.forEach(f=>{$(`#${f.id}_${el.id}`,el).addEventListener('input',update);$(`#${f.id}_${el.id}`,el).addEventListener('change',update);});
+  update();
+}
+
+const WID={};
+
+WID.classAEff=h=>widget(h,{
+  title:'Class A Power & Efficiency Analyzer (Series vs Transformer)',
+  intro:'Evaluate theoretical versus practical efficiency including transistor saturation drop V_{ce(min)}.',
+  fields:[
+    {id:'type',label:'Topology Type',opts:[{v:'series',t:'Series-Fed Resistive'},{v:'xfmr',t:'Transformer-Coupled'}]},
+    {id:'Vcc',label:'Supply Voltage V_{CC}',val:15,unit:'V'},
+    {id:'Vmin',label:'Saturation Voltage V_{ce(min)}',val:1,unit:'V'},
+    {id:'RL',label:'Load / Reflected Load R_{L}',val:16,unit:'Ω'}
+  ],
+  run(v){
+    let Pac, Pdc, eta, Pq, Vopp, Iopp;
+    if(v.type==='series'){
+      const Vceq = v.Vcc / 2;
+      const Icq = v.Vcc / (2 * v.RL);
+      Vopp = Math.max(0, v.Vcc - v.Vmin);
+      Pac = Math.pow(Vopp, 2) / (8 * v.RL);
+      Pdc = v.Vcc * Icq;
+      eta = (Pac / Pdc) * 100;
+      Pq = Vceq * Icq;
+      return [
+        {k:'Topology',v:'Series-Fed Resistive'},
+        {k:'AC Peak-to-Peak Swing',v:fmt3(Vopp)+' V'},
+        {k:'AC Output Power P_{ac}',v:eng(Pac,'W')},
+        {k:'DC Input Power P_{dc}',v:eng(Pdc,'W')},
+        {k:'Collector Efficiency η',v:fmt3(eta)+' %'},
+        {k:'Idle Transistor Heat P_{Q}',v:eng(Pq,'W')},
+        {k:'Figure of Merit (FM)',v:fmt3(Pq / Pac)},
+        {note:v.Vmin>0?'Notice how non-zero V_{ce(min)} reduces practical efficiency below the 25% theoretical limit!':'Matches 25% theoretical maximum at zero saturation.'}
+      ];
+    }else{
+      Vopp = Math.max(0, 2 * (v.Vcc - v.Vmin));
+      const Icq = (v.Vcc - v.Vmin) / v.RL;
+      Pac = Math.pow(Vopp, 2) / (8 * v.RL);
+      Pdc = v.Vcc * Icq;
+      eta = (Pac / Pdc) * 100;
+      Pq = v.Vcc * Icq;
+      return [
+        {k:'Topology',v:'Transformer-Coupled'},
+        {k:'AC Peak-to-Peak Swing (up to 2V_{CC})',v:fmt3(Vopp)+' V'},
+        {k:'AC Output Power P_{ac}',v:eng(Pac,'W')},
+        {k:'DC Input Power P_{dc}',v:eng(Pdc,'W')},
+        {k:'Collector Efficiency η',v:fmt3(eta)+' %'},
+        {k:'Idle Transistor Heat P_{Q}',v:eng(Pq,'W')},
+        {k:'Figure of Merit (FM)',v:fmt3(Pq / Pac)},
+        {note:'Transformer coupling swings to 2·V_{CC} and delivers double the efficiency of series-fed!'}
+      ];
+    }
+  }
+});
+
+WID.classBEff=h=>widget(h,{
+  title:'Class B Push-Pull Power & Efficiency Calculator',
+  intro:'Matches the exact parameters of Summer 2026 Q5 and Dr. Ghongade\'s 4W/16Ω design problem.',
+  fields:[
+    {id:'Vcc',label:'Supply Voltage V_{CC}',val:30,unit:'V'},
+    {id:'Vmin',label:'Saturation Drop V_{ce(min)}',val:1,unit:'V'},
+    {id:'Po',label:'Target Audio Power P_{o}',val:4,unit:'W'},
+    {id:'RL',label:'Speaker Load R_{L}',val:16,unit:'Ω'},
+    {id:'etaX',label:'Transformer Efficiency',val:80,unit:'%'}
+  ],
+  run(v){
+    const Po_prime = v.Po / (v.etaX / 100);
+    const Vp = Math.max(1, v.Vcc - v.Vmin);
+    const RL_prime = Math.pow(Vp, 2) / (2 * Po_prime);
+    const RL_total = 4 * RL_prime;
+    const turns_ratio = Math.sqrt(RL_prime / v.RL);
+    const Ip = 2 * Po_prime / Vp;
+    const Pdc = (2 / Math.PI) * v.Vcc * Ip;
+    const eta = (Po_prime / Pdc) * 100;
+    const PQ = 0.5 * (Pdc - Po_prime);
+    const PQ_worst = Math.pow(v.Vcc, 2) / (Math.pow(Math.PI, 2) * RL_prime);
+    return [
+      {k:'Primary Power P_{o}\'',v:fmt3(Po_prime)+' W'},
+      {k:'Primary Half Load R_{L}\'',v:fmt3(RL_prime)+' Ω'},
+      {k:'Total Primary Impedance',v:fmt3(RL_total)+' Ω C.T.'},
+      {k:'Turns Ratio N_{1}:N_{2}',v:fmt3(turns_ratio)+' : 1'},
+      {k:'Peak Current I_{p}',v:eng(Ip,'A')},
+      {k:'DC Power Drawn P_{dc}',v:fmt3(Pdc)+' W'},
+      {k:'Collector Efficiency η',v:fmt3(eta)+' %'},
+      {k:'Transistor Heat P_{Q}',v:fmt3(PQ)+' W'},
+      {k:'Worst-Case Heat (at 63% swing)',v:fmt3(PQ_worst)+' W'},
+      {note:'Requires transistor ratings: BV_{CEO} ≥ '+fmt3(v.Vcc*2.3)+' V, I_{C(max)} ≥ '+fmt3(Ip*1.15*1e3)+' mA, P_{D} ≥ '+fmt3(PQ_worst*1.15)+' W.'}
+    ];
+  }
+});
+
+WID.compSymDesign=h=>widget(h,{
+  title:'Complementary-Symmetry Class AB Design Wizard',
+  intro:'Generates exact resistor, capacitor, and supply values matching Dr. Ghongade\'s 1W/50Ω design method.',
+  fields:[
+    {id:'Po',label:'Target Audio Power P_{o}',val:1,unit:'W'},
+    {id:'RL',label:'Speaker Load R_{L}',val:50,unit:'Ω'},
+    {id:'fL',label:'Lower Cutoff Frequency f_{L}',val:50,unit:'Hz'},
+    {id:'hfe',label:'Minimum Output h_{FE}',val:50,unit:''},
+    {id:'Vhead',label:'Driver Headroom V_{RC(min)}',val:4,unit:'V'}
+  ],
+  run(v){
+    const Vp = Math.sqrt(2 * v.RL * v.Po);
+    const Ip = Vp / v.RL;
+    const RE2 = 0.1 * v.RL;
+    const ICQ = 0.1 * Ip;
+    const VB = 0.7 + ICQ * (2 * RE2) + 0.7;
+    const IB_max = Ip / v.hfe;
+    const IRC_min = IB_max + 0.001;
+    const RC = v.Vhead / IRC_min;
+    const Vcc_calc = 2 * (Vp + Ip * RE2 + 0.7 + v.Vhead);
+    const Vcc_std = Math.ceil(Vcc_calc);
+    const VC1 = 0.5 * (Vcc_std - VB);
+    const IC1 = VC1 / RC;
+    const RB = (VB - 1.4) / IC1;
+    const Pdc = 0.35 * Vcc_std * Ip;
+    const PT = 0.5 * (Pdc - v.Po);
+    const Co = 1 / (2 * Math.PI * v.fL * (0.1 * v.RL));
+    const CE = 1 / (2 * Math.PI * v.fL * 2);
+    return [
+      {k:'Peak Voltage V_{p}',v:fmt3(Vp)+' V'},
+      {k:'Peak Current I_{p}',v:eng(Ip,'A')},
+      {k:'Stabilization R_{E2}, R_{E3}',v:fmt3(RE2)+' Ω (Use 4.7Ω std)'},
+      {k:'Bias String Drop V_{B}',v:fmt3(VB)+' V'},
+      {k:'Recommended V_{CC}',v:fmt3(Vcc_std)+' V'},
+      {k:'Driver Collector R_{C}',v:fmt3(RC)+' Ω (Use 680Ω std)'},
+      {k:'Bias Trimpot R_{B}',v:fmt3(RB)+' Ω (Use 20Ω pot)'},
+      {k:'Output Capacitor C_{o}',v:eng(Co,'F')+' (Use 680µF std)'},
+      {k:'Bypass Capacitor C_{E}',v:eng(CE,'F')+' (Use 1800µF std)'},
+      {k:'Transistor Heat P_{T}',v:fmt3(PT)+' W'},
+      {note:'Output transistors: V_{CE} ≥ '+fmt3(Vcc_std)+' V, I_{C} ≥ '+fmt3(Ip*1.1*1e3)+' mA, P_{D} ≥ '+fmt3(PT*1.15)+' W.'}
+    ];
+  }
+});
+
+WID.thdCalc=h=>widget(h,{
+  title:'Harmonic Distortion & THD Calculator',
+  intro:'Calculate individual harmonic percentages, Total Harmonic Distortion (THD), and power loss.',
+  fields:[
+    {id:'I1',label:'Fundamental I_{1}',val:100,unit:'mA'},
+    {id:'I2',label:'2nd Harmonic I_{2}',val:8,unit:'mA'},
+    {id:'I3',label:'3rd Harmonic I_{3}',val:4,unit:'mA'},
+    {id:'I4',label:'4th Harmonic I_{4}',val:1.5,unit:'mA'},
+    {id:'I5',label:'5th Harmonic I_{5}',val:0.8,unit:'mA'},
+    {id:'RL',label:'Load Resistance R_{L}',val:8,unit:'Ω'}
+  ],
+  run(v){
+    const d2 = (v.I2 / v.I1) * 100;
+    const d3 = (v.I3 / v.I1) * 100;
+    const d4 = (v.I4 / v.I1) * 100;
+    const d5 = (v.I5 / v.I1) * 100;
+    const thd = Math.sqrt(d2*d2 + d3*d3 + d4*d4 + d5*d5);
+    const P1 = 0.5 * Math.pow(v.I1 * 1e-3, 2) * v.RL;
+    const Ptot = P1 * (1 + Math.pow(thd/100, 2));
+    const Pharm = Ptot - P1;
+    return [
+      {k:'2nd Harmonic D_{2}',v:fmt3(d2)+' %'},
+      {k:'3rd Harmonic D_{3}',v:fmt3(d3)+' %'},
+      {k:'4th Harmonic D_{4}',v:fmt3(d4)+' %'},
+      {k:'5th Harmonic D_{5}',v:fmt3(d5)+' %'},
+      {k:'Total Harmonic Distortion (THD)',v:fmt3(thd)+' %'},
+      {k:'Fundamental Audio Power P_{1}',v:eng(P1,'W')},
+      {k:'Total Power Delivered',v:eng(Ptot,'W')},
+      {k:'Harmonic Waste Power',v:eng(Pharm,'W')},
+      {note:thd<5?'THD is under 5%—high fidelity performance!':'THD exceeds 5%—distortion may be audible to discerning listeners.'}
+    ];
+  }
+});
+
+/* ---------- Page Initialization ---------- */
+function init(){
+  document.querySelectorAll('[data-dg]').forEach(el=>{
+    const f=DG[el.dataset.dg];
+    if(f) el.innerHTML=f();
+    else el.textContent='diagram: '+el.dataset.dg;
+  });
+  document.querySelectorAll('[data-w]').forEach(el=>{
+    const f=WID[el.dataset.w];
+    if(f) f(el);
+  });
+  mathify($('main'));
+
+  // Theme toggle
+  $('#themeBtn').addEventListener('click',()=>{
+    const r=document.documentElement;
+    const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    r.dataset.theme=cur==='dark'?'light':'dark';
+  });
+
+  // Progress tracking via localStorage
+  const chips=[...document.querySelectorAll('#chips a')];
+  let done=[];
+  try{done=JSON.parse(localStorage.getItem('unit5-guide-done')||'[]');}catch(e){}
+  const paint=()=>{
+    chips.forEach(a=>{
+      const id=a.getAttribute('href').slice(1);
+      a.classList.toggle('done',done.includes(id));
+    });
+    document.querySelectorAll('input[data-done]').forEach(i=>{
+      i.checked=done.includes(i.dataset.done);
+    });
+  };
+  document.querySelectorAll('input[data-done]').forEach(i=>i.addEventListener('change',()=>{
+    const id=i.dataset.done;
+    done=done.filter(x=>x!==id);
+    if(i.checked) done.push(id);
+    try{localStorage.setItem('unit5-guide-done',JSON.stringify(done));}catch(e){}
+    paint();
+  }));
+  paint();
+
+  // Scroll Performance Optimized IntersectionObserver
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{
+      es.forEach(e=>{
+        if(e.isIntersecting){
+          chips.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));
+          const on=chips.find(a=>a.classList.contains('on'));
+          const nav = document.getElementById('chips'); if(on && nav){ nav.scrollLeft = on.offsetLeft - (nav.clientWidth - on.clientWidth) / 2; }
+        }
+      });
+    },{rootMargin:'-20% 0px -70% 0px'});
+    document.querySelectorAll('section.sec').forEach(s=>io.observe(s));
+  }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
+</script>
+</body>
+</html>

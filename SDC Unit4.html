@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feedback Amplifiers Study Guide · Unit 4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout concept: engineer's graph-paper notebook. Sticky chip bar, single reading column, every topic = intuition > diagram > mechanism > derivation > example > try-it > exam skeleton. */
+:root{
+  --bg:#EEF2F5; --grid:rgba(18,32,41,.045); --surface:#FFFFFF; --surface2:#E7EDF2; --fg:#112029; --muted:#4A5E6C; --line:#C6D2DA;
+  --accent:#0B5FD3; --accent-ink:#FFFFFF; --dc:#B84E06; --ac:#087A5A; --bad:#B82633; --wire:#1B2B36; --fill:#DCE8F6;
+  --display:"Space Grotesk","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{margin:0;font:16px/1.65 var(--body);color:var(--fg);
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  background-attachment:fixed;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 4rem}
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 4rem}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,3.6vw,2rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:600;margin:2rem 0 .5rem}
+p{margin:.6rem 0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,.mono{font-family:var(--mono);font-size:.9em}
+sub,sup{line-height:0}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);
+  margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.bar .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:.75rem;min-height:52px}
+.brand{font:700 .95rem var(--display);color:var(--fg);text-decoration:none;white-space:nowrap}
+.chips{display:flex;gap:.35rem;overflow-x:auto;flex:1;min-width:0;scrollbar-width:thin;padding:.4rem 0}
+.chips a{white-space:nowrap;font:500 .8rem var(--body);text-decoration:none;color:var(--muted);padding:.25rem .6rem;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.chips a:hover{color:var(--fg);border-color:var(--accent)}
+.chips a.done::before{content:"✓ ";color:var(--ac)}
+.chips a.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#themeBtn{font:500 .8rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:.3rem .6rem;cursor:pointer}
+
+/* hero */
+.hero{padding:2.6rem 0 1.2rem}
+.kicker{font:500 .75rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:1.08rem;color:var(--muted);max-width:62ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.6rem;margin:1.2rem 0}
+.topic{display:block;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.7rem .85rem}
+.topic:hover{border-color:var(--accent)}
+.topic b{display:block;font:600 .95rem var(--display)}
+.topic span{font-size:.8rem;color:var(--muted)}
+.topic .q{display:inline-block;margin-top:.3rem;font:500 .68rem var(--mono);color:var(--dc)}
+
+/* sections */
+section.sec{padding:2.8rem 0 .5rem;border-top:2px solid var(--fg);margin-top:2.4rem;}
+.sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem .8rem;margin-bottom:.4rem}
+.secno{font:500 .8rem var(--mono);color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0 1rem}
+.tag{font:500 .72rem var(--mono);padding:.15rem .5rem;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--muted)}
+.tag.hot{background:var(--dc);color:#fff;border-color:var(--dc)}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1rem 1.15rem;margin:1rem 0}
+.card.intuition{border-left:4px solid var(--ac)}
+.card.exam{border-left:4px solid var(--dc);background:rgba(184,78,6,.04)}
+.card.watch{border-left:4px solid var(--bad);background:rgba(184,38,51,.04)}
+.card.try{border-left:4px solid var(--accent);background:rgba(11,95,211,.04)}
+.card .label{display:block;font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.card.intuition .label{color:var(--ac)}
+.card.exam .label{color:var(--dc)}
+.card.watch .label{color:var(--bad)}
+.card.try .label{color:var(--accent)}
+
+/* equations & steps */
+.eq{font-family:var(--mono);font-size:.95rem;background:var(--surface2);padding:.6rem .9rem;border-radius:6px;margin:.7rem 0;overflow-x:auto}
+.eq.key{background:var(--fill);border-left:3.5px solid var(--accent)}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;line-height:1.35}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .35em}
+.frac>span:last-child{padding:0 .35em}
+.steps{counter-reset:s;list-style:none;padding:0;margin:.8rem 0}
+.steps>li{counter-increment:s;position:relative;padding-left:2.2rem;margin:.7rem 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:.05rem;width:1.55rem;height:1.55rem;border-radius:50%;background:var(--fg);color:var(--bg);font:600 .78rem/1.55rem var(--mono);text-align:center}
+
+/* tables */
+.tw{overflow-x:auto;margin:.9rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface2);font:600 .78rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+
+/* diagrams */
+figure{margin:1.1rem 0}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:.35rem}
+svg.dg{display:block;width:100%;height:auto;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+svg.dg path{fill:none;stroke:var(--wire);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+svg.dg path.fl{fill:var(--wire);stroke:none}
+svg.dg path.dc{stroke:var(--dc)}svg.dg path.ac{stroke:var(--ac)}svg.dg path.ac2{stroke:var(--accent)}svg.dg path.bad{stroke:var(--bad)}
+svg.dg path.dash{stroke-dasharray:5 4}
+svg.dg path.thin{stroke-width:1;stroke:var(--line)}
+svg.dg path.shade{fill:var(--fill);stroke:none;opacity:.85}
+svg.dg path.shadeb{fill:var(--bad);stroke:none;opacity:.14}
+svg.dg path.shadeg{fill:var(--ac);stroke:none;opacity:.14}
+svg.dg circle.dot{fill:var(--wire);stroke:none}
+svg.dg circle.node{fill:var(--surface);stroke:var(--wire);stroke-width:1.6}
+svg.dg circle.sym{fill:var(--surface);stroke:var(--wire);stroke-width:1.7}
+svg.dg circle.q{fill:var(--bad);stroke:none}
+svg.dg polygon{stroke:var(--wire);stroke-width:1.7;fill:var(--surface)}
+svg.dg rect.box{fill:var(--surface2);stroke:var(--wire);stroke-width:1.7}
+svg.dg text{fill:var(--fg);font:12.5px var(--mono)}
+svg.dg text.s{font-size:11px;fill:var(--muted)}
+svg.dg text.b{font-weight:600;font-size:13px}
+svg.dg text.dc{fill:var(--dc)}svg.dg text.ac{fill:var(--ac)}svg.dg text.ac2{fill:var(--accent)}svg.dg text.bad{fill:var(--bad)}
+
+/* widgets */
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:1.2rem 0}
+.wlabel{display:inline-block;font:600 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.1rem .5rem;border-radius:4px;background:var(--dc);color:var(--bg);margin-bottom:.5rem}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem .9rem;margin:.6rem 0}
+.fld{display:flex;flex-direction:column;gap:.15rem;font-size:.82rem;color:var(--muted);min-width:0}
+.fld .row{display:flex;gap:.4rem;align-items:center}
+.fld input[type=number],.fld select{font:500 .95rem var(--mono);width:100%;min-width:0;padding:.3rem .45rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.fld input[type=range]{width:100%;accent-color:var(--accent)}
+.fld .u{font:.8rem var(--mono);white-space:nowrap}
+.fld output{font:600 .85rem var(--mono);color:var(--fg)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem;margin-top:.8rem}
+.res div{background:var(--surface2);border-radius:8px;padding:.5rem .7rem;min-width:0}
+.res small{display:block;font:500 .7rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.res b{font:600 1.05rem var(--mono);overflow-wrap:anywhere}
+.res .note{grid-column:1/-1;background:none;padding:0;font-size:.85rem;color:var(--muted)}
+.res .warn{grid-column:1/-1;background:var(--bad);color:var(--bg);font-size:.85rem;border-radius:8px;padding:.5rem .7rem}
+.pill{display:inline-block;font:600 .8rem var(--mono);padding:.15rem .6rem;border-radius:999px;color:var(--bg)}
+details{margin:.5rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:.1rem .8rem}
+summary{cursor:pointer;padding:.5rem 0;font-weight:500}
+details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:.4rem}
+.done-row{display:flex;align-items:center;gap:.5rem;margin:1.6rem 0 .5rem;font-size:.9rem;color:var(--muted)}
+.done-row input{width:1.1rem;height:1.1rem;accent-color:var(--ac)}
+footer{margin-top:3rem;font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.brand{display:none}.eq{font-size:.88rem}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.sqrt{display:inline-flex;align-items:baseline;vertical-align:middle;margin:0 .15em;line-height:1}
+.radic{font-size:1.25em;line-height:.9;padding-right:1px;font-family:var(--display),serif;transform:translateY(1px)}
+.radicand{border-top:1.6px solid currentColor;padding:.05em .25em 0 .15em;display:inline-block;line-height:1.25}
+</style>
+</head>
+<body>
+<header class="bar"><div class="in">
+  <a class="brand" href="#top">Feedback Amplifiers</a>
+  <nav class="chips" id="chips" aria-label="Topics">
+    <a href="#s0">Start</a>
+    <a href="#s1">Basic Amps</a>
+    <a href="#s2">Feedback Concept</a>
+    <a href="#s3">4 Topologies</a>
+    <a href="#s4">Gain &amp; BW</a>
+    <a href="#s5">Distortion &amp; Noise</a>
+    <a href="#s6">Impedance Effects</a>
+    <a href="#s7">BJT Voltage-Series</a>
+    <a href="#s8">BJT Current-Series</a>
+    <a href="#s9">BJT Current-Shunt</a>
+    <a href="#s10">BJT Voltage-Shunt</a>
+    <a href="#s11">Summary &amp; Rules</a>
+    <a href="#s12">Exam Map &amp; Formulas</a>
+  </nav>
+  <button id="themeBtn" type="button" aria-label="Switch light or dark theme">Theme</button>
+</div></header>
+
+<main class="wrap" id="top">
+<div class="hero">
+  <div class="kicker">Semiconductor Devices &amp; Circuits · Unit 4</div>
+  <h1>Feedback Amplifiers, explained from the ground up</h1>
+  <p class="lead">Complete coverage of Unit 4 according to Bharati Vidyapeeth NEP syllabus and Dr. R. B. Ghongade's notes. Master the four basic amplifier representations, feedback mathematics, all 4 negative-feedback topologies, impedance variations, bandwidth extension, distortion suppression, and comprehensive BJT circuit designs with numerical problems.</p>
+  <div class="grid">
+    <a class="topic" href="#s1"><b>1 · Basic Amplifiers</b><span>Voltage, Current, Transconductance, Transresistance representations</span><span class="q">Summer 2026 Q4</span></a>
+    <a class="topic" href="#s2"><b>2 · Feedback Concept</b><span>Positive vs Negative, Closed-loop gain A<sub>f</sub> = A/(1+Aβ)</span><span class="q">Core Theory</span></a>
+    <a class="topic" href="#s3"><b>3 · Four Topologies</b><span>Voltage-Series, Voltage-Shunt, Current-Series, Current-Shunt</span><span class="q">Winter 2025 SDC-II Q2</span></a>
+    <a class="topic" href="#s4"><b>4 · Gain &amp; Bandwidth</b><span>Gain stabilization, sensitivity dA<sub>f</sub>/A<sub>f</sub>, f<sub>1f</sub> and f<sub>2f</sub></span><span class="q">Winter 2025 Q4</span></a>
+    <a class="topic" href="#s5"><b>5 · Distortion &amp; Noise</b><span>Suppression of non-linear harmonic distortion, S/N ratio</span><span class="q">Winter 2025 SDC-II Q3</span></a>
+    <a class="topic" href="#s6"><b>6 · Impedance Effects</b><span>Input &amp; output impedance formulas for all 4 topologies</span><span class="q">Winter 2025 Q4 · Summer 2026 Q4</span></a>
+    <a class="topic" href="#s7"><b>7 · BJT Voltage-Series</b><span>Two-stage RC-coupled CE feedback amplifier &amp; numerical</span><span class="q">Notes Worked Ex. 1 &amp; 2</span></a>
+    <a class="topic" href="#s8"><b>8 · BJT Current-Series</b><span>CE with unbypassed R<sub>E1</sub>, gain stability, complete 6-step design</span><span class="q">Notes Worked Ex. 3 &amp; 4</span></a>
+    <a class="topic" href="#s9"><b>9 · BJT Current-Shunt</b><span>Modified DC feedback pair, open-loop design &amp; feedback modification</span><span class="q">Notes Worked Ex. 5 &amp; 6</span></a>
+    <a class="topic" href="#s10"><b>10 · BJT Voltage-Shunt</b><span>Collector-to-base CE stage, transresistance R<sub>m</sub> derivation</span><span class="q">Core Analytical</span></a>
+    <a class="topic" href="#s11"><b>11 · Summary &amp; Rules</b><span>3-step topology identification procedure &amp; comparison table</span><span class="q">Quick Revision</span></a>
+    <a class="topic" href="#s12"><b>12 · Exam Map &amp; Formulas</b><span>Complete question paper analysis &amp; master formula sheet</span><span class="q">All PYQs</span></a>
+  </div>
+</div>
+
+<!-- ============ S0: START HERE ============ -->
+<section class="sec" id="s0">
+  <div class="sechead"><span class="secno">Start Here</span></div>
+  <h2>The core intuition of feedback</h2>
+  <div class="card intuition"><span class="label">Intuition 1 · The Fundamental Trade-Off</span>
+  <p>In open-loop amplifiers, voltage gain depends heavily on transistor parameters like h<sub>fe</sub> and g<sub>m</sub>, which vary wildly (up to 300%) with temperature and batch manufacturing. Negative feedback introduces a fraction β of the output back to oppose the input signal. <b>We sacrifice raw open-loop gain A to gain rock-solid stability, wider bandwidth, and reduced distortion.</b> When loop gain Aβ &gt;&gt; 1, closed-loop gain becomes A<sub>f</sub> ≈ 1/β, determined entirely by passive resistors!</p></div>
+
+  <div class="card intuition"><span class="label">Intuition 2 · The Desensitivity Factor (1 + Aβ)</span>
+  <p>Every major benefit of negative feedback is scaled by the <b>amount of feedback (1 + Aβ)</b> (also called the return difference or desensitivity factor D):</p>
+  <ul>
+    <li>Gain decreases by (1 + Aβ): A<sub>f</sub> = A / (1 + Aβ)</li>
+    <li>Gain instability decreases by (1 + Aβ): (dA<sub>f</sub>/A<sub>f</sub>) = (1 / (1 + Aβ)) · (dA/A)</li>
+    <li>Bandwidth multiplies by (1 + Aβ): BW<sub>f</sub> = BW · (1 + Aβ)</li>
+    <li>Harmonic distortion divides by (1 + Aβ): D<sub>f</sub> = D / (1 + Aβ)</li>
+  </ul></div>
+
+  <div class="card intuition"><span class="label">Intuition 3 · The Golden Rule of Impedances</span>
+  <p>Memorize this foolproof two-part rule for input and output impedance under feedback:</p>
+  <ul>
+    <li><b>Input Mixing:</b> Series connection at input always <i>increases</i> input impedance by (1 + Aβ): Z<sub>if</sub> = Z<sub>i</sub>(1 + Aβ). Shunt (parallel) connection at input always <i>decreases</i> input impedance: Z<sub>if</sub> = Z<sub>i</sub> / (1 + Aβ).</li>
+    <li><b>Output Sampling:</b> Voltage sampling (parallel connection across output) always <i>decreases</i> output impedance: Z<sub>of</sub> = Z<sub>o</sub> / (1 + Aβ). Current sampling (series connection in output branch) always <i>increases</i> output impedance: Z<sub>of</sub> = Z<sub>o</sub>(1 + Aβ).</li>
+  </ul></div>
+</section>
+
+<!-- ============ S1: BASIC AMPLIFIERS ============ -->
+<section class="sec" id="s1">
+  <div class="sechead"><span class="secno">Topic 1</span></div>
+  <h2>The four basic amplifier types</h2>
+  <div class="tags"><span class="tag">Summer 2026 Q4 (10 Marks)</span><span class="tag">Two-Port Representations</span><span class="tag">Ideal Port Resistances</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>An electrical signal can be represented as a voltage or current source, and a load can be controlled by voltage or current. This yields exactly <b>four basic amplifier classes</b>. An ideal amplifier never loads its source or its load.</p></div>
+
+  <figure><div data-dg="fourBasicAmps"></div><figcaption>The four fundamental amplifier categories with their input/output source-load representations.</figcaption></figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>Amplifier Type</th><th>Input Signal (X<sub>i</sub>)</th><th>Output Signal (X<sub>o</sub>)</th><th>Gain Parameter</th><th>Ideal R<sub>in</sub></th><th>Ideal R<sub>out</sub></th><th>Practical Goal</th></tr></thead>
+    <tbody>
+      <tr><td><b>Voltage Amplifier</b></td><td>Voltage (V<sub>i</sub>)</td><td>Voltage (V<sub>o</sub>)</td><td>A<sub>v</sub> = V<sub>o</sub>/V<sub>i</sub> (dimensionless)</td><td>∞ (open)</td><td>0 (short)</td><td>Sense voltage without drawing current; drive load without voltage drop</td></tr>
+      <tr><td><b>Current Amplifier</b></td><td>Current (I<sub>i</sub>)</td><td>Current (I<sub>o</sub>)</td><td>A<sub>i</sub> = I<sub>o</sub>/I<sub>i</sub> (dimensionless)</td><td>0 (short)</td><td>∞ (open)</td><td>Absorb all source current; act as an ideal current source for load</td></tr>
+      <tr><td><b>Transconductance Amplifier</b></td><td>Voltage (V<sub>i</sub>)</td><td>Current (I<sub>o</sub>)</td><td>G<sub>m</sub> = I<sub>o</sub>/V<sub>i</sub> (Siemens, S)</td><td>∞ (open)</td><td>∞ (open)</td><td>Convert input voltage into proportional output current (e.g. FET, OTA)</td></tr>
+      <tr><td><b>Transresistance Amplifier</b></td><td>Current (I<sub>i</sub>)</td><td>Voltage (V<sub>o</sub>)</td><td>R<sub>m</sub> = V<sub>o</sub>/I<sub>i</sub> (Ohms, Ω)</td><td>0 (short)</td><td>0 (short)</td><td>Convert input current into proportional output voltage (e.g. photodiode TIA)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton (Summer 2026 Q4)</span>
+  <ol>
+    <li>Define all four basic amplifiers by identifying input signal variable and output controlled variable (2).</li>
+    <li>Draw the Thévenin / Norton equivalent circuit representations for Current Amplifier and Transconductance Amplifier (4).</li>
+    <li>Derive why ideal R<sub>in</sub> and R<sub>out</sub> values take their infinite/zero values based on voltage/current division (2).</li>
+    <li>State the practical units of transfer parameters (A<sub>v</sub>, A<sub>i</sub>, G<sub>m</sub> in Siemens, R<sub>m</sub> in Ohms) (2).</li>
+  </ol></div>
+  <details><summary>Quick check: Why does an ideal transconductance amplifier require both infinite input and output resistance?</summary><p>Infinite R<sub>in</sub> ensures the amplifier samples the input voltage without drawing any current from the source (no loading). Infinite R<sub>out</sub> ensures that all generated output current g<sub>m</sub>V<sub>i</sub> flows entirely into the external load regardless of load resistance value.</p></details>
+  <label class="done-row"><input type="checkbox" data-done="s1"> Mark topic 1 as done</label>
+</section>
+
+<!-- ============ S2: FEEDBACK CONCEPT ============ -->
+<section class="sec" id="s2">
+  <div class="sechead"><span class="secno">Topic 2</span></div>
+  <h2>Feedback concept &amp; transfer gain derivation</h2>
+  <div class="tags"><span class="tag">Loop Transfer Function</span><span class="tag">Barkhausen &amp; Stability</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Feedback is the process of taking a sample of the output signal and feeding it back into the input. If the returned signal <i>adds</i> to the input, it is <b>positive feedback</b> (amplification grows until oscillation or saturation). If it <i>subtracts</i> from the input, it is <b>negative feedback</b> (self-correcting control loop).</p></div>
+
+  <figure><div data-dg="feedbackBlock"></div><figcaption>Canonical single-loop feedback block schematic showing input comparator, basic amplifier A, and feedback network β.</figcaption></figure>
+
+  <h3>2.1 Mathematical Derivation of Closed-Loop Gain A<sub>f</sub></h3>
+  <p>Let:</p>
+  <ul>
+    <li>X<sub>s</sub> = externally applied input signal (voltage or current)</li>
+    <li>X<sub>f</sub> = feedback signal returned by the feedback network</li>
+    <li>X<sub>i</sub> = effective input signal applied to the basic amplifier</li>
+    <li>X<sub>o</sub> = output signal</li>
+    <li>A = open-loop gain = X<sub>o</sub> / X<sub>i</sub></li>
+    <li>β = feedback factor (transfer ratio) = X<sub>f</sub> / X<sub>o</sub></li>
+  </ul>
+  <p>At the input comparator (mixer), for negative feedback:</p>
+  <div class="eq key l">X_{i} = X_{s} − X_{f} = X_{s} − β X_{o}</div>
+  <p>The basic amplifier amplifies X<sub>i</sub>:</p>
+  <div class="eq l">X_{o} = A X_{i} = A (X_{s} − β X_{o}) = A X_{s} − A β X_{o}</div>
+  <p>Rearranging terms to collect X<sub>o</sub> on the left side:</p>
+  <div class="eq l">X_{o} (1 + A β) = A X_{s}</div>
+  <p>Dividing by X<sub>s</sub> gives the celebrated <b>transfer gain with feedback</b> formula:</p>
+  <div class="eq key l">A_{f} = [[X_{o}|X_{s}]] = [[A|1 + A β]]</div>
+  <p>Key quantities:</p>
+  <ul>
+    <li><b>Loop Gain (Return Ratio):</b> T = Aβ</li>
+    <li><b>Amount of Feedback (Desensitivity Factor):</b> D = 1 + Aβ</li>
+    <li><b>High Loop Gain Limit:</b> When |Aβ| &gt;&gt; 1, A<sub>f</sub> ≈ [[A|A β]] = [[1|β]]. The closed-loop gain is completely independent of transistor parameters!</li>
+  </ul>
+
+  <div class="widget" data-w="feedbackGain"></div>
+  <label class="done-row"><input type="checkbox" data-done="s2"> Mark topic 2 as done</label>
+</section>
+
+<!-- ============ S3: FOUR TOPOLOGIES ============ -->
+<section class="sec" id="s3">
+  <div class="sechead"><span class="secno">Topic 3</span></div>
+  <h2>The four negative feedback topologies</h2>
+  <div class="tags"><span class="tag">Winter 2025 SDC-II Q2</span><span class="tag">Mixing &amp; Sampling Methods</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Every feedback connection consists of two operations: <b>how output is sampled</b> (voltage vs current) and <b>how feedback is mixed at the input</b> (series vs shunt). 2 × 2 = <b>4 distinct topologies</b>.</p></div>
+
+  <figure><div data-dg="fourTopologies"></div><figcaption>Block schematics of all four negative feedback topologies showing precise input and output port connections.</figcaption></figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>Topology</th><th>Alternative Names</th><th>Output Sampling</th><th>Input Mixing</th><th>Feedback Factor β</th><th>Stabilized Gain</th></tr></thead>
+    <tbody>
+      <tr><td><b>Voltage-Series</b></td><td>Series-Shunt</td><td>Voltage (parallel across output)</td><td>Series (subtraction of voltages: V<sub>i</sub> = V<sub>s</sub> − V<sub>f</sub>)</td><td>β = V<sub>f</sub>/V<sub>o</sub> (dimensionless)</td><td>Voltage Gain A<sub>vf</sub> = V<sub>o</sub>/V<sub>s</sub></td></tr>
+      <tr><td><b>Current-Series</b></td><td>Series-Series</td><td>Current (in series with load)</td><td>Series (subtraction of voltages: V<sub>i</sub> = V<sub>s</sub> − V<sub>f</sub>)</td><td>β = V<sub>f</sub>/I<sub>o</sub> (Ω, Ohms)</td><td>Transconductance G<sub>mf</sub> = I<sub>o</sub>/V<sub>s</sub></td></tr>
+      <tr><td><b>Current-Shunt</b></td><td>Shunt-Series</td><td>Current (in series with load)</td><td>Shunt (subtraction of currents: I<sub>i</sub> = I<sub>s</sub> − I<sub>f</sub>)</td><td>β = I<sub>f</sub>/I<sub>o</sub> (dimensionless)</td><td>Current Gain A<sub>if</sub> = I<sub>o</sub>/I<sub>s</sub></td></tr>
+      <tr><td><b>Voltage-Shunt</b></td><td>Shunt-Shunt</td><td>Voltage (parallel across output)</td><td>Shunt (subtraction of currents: I<sub>i</sub> = I<sub>s</sub> − I<sub>f</sub>)</td><td>β = I<sub>f</sub>/V<sub>o</sub> (S, Siemens)</td><td>Transresistance R<sub>mf</sub> = V<sub>o</sub>/I<sub>s</sub></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton (Winter 2025 SDC-II Q2)</span>
+  <ol>
+    <li>State the 4 feedback topologies based on output sampling (voltage/current) and input mixing (series/shunt) (2).</li>
+    <li>Draw neat labeled block diagrams for each of the 4 topologies showing source, amplifier, load, and feedback network (4).</li>
+    <li>Specify the physical units and definitions of transfer gain and feedback factor β for each topology (2).</li>
+    <li>State the primary quantity stabilized in each circuit configuration (2).</li>
+  </ol></div>
+  <label class="done-row"><input type="checkbox" data-done="s3"> Mark topic 3 as done</label>
+</section>
+
+<!-- ============ S4: GAIN & BANDWIDTH ============ -->
+<section class="sec" id="s4">
+  <div class="sechead"><span class="secno">Topic 4</span></div>
+  <h2>Effect on gain stability and bandwidth</h2>
+  <div class="tags"><span class="tag">Winter 2025 Q4 OR (10 Marks)</span><span class="tag">Desensitization</span><span class="tag">Gain-Bandwidth Product</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Why do we accept a drop in gain? Because it gives us <b>gain desensitization</b>. If the transistor's internal gain drifts by 20% due to heat or ageing, negative feedback can reduce that variation to less than 0.2%!</p></div>
+
+  <h3>4.1 Derivation of Gain Desensitization (Sensitivity)</h3>
+  <p>Starting from the closed-loop gain equation:</p>
+  <div class="eq l">A_{f} = [[A|1 + A β]]</div>
+  <p>Differentiating A<sub>f</sub> with respect to the open-loop gain A:</p>
+  <div class="eq l">[[dA_{f}|dA]] = [[(1 + A β)(1) − A (β)|(1 + A β)^{2}]] = [[1 + A β − A β|(1 + A β)^{2}]] = [[1|(1 + A β)^{2}]]</div>
+  <p>Divide both sides by A<sub>f</sub> = A / (1 + Aβ):</p>
+  <div class="eq key l">[[dA_{f}|A_{f}]] = [[1|1 + A β]] · [[dA|A]]</div>
+  <p><b>Conclusion:</b> The fractional percentage change in closed-loop gain ([[dA_{f}|A_{f}]]) is equal to the fractional change in open-loop gain ([[dA|A]]) <b>divided by the desensitivity factor (1 + Aβ)</b>!</p>
+
+  <h3>4.2 Effect on Bandwidth and Cutoff Frequencies</h3>
+  <p>Consider an amplifier with lower cutoff frequency f<sub>1</sub> and upper cutoff frequency f<sub>2</sub>. Negative feedback affects both ends of the frequency spectrum:</p>
+  <ul>
+    <li><b>Upper Cutoff Frequency (f<sub>2</sub>):</b> Feedback extends high-frequency response because negative feedback diminishes at high frequencies, flattening the gain curve:
+      <div class="eq key l">f_{2f} = f_{2} (1 + A_{mid} β)</div>
+    </li>
+    <li><b>Lower Cutoff Frequency (f<sub>1</sub>):</b> Low-frequency roll-off occurs lower down the spectrum:
+      <div class="eq key l">f_{1f} = [[f_{1}|1 + A_{mid} β]]</div>
+    </li>
+    <li><b>Overall Bandwidth (BW):</b>
+      <div class="eq l">BW_{f} = f_{2f} − f_{1f} ≈ f_{2} (1 + A_{mid} β) = BW · (1 + A_{mid} β)</div>
+    </li>
+    <li><b>Gain-Bandwidth Product (GBW):</b>
+      <div class="eq key l">A_{f(mid)} · BW_{f} = [[A_{mid}|1 + A_{mid} β]] · [BW (1 + A_{mid} β)] = A_{mid} · BW = Constant</div>
+      The gain-bandwidth product is strictly invariant under feedback. Gain is traded directly for bandwidth!
+    </li>
+  </ul>
+
+  <figure><div data-dg="bandwidthGain"></div><figcaption>Frequency response showing bandwidth widening from [f1, f2] to [f1f, f2f] with feedback.</figcaption></figure>
+  <div class="widget" data-w="bwExtension"></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton (Winter 2025 Q4 OR)</span>
+  <ol>
+    <li>State the feedback gain equation A<sub>f</sub> = A / (1 + Aβ) (1).</li>
+    <li>Perform differential calculus step to prove dA<sub>f</sub>/A<sub>f</sub> = (1/(1+Aβ)) (dA/A) (3).</li>
+    <li>Derive high cutoff extension f<sub>2f</sub> = f<sub>2</sub>(1+Aβ) and low cutoff f<sub>1f</sub> = f<sub>1</sub>/(1+Aβ) (3).</li>
+    <li>Show that Gain × Bandwidth remains constant (2).</li>
+    <li>Provide one short numerical calculation illustrating desensitization (1).</li>
+  </ol></div>
+  <label class="done-row"><input type="checkbox" data-done="s4"> Mark topic 4 as done</label>
+</section>
+
+<!-- ============ S5: DISTORTION & NOISE ============ -->
+<section class="sec" id="s5">
+  <div class="sechead"><span class="secno">Topic 5</span></div>
+  <h2>Effect on non-linear distortion and noise</h2>
+  <div class="tags"><span class="tag">Harmonic Distortion Df</span><span class="tag">Signal-to-Noise Ratio</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>When an amplifier operates with large signals, non-linear curvature in transistor characteristics introduces unwanted harmonics (2nd, 3rd harmonics). Negative feedback senses the distortion generated inside the amplifier and subtracts an anti-phase replica at the input, cancelling out the harmonic content!</p></div>
+
+  <h3>5.1 Reduction of Non-Linear Distortion</h3>
+  <p>Let D be the harmonic distortion voltage generated within the open-loop amplifier. With negative feedback applied, the distorted component circulating through the loop is returned as β D<sub>f</sub> and subtracted at the input.</p>
+  <div class="eq l">D_{f} = D − A β D_{f} &rArr; D_{f} (1 + A β) = D</div>
+  <div class="eq key l">D_{f} = [[D|1 + A β]]</div>
+  <p><b>Important Caveat:</b> This distortion reduction holds when the closed-loop output signal amplitude is restored to the open-loop level by boosting input excitation, assuming the preceding pre-amplifier stage generates zero distortion.</p>
+
+  <h3>5.2 Effect of Negative Feedback on Noise</h3>
+  <p>Let noise voltage V<sub>n</sub> be generated in an intermediate stage of the amplifier (e.g. power-supply hum, thermal noise). Negative feedback reduces noise generated <i>inside the loop</i> by the factor (1 + Aβ):</p>
+  <div class="eq key l">V_{nf} = [[V_{n}|1 + A β]]</div>
+  <p>However, noise entering at the <b>input terminal</b> (such as sensor thermal noise) is amplified by exactly the same closed-loop gain as the signal. Therefore, <b>negative feedback does NOT improve the Signal-to-Noise Ratio (SNR) for input noise</b>. It only suppresses noise generated in subsequent stages within the loop!</p>
+
+  <label class="done-row"><input type="checkbox" data-done="s5"> Mark topic 5 as done</label>
+</section>
+
+<!-- ============ S6: IMPEDANCE EFFECTS ============ -->
+<section class="sec" id="s6">
+  <div class="sechead"><span class="secno">Topic 6</span></div>
+  <h2>Effect on input and output impedance</h2>
+  <div class="tags"><span class="tag">Winter 2025 Q4 (10 Marks)</span><span class="tag">Summer 2026 Q4 OR (10 Marks)</span><span class="tag">Impedance Derivations</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Remember the simple rule:</p>
+  <ul>
+    <li><b>Series mixing at input:</b> Opposing feedback voltage V<sub>f</sub> opposes V<sub>s</sub>, so input current I<sub>i</sub> drops dramatically $&rArr;$ <b>Input impedance increases: Z<sub>if</sub> = Z<sub>i</sub> (1 + Aβ)</b>.</li>
+    <li><b>Shunt mixing at input:</b> Feedback current I<sub>f</sub> draws away current in parallel, so from the source's view it takes more total current $&rArr;$ <b>Input impedance decreases: Z<sub>if</sub> = Z<sub>i</sub> / (1 + Aβ)</b>.</li>
+    <li><b>Voltage sampling at output:</b> If output voltage V<sub>o</sub> tries to rise, feedback sends a large opposing signal to pull it down (like a stiff voltage regulator) $&rArr;$ <b>Output impedance decreases: Z<sub>of</sub> = Z<sub>o</sub> / (1 + Aβ)</b>.</li>
+    <li><b>Current sampling at output:</b> If output current I<sub>o</sub> tries to change, feedback opposes the change (like an ideal constant current source) $&rArr;$ <b>Output impedance increases: Z<sub>of</sub> = Z<sub>o</sub> (1 + Aβ)</b>.</li>
+  </ul></div>
+
+  <h3>6.1 Voltage-Series Derivation (Winter 2025 Q4)</h3>
+  <p><b>Input Impedance (Z<sub>if</sub>):</b></p>
+  <div class="eq l">V_{s} = V_{i} + V_{f} = I_{i} Z_{i} + β V_{o} = I_{i} Z_{i} + β (A V_{i}) = I_{i} Z_{i} + A β (I_{i} Z_{i}) = I_{i} Z_{i} (1 + A β)</div>
+  <div class="eq key l">Z_{if} = [[V_{s}|I_{i}]] = Z_{i} (1 + A β)</div>
+  <p><b>Output Impedance (Z<sub>of</sub>):</b> To find Z<sub>of</sub>, set signal source V<sub>s</sub> = 0 and apply an external test voltage V at the output port:</p>
+  <div class="eq l">V_{s} = 0 &rArr; V_{i} = −V_{f} = −β V</div>
+  <p>The current I delivered by test source into the output port:</p>
+  <div class="eq l">I = [[V − A V_{i}|Z_{o}]] = [[V − A(−β V)|Z_{o}]] = [[V (1 + A β)|Z_{o}]]</div>
+  <div class="eq key l">Z_{of} = [[V|I]] = [[Z_{o}|1 + A β]]</div>
+
+  <h3>6.2 Current-Shunt Derivation (Summer 2026 Q4 OR)</h3>
+  <p><b>Input Impedance (Z<sub>if</sub>):</b> Shunt mixing connects feedback current in parallel with input:</p>
+  <div class="eq l">I_{s} = I_{i} + I_{f} = I_{i} + β I_{o} = I_{i} + β (A_{i} I_{i}) = I_{i} (1 + A_{i} β)</div>
+  <p>Since input voltage is V<sub>i</sub> = I<sub>i</sub> Z<sub>i</sub>:</p>
+  <div class="eq key l">Z_{if} = [[V_{i}|I_{s}]] = [[I_{i} Z_{i}|I_{i} (1 + A_{i} β)]] = [[Z_{i}|1 + A_{i} β]]</div>
+  <p><b>Output Impedance (Z<sub>of</sub>):</b> Current sampling increases output impedance:</p>
+  <div class="eq key l">Z_{of} = Z_{o} (1 + A_{i} β)</div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Feedback Topology</th><th>Input Connection</th><th>Output Connection</th><th>Input Impedance Z<sub>if</sub></th><th>Output Impedance Z<sub>of</sub></th></tr></thead>
+    <tbody>
+      <tr><td><b>Voltage-Series</b></td><td>Series</td><td>Shunt (voltage)</td><td>Z<sub>i</sub> (1 + A<sub>v</sub>β) [Increases]</td><td>Z<sub>o</sub> / (1 + A<sub>v</sub>β) [Decreases]</td></tr>
+      <tr><td><b>Voltage-Shunt</b></td><td>Shunt</td><td>Shunt (voltage)</td><td>Z<sub>i</sub> / (1 + R<sub>m</sub>β) [Decreases]</td><td>Z<sub>o</sub> / (1 + R<sub>m</sub>β) [Decreases]</td></tr>
+      <tr><td><b>Current-Series</b></td><td>Series</td><td>Series (current)</td><td>Z<sub>i</sub> (1 + G<sub>m</sub>β) [Increases]</td><td>Z<sub>o</sub> (1 + G<sub>m</sub>β) [Increases]</td></tr>
+      <tr><td><b>Current-Shunt</b></td><td>Shunt</td><td>Series (current)</td><td>Z<sub>i</sub> / (1 + A<sub>i</sub>β) [Decreases]</td><td>Z<sub>o</sub> (1 + A<sub>i</sub>β) [Increases]</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-mark answer skeleton (Winter 2025 Q4 / Summer 2026 Q4 OR)</span>
+  <ol>
+    <li>State the general definition of input/output impedance with feedback (1).</li>
+    <li>Draw AC equivalent circuit with test generator V at output (V<sub>s</sub> = 0) (3).</li>
+    <li>Derive step-by-step Z<sub>of</sub> = Z<sub>o</sub> / (1+Aβ) showing V<sub>i</sub> = −βV (3).</li>
+    <li>Derive Z<sub>if</sub> = Z<sub>i</sub>(1+Aβ) for series mixing or Z<sub>if</sub> = Z<sub>i</sub>/(1+Aβ) for shunt mixing (3).</li>
+  </ol></div>
+  <label class="done-row"><input type="checkbox" data-done="s6"> Mark topic 6 as done</label>
+</section>
+
+<!-- ============ S7: BJT VOLTAGE-SERIES ============ -->
+<section class="sec" id="s7">
+  <div class="sechead"><span class="secno">Topic 7</span></div>
+  <h2>BJT voltage-series feedback amplifier</h2>
+  <div class="tags"><span class="tag">Two-Stage RC-Coupled CE</span><span class="tag">Exact Notes Worked Example</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>To implement voltage-series feedback with BJTs, why do we use a <b>two-stage amplifier</b>? Because each CE stage introduces a 180° phase inversion. Two cascaded CE stages produce 180° + 180° = 360° (0°) overall phase shift. When the output voltage at the second collector is fed back to the emitter of the first stage, the emitter voltage rises in phase with the base signal, which <b>subtracts from V<sub>be1</sub></b> (V<sub>be1</sub> = V<sub>b1</sub> − V<sub>e1</sub>), creating true negative feedback!</p></div>
+
+  <figure><div data-dg="bjtVoltageSeries"></div><figcaption>Two-stage BJT voltage-series feedback amplifier with feedback network Rf1 and Rf2.</figcaption></figure>
+
+  <h3>7.1 Circuit Analysis &amp; Formulas</h3>
+  <p>The feedback factor β is set by the resistive divider from Q<sub>2</sub> collector to Q<sub>1</sub> emitter:</p>
+  <div class="eq key l">β = [[R_{f2}|R_{f1} + R_{f2}]]</div>
+  <p>The closed-loop voltage gain for large loop gain:</p>
+  <div class="eq key l">A_{vf} = [[A_{v}|1 + A_{v} β]] ≈ [[1|β]] = [[R_{f1} + R_{f2}|R_{f2}]] = 1 + [[R_{f1}|R_{f2}]]</div>
+
+  <h3>7.2 Solved Problem: Exact Numerical Example from Dr. Ghongade's Notes</h3>
+  <div class="card try"><span class="label">Worked Example 1 (From Handwritten Teaching Notes)</span>
+  <p><b>Given Data:</b> A two-stage RC-coupled CE BJT amplifier has open-loop voltage gain A<sub>v</sub> = 1118, input resistance Z<sub>i</sub> = 1.98 kΩ, and output resistance Z<sub>o</sub> = 12 kΩ. The feedback network uses R<sub>f1</sub> = 16.2 kΩ and R<sub>f2</sub> = 220 Ω.</p>
+  <ol class="steps">
+    <li>Calculate feedback factor β:
+      <div class="eq">β = [[R_{f2}|R_{f1} + R_{f2}]] = [[220|16200 + 220]] = [[220|16420]] = 0.0134</div>
+    </li>
+    <li>Calculate loop gain and desensitivity factor:
+      <div class="eq">A_{v} β = 1118 × 0.0134 = 14.98 &rArr; 1 + A_{v} β = 1 + 14.98 = 15.98</div>
+    </li>
+    <li>Calculate closed-loop voltage gain A<sub>vf</sub>:
+      <div class="eq">A_{vf} = [[A_{v}|1 + A_{v} β]] = [[1118|15.98]] = 69.96 ≈ 70</div>
+      <i>Check with approximation:</i> 1/β = 16420 / 220 = 74.6.
+    </li>
+    <li>Calculate closed-loop input impedance:
+      <div class="eq">Z_{if} = Z_{i} (1 + A_{v} β) = 1.98 kΩ × 15.98 = 31.64 kΩ</div>
+    </li>
+    <li>Calculate closed-loop output impedance:
+      <div class="eq">Z_{of} = [[Z_{o}|1 + A_{v} β]] = [[12 kΩ|15.98]] = 750.9 Ω</div>
+    </li>
+  </ol></div>
+
+  <h3>7.3 Complete Design Procedure (Capacitor Selection at f<sub>L</sub> = 100 Hz)</h3>
+  <p>From the notes, for f<sub>L</sub> = 100 Hz:</p>
+  <ul>
+    <li>Bypass capacitor C<sub>2</sub> at R<sub>f2</sub>:
+      <div class="eq">|X_{C2}| = R_{f2} &rArr; C_{2} = [[1|2 π f_{L} R_{f2}]] = [[1|2 π (100) (220)]] = 7.23 µF &rArr; Select Standard  <b>8 µF or  10 µF</b></div>
+    </li>
+    <li>Decoupling capacitor C<sub>f1</sub>:
+      <div class="eq">C_{f1} = [[1|2 π f_{L} (R_{f1}/100)]] = [[1|2 π (100) (162)]] = 9.8 µF &rArr; Select Standard  <b>10 µF</b></div>
+    </li>
+  </ul>
+
+  <div class="widget" data-w="vSeriesBJT"></div>
+  <label class="done-row"><input type="checkbox" data-done="s7"> Mark topic 7 as done</label>
+</section>
+
+<!-- ============ S8: BJT CURRENT-SERIES ============ -->
+<section class="sec" id="s8">
+  <div class="sechead"><span class="secno">Topic 8</span></div>
+  <h2>BJT current-series feedback amplifier</h2>
+  <div class="tags"><span class="tag">CE with Unbypassed RE1</span><span class="tag">Gain Stabilization</span><span class="tag">6-Step Design</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>The simplest and most widely used negative feedback circuit in electronics is a single CE transistor stage where the emitter resistor is split into two parts: an <b>unbypassed resistor R<sub>E1</sub></b> and a <b>bypassed resistor R<sub>E2</sub></b>. The emitter current I<sub>E</sub> flows through R<sub>E1</sub>, developing a feedback voltage V<sub>f</sub> = I<sub>E</sub> R<sub>E1</sub> directly in series with the input!</p></div>
+
+  <figure><div data-dg="bjtCurrentSeries"></div><figcaption>BJT CE stage with split emitter resistance R<sub>E1</sub> (unbypassed) and R<sub>E2</sub> (bypassed by C<sub>2</sub>).</figcaption></figure>
+
+  <h3>8.1 Analytical Derivations</h3>
+  <p><b>1. Transistor Base Input Impedance (Z<sub>b</sub>):</b></p>
+  <div class="eq key l">Z_{b} = h_{ie} + (1 + h_{fe}) R_{E1}</div>
+  <p>Total amplifier input impedance:</p>
+  <div class="eq l">Z_{in} = R_{1} || R_{2} || Z_{b}</div>
+  <p><b>2. Small-Signal Voltage Gain:</b></p>
+  <div class="eq key l">A_{v} = − [[h_{fe} (R_{C} || R_{L})|h_{ie} + (1 + h_{fe}) R_{E1}]]</div>
+  <p>When (1 + h<sub>fe</sub>)R<sub>E1</sub> &gt;&gt; h<sub>ie</sub> and since h<sub>fe</sub>/(1+h<sub>fe</sub>) ≈ 1:</p>
+  <div class="eq key l">A_{v} &approx; − [[R_{C} || R_{L}|R_{E1}]]</div>
+  <p>Notice that the voltage gain depends only on passive circuit resistors and is virtually independent of h<sub>fe</sub>!</p>
+
+  <h3>8.2 Solved Example: Exact h<sub>fe</sub> Variation from Dr. Ghongade's Notes</h3>
+  <div class="card try"><span class="label">Worked Example 2 (From Notes)</span>
+  <p><b>Circuit values:</b> R<sub>C</sub> = 12 kΩ, R<sub>L</sub> = 120 kΩ (giving R<sub>C</sub>∥R<sub>L</sub> = 10.91 kΩ), R<sub>E1</sub> = 150 Ω.<br>
+  Test the gain stability across extreme transistor production spreads:</p>
+  <ul>
+    <li>At maximum parameters: h<sub>fe</sub> = 400, h<sub>ie</sub> = 5 kΩ:
+      <div class="eq">|A_{v(max)}| = [[400 (10.91 kΩ)|5 kΩ + (1 + 400)(150 Ω)]] = [[4364|5 + 60.15]] = 67.0</div>
+    </li>
+    <li>At minimum parameters: h<sub>fe</sub> = 100, h<sub>ie</sub> = 2 kΩ:
+      <div class="eq">|A_{v(min)}| = [[100 (10.91 kΩ)|2 kΩ + (1 + 100)(150 Ω)]] = [[1091|2 + 15.15]] = 63.6</div>
+    </li>
+  </ul>
+  <p><b>Result:</b> While h<sub>fe</sub> varied by <b>300%</b> (from 100 to 400), the voltage gain changed by only <b>5.3%</b> (from 63.6 to 67.0)! This proves the immense gain-stabilizing power of emitter-current feedback.</p></div>
+
+  <h3>8.3 Exact 6-Step Design Example (from Notes)</h3>
+  <p><b>Requirement:</b> Design a current-series amplifier for A<sub>v</sub> = 70, f<sub>L</sub> = 100 Hz, with R<sub>s</sub> = 600 Ω, h<sub>ie</sub> = 2 kΩ, h<sub>fe</sub> = 100, V<sub>CC</sub> = 24 V, R<sub>1</sub> = 120 kΩ, R<sub>2</sub> = 39 kΩ, R<sub>C</sub> = 12 kΩ, R<sub>L</sub> = 120 kΩ, original R<sub>E</sub> = 3.9 kΩ.</p>
+  <ol class="steps">
+    <li>Calculate R<sub>E1</sub>:
+      <div class="eq">R_{E1} &approx; [[R_{C} || R_{L}|A_{v}]] = [[10.91 kΩ|70]] = 155.8 Ω &rArr; Select Standard  <b>150 Ω</b></div>
+    </li>
+    <li>Calculate bypassed R<sub>E2</sub>:
+      <div class="eq">R_{E2} = R_{E(orig)} − R_{E1} = 3.9 kΩ − 150 Ω = 3.75 kΩ &rArr; Select Standard  <b>3.9 kΩ</b></div>
+    </li>
+    <li>Calculate input impedance at base Z<sub>b</sub>:
+      <div class="eq">Z_{b} = h_{ie} + (1 + h_{fe}) R_{E1} = 2 kΩ + (101)(150 Ω) = 17.15 kΩ</div>
+    </li>
+    <li>Calculate total input impedance Z<sub>in</sub>:
+      <div class="eq">Z_{in} = 120 kΩ || 39 kΩ || 17.15 kΩ &approx; 10.8 kΩ</div>
+    </li>
+    <li>Calculate input coupling capacitor C<sub>1</sub>:
+      <div class="eq">|X_{C1}| = [[Z_{in} + R_{s}|10]] &rArr; C_{1} = [[1|2 π (100) (1140)]] = 1.39 µF &rArr; Select Standard  <b>1.5 µF</b></div>
+    </li>
+    <li>Calculate emitter bypass capacitor C<sub>2</sub>:
+      <div class="eq">|X_{C2}| = R_{E1} &rArr; C_{2} = [[1|2 π (100) (150)]] = 10.61 µF &rArr; Select Standard  <b>12 µF</b></div>
+    </li>
+  </ol>
+
+  <div class="widget" data-w="cSeriesBJT"></div>
+  <label class="done-row"><input type="checkbox" data-done="s8"> Mark topic 8 as done</label>
+</section>
+
+<!-- ============ S9: BJT CURRENT-SHUNT ============ -->
+<section class="sec" id="s9">
+  <div class="sechead"><span class="secno">Topic 9</span></div>
+  <h2>BJT current-shunt feedback amplifier</h2>
+  <div class="tags"><span class="tag">DC Feedback Pair</span><span class="tag">Current Gain Stabilization</span><span class="tag">Design Example</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>The current-shunt feedback configuration uses a <b>two-transistor DC feedback pair</b>. The output current I<sub>o</sub> in the emitter of Q<sub>2</sub> is sampled through resistor R<sub>f2</sub>, and feedback current I<sub>f</sub> is returned in parallel (shunt) to the base of Q<sub>1</sub> through R<sub>f1</sub>. This configuration lowers input impedance to tens of ohms, making it an outstanding current amplifier!</p></div>
+
+  <figure><div data-dg="bjtCurrentShunt"></div><figcaption>Two-transistor DC feedback pair with current-shunt feedback network Rf1 and Rf2.</figcaption></figure>
+
+  <h3>9.1 Circuit Operation &amp; Derivations</h3>
+  <p>At the input node, source current splits: i<sub>s</sub> = i<sub>i</sub> + i<sub>f</sub>. At the feedback sampling point, output current splits between R<sub>f1</sub> and R<sub>f2</sub>:</p>
+  <div class="eq key l">β = [[R_{f2}|R_{f1} + R_{f2}]]</div>
+  <p>Closed-loop current gain:</p>
+  <div class="eq key l">A_{if} = [[I_{o}|I_{s}]] = [[A_{i}|1 + A_{i} β]] &approx; [[1|β]] = [[R_{f1} + R_{f2}|R_{f2}]]</div>
+  <p>Input impedance with feedback:</p>
+  <div class="eq key l">Z_{if} = [[h_{ie1}|1 + A_{i} β]]</div>
+
+  <h3>9.2 Solved Design Example from Dr. Ghongade's Notes</h3>
+  <div class="card try"><span class="label">Worked Example 3 (From Notes)</span>
+  <p><b>Specification:</b> Design a current-shunt feedback amplifier to achieve closed-loop current gain <b>A<sub>if</sub> = 55</b> using the designed DC pair (V<sub>CC</sub> = 12 V, I<sub>C</sub> = 2 mA, h<sub>fe</sub> = 100, h<sub>ie</sub> = 2 kΩ, A<sub>i(open)</sub> = 6226).</p>
+  <ol class="steps">
+    <li>Obtain feedback resistor ratio:
+      <div class="eq">A_{if} &approx; [[R_{f1} + R_{f2}|R_{f2}]] = 55 &rArr; [[R_{f1}|R_{f2}]] = 54 &rArr; R_{f1} = 54 R_{f2}</div>
+    </li>
+    <li>Select standard R<sub>f2</sub> and compute R<sub>f1</sub>:
+      <p>As per the notes, choose R<sub>f2</sub> between 100 Ω and 470 Ω. Let R<sub>f2</sub> = 100 Ω:</p>
+      <div class="eq">R_{f1} = 54 × 100 Ω = 5.4 kΩ &rArr; Select Standard  <b>5.6 kΩ</b></div>
+    </li>
+    <li>Split original bias resistor R<sub>2</sub> = 180 kΩ:
+      <div class="eq">R_{5} = R_{2} − R_{f1} = 180 kΩ − 5.6 kΩ = 174.4 kΩ &rArr; Select Standard  <b>180 kΩ</b></div>
+    </li>
+    <li>Calculate feedback coupling capacitor C<sub>f1</sub> at f<sub>L</sub> = 150 Hz:
+      <div class="eq">|X_{Cf1}| = [[R_{f1}|100]] &rArr; Selected in notes:  <b>C_{f1} = 2.2 µF</b></div>
+    </li>
+    <li>Calculate input impedance under feedback:
+      <div class="eq">Z_{if} = [[h_{ie1}|1 + A_{i} β]] = [[2000 Ω|1 + [[6226|55]]]] = [[2000|1 + 113.2]] = <b>17.5 Ω</b></div>
+    </li>
+  </ol></div>
+
+  <div class="widget" data-w="cShuntBJT"></div>
+  <label class="done-row"><input type="checkbox" data-done="s9"> Mark topic 9 as done</label>
+</section>
+
+<!-- ============ S10: BJT VOLTAGE-SHUNT ============ -->
+<section class="sec" id="s10">
+  <div class="sechead"><span class="secno">Topic 10</span></div>
+  <h2>BJT voltage-shunt feedback amplifier</h2>
+  <div class="tags"><span class="tag">Collector-to-Base Feedback</span><span class="tag">Transresistance Stabilization</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>In a voltage-shunt feedback amplifier, a feedback resistor R<sub>f</sub> is connected directly from the <b>collector (output voltage)</b> back to the <b>base (input current)</b> of a CE stage. Output voltage is sampled, and feedback is returned in shunt. Both input and output impedances are drastically reduced, and the circuit acts as a highly stable <b>transresistance amplifier</b>!</p></div>
+
+  <figure><div data-dg="bjtVoltageShunt"></div><figcaption>BJT voltage-shunt feedback amplifier with collector-to-base feedback resistor Rf.</figcaption></figure>
+
+  <h3>10.1 Circuit Analysis &amp; Formulas</h3>
+  <p>Feedback current returning to base:</p>
+  <div class="eq l">I_{f} = [[V_{i} − V_{o}|R_{f}]] &approx; − [[V_{o}|R_{f}]] = β V_{o} &rArr; <b>β = − [[1|R_{f}]]</b></div>
+  <p>The open-loop transresistance R<sub>m</sub> without feedback is defined as V<sub>o</sub> / I<sub>s</sub>:</p>
+  <div class="eq l">R = R_{s} || R_{f1},   R_{C}' = R_{C} || R_{f2}</div>
+  <div class="eq key l">R_{m} = − [[h_{fe} R_{C}' R|R + h_{ie}]]</div>
+  <p>The closed-loop transresistance:</p>
+  <div class="eq key l">R_{mf} = [[R_{m}|1 + β R_{m}]] = − [[h_{fe} R_{C}' R R_{f}|R_{f}(R + h_{ie}) + h_{fe} R_{C}' R]]</div>
+  <p>When loop gain is very large, R<sub>mf</sub> simplifies to:</p>
+  <div class="eq key l">R_{mf} &approx; [[1|β]] = − R_{f}</div>
+  <p>The overall voltage gain is simply:</p>
+  <div class="eq key l">A_{vf} = [[V_{o}|V_{s}]] = [[R_{mf}|R_{s}]] &approx; − [[R_{f}|R_{s}]]</div>
+
+  <div class="widget" data-w="vShuntBJT"></div>
+  <label class="done-row"><input type="checkbox" data-done="s10"> Mark topic 10 as done</label>
+</section>
+
+<!-- ============ S11: SUMMARY & RULES ============ -->
+<section class="sec" id="s11">
+  <div class="sechead"><span class="secno">Topic 11</span></div>
+  <h2>Consolidated summary &amp; topology identification rule</h2>
+  <div class="tags"><span class="tag">3-Step Identification Algorithm</span><span class="tag">Master Comparison</span></div>
+  <div class="card intuition"><span class="label">Intuition</span>
+  <p>Exam questions often ask you to classify an unfamiliar circuit. Follow this infallible 3-step decision procedure:</p></div>
+
+  <ol class="steps">
+    <li><b>Determine Output Sampling:</b> Look at the output node.
+      <ul>
+        <li>If feedback network is connected directly in parallel with the output terminals (so setting V<sub>o</sub> = 0 removes the feedback signal), it is <b>Voltage Sampling</b>.</li>
+        <li>If feedback network is in series with the load (so opening the load loop reduces feedback signal to zero), it is <b>Current Sampling</b>.</li>
+      </ul>
+    </li>
+    <li><b>Determine Input Mixing:</b> Look at the input node.
+      <ul>
+        <li>If feedback signal is in series with the external source (loops around base-emitter loop: V<sub>i</sub> = V<sub>s</sub> − V<sub>f</sub>), it is <b>Series Mixing</b>.</li>
+        <li>If feedback signal connects directly to the same node as the input source (KCL: I<sub>i</sub> = I<sub>s</sub> − I<sub>f</sub>), it is <b>Shunt Mixing</b>.</li>
+      </ul>
+    </li>
+    <li><b>Apply the Impedance Rule:</b>
+      <ul>
+        <li>Series mixing $&rArr;$ Z<sub>in</sub> multiplies by (1 + Aβ).</li>
+        <li>Shunt mixing $&rArr;$ Z<sub>in</sub> divides by (1 + Aβ).</li>
+        <li>Voltage sampling $&rArr;$ Z<sub>out</sub> divides by (1 + Aβ).</li>
+        <li>Current sampling $&rArr;$ Z<sub>out</sub> multiplies by (1 + Aβ).</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="tw"><table>
+    <thead><tr><th>Topology</th><th>Typical Circuit</th><th>Z<sub>in</sub></th><th>Z<sub>out</sub></th><th>Stabilized Quantity</th><th>Practical Application</th></tr></thead>
+    <tbody>
+      <tr><td><b>Voltage-Series</b></td><td>Two-stage CE with R<sub>f1</sub>-R<sub>f2</sub> from Q<sub>2</sub> collector to Q<sub>1</sub> emitter</td><td>High: Z<sub>i</sub>(1+Aβ)</td><td>Low: Z<sub>o</sub>/(1+Aβ)</td><td>Voltage Gain A<sub>vf</sub></td><td>Audio preamplifiers, op-amp non-inverting buffers</td></tr>
+      <tr><td><b>Current-Series</b></td><td>Single CE with unbypassed emitter resistor R<sub>E1</sub></td><td>High: Z<sub>i</sub>(1+Aβ)</td><td>High: ≈ R<sub>C</sub></td><td>Transconductance G<sub>mf</sub></td><td>Transconductance stages, voltage-to-current converters</td></tr>
+      <tr><td><b>Current-Shunt</b></td><td>Two-transistor DC feedback pair</td><td>Low: Z<sub>i</sub>/(1+Aβ)</td><td>High: Z<sub>o</sub>(1+Aβ)</td><td>Current Gain A<sub>if</sub></td><td>Current amplifiers, transducer current summing</td></tr>
+      <tr><td><b>Voltage-Shunt</b></td><td>Collector-to-base feedback resistor R<sub>f</sub></td><td>Low: Z<sub>i</sub>/(1+Aβ)</td><td>Low: Z<sub>o</sub>/(1+Aβ)</td><td>Transresistance R<sub>mf</sub></td><td>Transimpedance amplifiers (TIA), photodiode amplifiers</td></tr>
+    </tbody>
+  </table></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s11"> Mark topic 11 as done</label>
+</section>
+
+<!-- ============ S12: EXAM MAP & FORMULAS ============ -->
+<section class="sec" id="s12">
+  <div class="sechead"><span class="secno">Revision</span></div>
+  <h2>Exam map and master formula sheet</h2>
+  <h3>12.1 Questions on Unit 4 from your papers</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Examination Paper</th><th>Question Number &amp; Text</th><th>Marks</th><th>Section Coverage</th></tr></thead>
+    <tbody>
+      <tr><td><b>Summer 2026 (25/05/2026)</b><br>SDC Sem III (S-29238-2026)</td><td>Q4 (a): How will you define various basic amplifiers? Explain Current amplifier and transconductance amplifier using suitable diagrams.</td><td>10</td><td><a href="#s1">Topic 1</a></td></tr>
+      <tr><td><b>Summer 2026 (25/05/2026)</b><br>SDC Sem III (S-29238-2026)</td><td>Q4 OR (a): What is the impact of negative feedback on input impedance? Analyze the same using current shunt feedback topology.</td><td>10</td><td><a href="#s6">Topic 6.2</a> &amp; <a href="#s9">Topic 9</a></td></tr>
+      <tr><td><b>Winter 2025 (11/12/2025)</b><br>SDC Sem III (W-29238-2025)</td><td>Q4 (a): What is the impact of negative feedback on output impedance? Analyze the same using voltage series feedback topology.</td><td>10</td><td><a href="#s6">Topic 6.1</a> &amp; <a href="#s7">Topic 7</a></td></tr>
+      <tr><td><b>Winter 2025 (11/12/2025)</b><br>SDC Sem III (W-29238-2025)</td><td>Q4 OR (a): How negative feedback helps in improving the gain performance of the amplifier? Discuss using suitable equations.</td><td>10</td><td><a href="#s4">Topic 4.1</a></td></tr>
+      <tr><td><b>Winter 2025 (11/12/2025)</b><br>SDC-II Sem III (W-25332-2025)</td><td>Q2: What are effects of negative voltage series feedback on input impedance, output impedance and voltage gain of an amplifier?</td><td>10</td><td><a href="#s4">Topic 4</a> &amp; <a href="#s6">Topic 6.1</a></td></tr>
+      <tr><td><b>Winter 2025 (11/12/2025)</b><br>SDC-II Sem III (W-25332-2025)</td><td>Q2 OR: State and explain different types of feedback amplifiers in detail with their typical circuit representations.</td><td>10</td><td><a href="#s3">Topic 3</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>12.2 Master Formula Sheet</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Concept</th><th>Mathematical Formula</th><th>Key Notes</th></tr></thead>
+    <tbody>
+      <tr><td><b>Closed-Loop Gain</b></td><td>A_{f} = [[A|1 + A β]] &approx; [[1|β]]</td><td>When |Aβ| &gt;&gt; 1, gain is set solely by feedback network</td></tr>
+      <tr><td><b>Gain Sensitivity</b></td><td>[[dA_{f}|A_{f}]] = [[1|1 + A β]] · [[dA|A]]</td><td>Divides parameter variations by desensitivity factor D</td></tr>
+      <tr><td><b>Bandwidth Extension</b></td><td>f_{2f} = f_{2} (1 + A β),   f_{1f} = [[f_{1}|1 + A β]]</td><td>Gain-Bandwidth product remains constant: A<sub>f</sub> · BW<sub>f</sub> = A · BW</td></tr>
+      <tr><td><b>Distortion Reduction</b></td><td>D_{f} = [[D|1 + A β]]</td><td>Harmonics generated within loop are suppressed by (1+Aβ)</td></tr>
+      <tr><td><b>Voltage-Series BJT</b></td><td>β = [[R_{f2}|R_{f1} + R_{f2}]],   A_{vf} &approx; [[R_{f1} + R_{f2}|R_{f2}]]</td><td>Z_{if} = Z_{i}(1+Aβ),   Z_{of} = Z_{o}/(1+Aβ)</td></tr>
+      <tr><td><b>Current-Series BJT</b></td><td>Z_{b} = h_{ie} + (1 + h_{fe}) R_{E1},   A_{v} &approx; − [[R_{C} || R_{L}|R_{E1}]]</td><td>Z_{in} = R_{1} || R_{2} || Z_{b},   Z_{out} &approx; R_{C}</td></tr>
+      <tr><td><b>Current-Shunt BJT</b></td><td>β = [[R_{f2}|R_{f1} + R_{f2}]],   A_{if} &approx; [[R_{f1} + R_{f2}|R_{f2}]]</td><td>Z_{if} = [[h_{ie1}|1 + A_{i} β]],   Z_{of} &approx; R_{C2}</td></tr>
+      <tr><td><b>Voltage-Shunt BJT</b></td><td>β = − [[1|R_{f}]],   R_{mf} &approx; − R_{f},   A_{vf} &approx; − [[R_{f}|R_{s}]]</td><td>Z_{if} = [[Z_{i}|1 + β R_{m}]],   Z_{of} = [[Z_{o}|1 + β R_{m}]]</td></tr>
+    </tbody>
+  </table></div>
+  <footer>Unit 4 Feedback Amplifiers Study Guide · Designed for B.Tech Sem III Students of Bharati Vidyapeeth (DU) COE Pune.</footer>
+</section>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const par=(a,b)=>a*b/(a+b);
+const F=n=>Math.round(n*10)/10;
+const LOG=Math.log10;
+
+function fmt3(x){return String(parseFloat(Number(x).toPrecision(3)));}
+function eng(v,u){
+  u=u||'';
+  if(!isFinite(v))return '—';
+  if(v===0)return '0 '+u;
+  const a=Math.abs(v),P=[[1e9,'G'],[1e6,'M'],[1e3,'k'],[1,''],[1e-3,'m'],[1e-6,'µ'],[1e-9,'n'],[1e-12,'p']];
+  for(const [m,s] of P){if(a>=m*0.9995)return fmt3(v/m)+' '+s+u;}
+  return v.toExponential(2)+' '+u;
+}
+function mk(s){
+  s=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function rBraced(str,cmd,f){
+    const p='\\'+cmd+'{';let idx;
+    while((idx=str.indexOf(p))!==-1){
+      const st=idx+p.length;let c=1,i=st;
+      while(i<str.length&&c>0){if(str[i]==='{')c++;else if(str[i]==='}')c--;i++;}
+      if(c===0){str=str.slice(0,idx)+f(str.slice(st,i-1))+str.slice(i);}else break;
+    }
+    return str;
+  }
+  s=rBraced(s,'text',x=>x);
+  s=rBraced(s,'mathbf',x=>'<b>'+x+'</b>');
+  s=rBraced(s,'sqrt',x=>'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">'+x+'</span></span>');
+  s=s.replace(/\\sqrt\s*(\d+)/g,'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">$1</span></span>');
+  
+  // Frac
+  let prev;
+  do{prev=s;s=s.replace(/_\{([^{}]+)\}/g,'<sub>$1</sub>').replace(/\^\{([^{}]+)\}/g,'<sup>$1</sup>');}while(s!==prev);
+  do{prev=s;s=s.replace(/\[\[([^\[\]|]+)\|([^\[\]]+)\]\]/g,'<span class="frac"><span>$1</span><span>$2</span></span>');}while(s!==prev);
+  s=s.replace(/\\left\s*([(\[{|])/g,'$1').replace(/\\right\s*([)\]}|])/g,'$1')
+     .replace(/\\left\b/g,'').replace(/\\right\b/g,'')
+     .replace(/\\implies\b/g,'&rArr;')
+     .replace(/\\approx\b/g,'&approx;')
+     .replace(/\\times\b/g,'&times;')
+     .replace(/\\cdot\b/g,'&middot;')
+     .replace(/\\Omega\b/g,'&Omega;')
+     .replace(/\\mu\b/g,'&mu;')
+     .replace(/\\pi\b/g,'&pi;')
+     .replace(/\\theta\b/g,'&theta;')
+     .replace(/\\eta\b/g,'&eta;')
+     .replace(/\\omega\b/g,'&omega;')
+     .replace(/\\ge\b/g,'&ge;')
+     .replace(/\\le\b/g,'&le;')
+     .replace(/\\pm\b/g,'&plusmn;')
+     .replace(/\\circ\b/g,'&deg;')
+     .replace(/\\dots\b/g,'&hellip;')
+     .replace(/\\quad\b/g,' ')
+     .replace(/\\qquad\b/g,'  ')
+     .replace(/\\parallel\b/g,'||')
+     .replace(/\\%/g,'%');
+  return s;
+}
+function mathify(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    if(!/_\{|\^\{|\[\[|\\sqrt|\\frac|\\implies|\\times|\\approx|\\mathbf|\\text|\\Omega|\\mu|\\le|\\ge|\\pi|&radic;|√/.test(n.nodeValue))return NodeFilter.FILTER_REJECT;
+    for(let p=n.parentNode;p&&p!==root;p=p.parentNode){const t=p.nodeName.toLowerCase();
+      if(t==='svg'||t==='script'||t==='style'||t==='textarea'||t==='input'||t==='option')return NodeFilter.FILTER_REJECT;}
+    return NodeFilter.FILTER_ACCEPT;}});
+  const list=[];while(w.nextNode())list.push(w.currentNode);
+  list.forEach(n=>{const sp=document.createElement('span');sp.innerHTML=mk(n.nodeValue);n.replaceWith(...sp.childNodes);});
+}
+
+/* ---------- SVG graphics library ---------- */
+const tx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/_\{([^{}]+)\}/g,'<tspan dy="3" font-size="9">$1</tspan><tspan dy="-3">​</tspan>');
+const W=(d,c)=>`<path${c?` class="${c}"`:''} d="${d}"/>`;
+const T=(x,y,s,c,a)=>`<text x="${x}" y="${y}" text-anchor="${a||'middle'}"${c?` class="${c}"`:''}>${tx(s)}</text>`;
+const dot=(x,y)=>`<circle class="dot" cx="${x}" cy="${y}" r="3"/>`;
+const term=(x,y)=>`<circle class="node" cx="${x}" cy="${y}" r="3.6"/>`;
+const G=(x,y,rot,inner)=>`<g transform="translate(${x} ${y})${rot?` rotate(${rot})`:''}">${inner}</g>`;
+function zig(len){const lead=8,n=3,seg=(len-2*lead)/(2*n);let d=`M0,0H${lead}`;for(let k=1;k<2*n;k++)d+=`L${F(lead+k*seg)},${k%2?-6:6}`;return d+`L${F(len-lead)},0H${len}`;}
+const R=(x,y,len,rot,c)=>G(x,y,rot||0,W(zig(len),c));
+const C=(x,y,len,rot,c)=>G(x,y,rot||0,W(`M0,0H${len/2-3}M${len/2-3},-10V10M${len/2+3},-10V10M${len/2+3},0H${len}`,c));
+const ACS=(x,y)=>`<circle class="sym" cx="${x}" cy="${y}" r="13"/>`+G(x,y,0,W('M-7,0q3.5,-8 7,0t7,0'));
+const GND=(x,y)=>G(x,y,0,W('M0,0V6M-9,6H9M-5,10H5M-2,14H2'));
+const NPN=(x,y)=>G(x,y,0,W('M-30,0H0M0,-16V16M0,-8L18,-20V-40M0,8L18,20V40')+W('M17,19.4L8.4,17.9L12.3,12Z','fl'));
+function ARW(x1,y1,x2,y2,c){const a=Math.atan2(y2-y1,x2-x1),h=7;
+  const p1=[x2-h*Math.cos(a-0.4),y2-h*Math.sin(a-0.4)],p2=[x2-h*Math.cos(a+0.4),y2-h*Math.sin(a+0.4)];
+  return W(`M${x1},${y1}L${x2},${y2}M${F(p1[0])},${F(p1[1])}L${x2},${y2}L${F(p2[0])},${F(p2[1])}`,c);}
+const SVG=(w,h,inner,label)=>`<svg class="dg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${inner}</svg>`;
+
+const DG={};
+
+/* Diagrams for Unit 4 */
+DG.fourBasicAmps=()=>{let s='';
+  const box=(x,y,w,h,t,sub)=>`<rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="6"/>`+T(x+w/2,y+h/2-4,t,'b')+T(x+w/2,y+h/2+14,sub,'s');
+  // Voltage Amp
+  s+=box(30,20,160,80,'Voltage Amp','A_{v} = V_{o}/V_{i}');
+  s+=W('M10,40H30')+W('M10,80H30')+W('M190,40H210')+W('M190,80H210')+T(15,35,'+')+T(15,75,'−')+T(205,35,'+')+T(205,75,'−')+T(110,118,'R_{in}=∞, R_{out}=0','s');
+  // Current Amp
+  s+=box(290,20,160,80,'Current Amp','A_{i} = I_{o}/I_{i}');
+  s+=ARW(260,50,290,50)+T(275,40,'I_{in}')+ARW(450,50,480,50)+T(465,40,'I_{out}')+T(370,118,'R_{in}=0, R_{out}=∞','s');
+  // Transconductance Amp
+  s+=box(30,150,160,80,'Transconductance','G_{m} = I_{o}/V_{i} (S)');
+  s+=W('M10,170H30')+W('M10,210H30')+T(15,165,'+')+T(15,205,'−')+ARW(190,180,220,180)+T(205,170,'I_{out}')+T(110,248,'R_{in}=∞, R_{out}=∞','s');
+  // Transresistance Amp
+  s+=box(290,150,160,80,'Transresistance','R_{m} = V_{o}/I_{i} (Ω)');
+  s+=ARW(260,180,290,180)+T(275,170,'I_{in}')+W('M450,170H470')+W('M450,210H470')+T(465,165,'+')+T(465,205,'−')+T(370,248,'R_{in}=0, R_{out}=0','s');
+  return SVG(500,270,s,'Four Basic Amplifier Models');
+};
+
+DG.feedbackBlock=()=>{let s='';
+  s+=`<circle class="sym" cx="130" cy="80" r="14"/>`+T(130,84,'Σ','b')+T(130,62,'+','s')+T(144,94,'−','s');
+  s+=`<rect class="box" x="210" y="50" width="120" height="60" rx="6"/>`+T(270,85,'Amplifier A','b');
+  s+=`<rect class="box" x="210" y="160" width="120" height="60" rx="6"/>`+T(270,195,'Feedback β','b');
+  s+=ARW(40,80,116,80)+T(75,70,'X_{s} (Source)')+ARW(144,80,210,80)+T(175,70,'X_{i}');
+  s+=W('M330,80H460')+dot(390,80)+ARW(390,80,470,80)+T(440,70,'X_{o} (Output)');
+  s+=W('M390,80V190H330')+ARW(360,190,330,190);
+  s+=W('M210,190H130V94')+ARW(130,140,130,94)+T(150,150,'X_{f} = βX_{o}','','start');
+  s+=T(270,245,'A_{f} = A / (1 + Aβ)','b');
+  return SVG(520,265,s,'Single-Loop Feedback Block Diagram');
+};
+
+DG.fourTopologies=()=>{let s='';
+  const mini=(x,y,title,inS,outS)=>{
+    let r=`<rect class="box" x="${x}" y="${y}" width="200" height="110" rx="6"/>`;
+    r+=T(x+100,y+24,title,'b')+T(x+100,y+45,`Mixing: ${inS}`,'s')+T(x+100,y+65,`Sampling: ${outS}`,'s');
+    r+=`<rect x="${x+20}" y="${y+76}" width="60" height="24" rx="4" fill="var(--surface)"/>`+T(x+50,y+92,'A','b');
+    r+=`<rect x="${x+120}" y="${y+76}" width="60" height="24" rx="4" fill="var(--surface)"/>`+T(x+150,y+92,'β','b');
+    return r;
+  };
+  s+=mini(20,20,'Voltage-Series','Series (Voltage)','Voltage (Shunt)');
+  s+=mini(250,20,'Voltage-Shunt','Shunt (Current)','Voltage (Shunt)');
+  s+=mini(20,150,'Current-Series','Series (Voltage)','Current (Series)');
+  s+=mini(250,150,'Current-Shunt','Shunt (Current)','Current (Series)');
+  return SVG(470,280,s,'Four Feedback Topologies');
+};
+
+DG.bandwidthGain=()=>{let s='';
+  const W0=560,H0=280,L=50,Tp=20,pw=460,ph=210;
+  s+=W(`M${L},${Tp}V${Tp+ph}H${L+pw}`);
+  // Open loop curve
+  s+=W(`M${L},${Tp+30}H${L+200}L${L+320},${Tp+ph}`,'dc');
+  // Closed loop curve
+  s+=W(`M${L},${Tp+110}H${L+340}L${L+430},${Tp+ph}`,'ac');
+  s+=T(L+100,Tp+20,'Open-Loop Gain A','dc','start');
+  s+=T(L+100,Tp+100,'Closed-Loop Gain A_{f}','ac','start');
+  s+=W(`M${L+200},${Tp+30}V${Tp+ph}`,'thin dash')+T(L+200,Tp+ph+16,'f_{2}','s');
+  s+=W(`M${L+340},${Tp+110}V${Tp+ph}`,'thin dash')+T(L+340,Tp+ph+16,'f_{2f} = f_{2}(1+Aβ)','s');
+  s+=T(L+pw/2,H0-6,'Frequency (log scale)');
+  return SVG(W0,H0,s,'Gain-Bandwidth Extension with Negative Feedback');
+};
+
+DG.bjtVoltageSeries=()=>{let s='';
+  // Two stage CE circuit with Rf1, Rf2 feedback
+  s+=W('M80,30H420')+T(435,34,'+V_{CC}','b','start')+dot(120,30)+dot(220,30)+dot(320,30)+dot(390,30);
+  // Q1
+  s+=NPN(180,120);
+  s+=R(120,30,60,90)+dot(120,90)+W('M120,90H150')+R(120,90,70,90)+W('M120,160V220');
+  s+=ACS(40,120)+W('M40,107V70H80')+C(80,70,40,0)+W('M120,70V90')+W('M40,133V220');
+  s+=R(200,30,50,90)+W('M200,80V120')+dot(200,80)+C(200,80,40,0)+W('M240,80H290');
+  // Q1 emitter to Rf2
+  s+=W('M200,160V180')+dot(200,180)+R(200,180,40,90)+W('M200,220V220');
+  // Q2
+  s+=NPN(320,120);
+  s+=R(290,30,60,90)+dot(290,90)+W('M290,90H320')+R(290,90,70,90)+W('M290,160V220');
+  s+=R(340,30,50,90)+W('M340,80V120')+dot(340,80)+C(340,80,40,0)+W('M380,80H440')+term(440,80)+T(455,84,'V_{o}','b');
+  s+=W('M340,160V220');
+  // Feedback resistor Rf1 from Q2 collector to Q1 emitter
+  s+=W('M340,80V180')+dot(340,180)+R(340,180,140,270)+W('M200,180H200');
+  s+=T(270,170,'R_{f1} (16.2 kΩ)','b')+T(215,200,'R_{f2} (220 Ω)','s','start');
+  s+=W('M40,220H420')+GND(230,220);
+  s+=T(180,100,'Q_{1}','b')+T(320,100,'Q_{2}','b')+T(270,250,'Two-stage BJT Voltage-Series Feedback Amplifier','b');
+  return SVG(500,265,s,'Two-Stage BJT Voltage-Series Feedback Amplifier');
+};
+
+DG.bjtCurrentSeries=()=>{let s='';
+  s+=W('M120,30H320')+T(335,34,'+V_{CC}','b','start')+dot(150,30)+dot(270,30);
+  s+=R(150,30,70,90)+dot(150,100)+R(150,100,70,90)+W('M150,170V240');
+  s+=ACS(40,100)+W('M40,87V50H80')+C(80,50,40,0)+W('M120,50H150')+W('M40,113V240');
+  s+=NPN(230,100);
+  s+=R(250,30,60,90)+W('M250,90V100')+dot(250,70)+C(250,70,40,0)+W('M290,70H350')+term(350,70)+T(365,74,'V_{o}','b');
+  s+=W('M250,140V150')+R(250,150,40,90)+dot(250,190)+R(250,190,50,90)+W('M250,240V240');
+  s+=W('M250,190H300')+C(300,190,50,90)+W('M300,240V240');
+  s+=W('M40,240H350')+GND(190,240);
+  s+=T(270,165,'R_{E1} (unbypassed)','b','start')+T(270,215,'R_{E2} (bypassed)','s','start')+T(325,215,'C_{2}','s','start');
+  s+=T(220,80,'Q_{1}','b')+T(265,55,'R_{C}','s','start')+T(200,265,'Current-Series (Emitter Degeneration)','b');
+  return SVG(440,280,s,'BJT Current-Series Feedback Amplifier');
+};
+
+DG.bjtCurrentShunt=()=>{let s='';
+  s+=W('M100,30H360')+T(375,34,'+V_{CC}','b','start')+dot(140,30)+dot(240,30)+dot(320,30);
+  s+=NPN(200,110);
+  s+=R(140,30,60,90)+dot(140,90)+W('M140,90H170');
+  s+=R(220,30,50,90)+W('M220,80V110')+dot(220,80)+W('M220,80H260');
+  s+=NPN(290,110);
+  s+=R(310,30,50,90)+W('M310,80V110')+dot(310,80)+C(310,80,40,0)+W('M350,80H390')+term(390,80)+T(405,84,'I_{o}','b');
+  // Emitter of Q2 sampled
+  s+=W('M310,150V180')+dot(310,180)+R(310,180,40,90)+W('M310,220V240');
+  // Feedback to base of Q1
+  s+=W('M310,180H220')+R(220,180,80,180)+W('M140,180H140V90');
+  s+=W('M200,150V240');
+  s+=W('M60,240H360')+GND(200,240);
+  s+=T(180,195,'R_{f1} (5.6 kΩ)','b')+T(335,200,'R_{f2} (100 Ω)','s','start');
+  s+=T(200,265,'Two-Transistor Current-Shunt Feedback Pair','b');
+  return SVG(440,280,s,'Two-Transistor Current-Shunt Feedback Pair');
+};
+
+DG.bjtVoltageShunt=()=>{let s='';
+  s+=W('M120,30H280')+T(295,34,'+V_{CC}','b','start')+dot(220,30);
+  s+=R(220,30,70,90)+W('M220,100V110')+dot(220,100)+dot(220,80);
+  s+=NPN(200,110);
+  s+=ACS(40,110)+W('M40,97V70H100')+R(100,70,40,0)+W('M140,70H170')+dot(150,70)+W('M150,70V110')+W('M40,123V200');
+  s+=W('M200,150V200')+W('M40,200H280')+GND(160,200);
+  // Feedback Rf from collector to base
+  s+=W('M220,80H150V70')+R(220,80,70,180);
+  s+=W('M220,100H280')+term(280,100)+T(295,104,'V_{o}','b');
+  s+=T(185,65,'R_{f}','b')+T(120,60,'R_{s}','s')+T(240,65,'R_{C}','s','start');
+  s+=T(170,225,'Collector-to-Base Voltage-Shunt CE Stage','b');
+  return SVG(360,240,s,'Collector-to-Base Voltage-Shunt Feedback Stage');
+};
+
+/* ---------- Interactive Widgets for Unit 4 ---------- */
+const WID={};
+
+const cells=a=>a.map(x=>x.warn?`<div class="warn">${mk(x.warn)}</div>`:x.note?`<div class="note">${mk(x.note)}</div>`:`<div><small>${mk(x.k)}</small><b>${x.v}</b></div>`).join('');
+function widget(host,o){
+  host.className='widget';
+  host.innerHTML=`<span class="wlabel">Try it</span> <b>${mk(o.title)}</b>${o.intro?`<p style="margin:.3rem 0;font-size:.88rem;color:var(--muted)">${mk(o.intro)}</p>`:''}<div class="wgrid"></div><div class="wfig"></div><div class="res"></div>`;
+  const g=$('.wgrid',host),fig=$('.wfig',host),res=$('.res',host),els={};
+  o.fields.forEach(f=>{
+    const id=host.dataset.w+'_'+f.id,d=document.createElement('div');d.className='fld';let ctl;
+    if(f.type==='sel')ctl=`<select id="${id}">${f.opts.map(([v,l])=>`<option value="${v}"${String(v)===String(f.val)?' selected':''}>${l}</option>`).join('')}</select>`;
+    else if(f.type==='range'||f.type==='log')ctl=`<input id="${id}" type="range" min="${f.min}" max="${f.max}" step="${f.step||'any'}" value="${f.type==='log'?LOG(f.val):f.val}"><output id="${id}_o"></output>`;
+    else ctl=`<input id="${id}" type="number" inputmode="decimal" min="0" step="any" value="${f.val}"><span class="u">${mk(f.unit||'')}</span>`;
+    d.innerHTML=`<label for="${id}">${mk(f.label)}</label><div class="row">${ctl}</div>`;g.appendChild(d);els[f.id]=$('#'+id,d);
+  });
+  function update(){
+    const v={};
+    o.fields.forEach(f=>{const e=els[f.id];let x;
+      if(f.type==='sel'){x=e.value;if(x!==''&&!isNaN(+x))x=+x;}
+      else if(f.type==='log')x=Math.pow(10,+e.value);
+      else{x=parseFloat(e.value);if(isNaN(x))x=0;x*=(f.scale||1);}
+      v[f.id]=x;
+      if(f.type==='range'||f.type==='log'){$('#'+e.id+'_o',host).textContent=f.fmt?f.fmt(x):x;}
+    });
+    if(o.figure)fig.innerHTML=o.figure(v);
+    res.innerHTML=cells(o.run(v));
+  }
+  host.addEventListener('input',update);update();
+}
+
+WID.feedbackGain=h=>widget(h,{
+  title:'Feedback Transfer Gain & Desensitization Explorer',
+  intro:'Experiment with open-loop gain A and feedback factor β. Observe how (1+Aβ) stabilizes gain against a 20% drift in A.',
+  fields:[
+    {id:'A',label:'Open-Loop Gain A',val:1000,unit:''},
+    {id:'beta',label:'Feedback Factor β',val:0.01,unit:''},
+    {id:'drift',label:'Open-Loop Gain Drift dA/A',val:20,unit:'%'}
+  ],
+  run(v){
+    const loop=v.A*v.beta, D=1+loop, Af=v.A/D, ideal=1/v.beta;
+    const dAf_pct = v.drift / D;
+    return [
+      {k:'Loop Gain T = Aβ',v:fmt3(loop)},
+      {k:'Desensitivity D = 1 + Aβ',v:fmt3(D)},
+      {k:'Closed-Loop Gain A_{f}',v:fmt3(Af)},
+      {k:'Ideal Gain 1/β',v:fmt3(ideal)},
+      {k:'Closed-Loop Gain Drift dA_{f}/A_{f}',v:fmt3(dAf_pct)+' %'},
+      {note:`Open-loop drifted by ${v.drift}%, but closed-loop gain drifted by only ${fmt3(dAf_pct)}%!`}
+    ];
+  }
+});
+
+WID.bwExtension=h=>widget(h,{
+  title:'Gain-Bandwidth Extension Calculator',
+  intro:'Observe how negative feedback broadens the passband while holding the gain-bandwidth product constant.',
+  fields:[
+    {id:'Am',label:'Mid-Band Gain A_{mid}',val:500,unit:''},
+    {id:'beta',label:'Feedback Factor β',val:0.02,unit:''},
+    {id:'f1',label:'Lower Cutoff f_{1}',val:100,unit:'Hz'},
+    {id:'f2',label:'Upper Cutoff f_{2}',val:20,unit:'kHz',scale:1e3}
+  ],
+  run(v){
+    const D = 1 + v.Am * v.beta, Af = v.Am / D;
+    const f1f = v.f1 / D, f2f = v.f2 * D;
+    const bw_open = v.f2 - v.f1, bw_closed = f2f - f1f;
+    return [
+      {k:'Desensitivity 1 + Aβ',v:fmt3(D)},
+      {k:'Closed-Loop Gain A_{f}',v:fmt3(Af)},
+      {k:'New Lower Cutoff f_{1f}',v:eng(f1f,'Hz')},
+      {k:'New Upper Cutoff f_{2f}',v:eng(f2f,'Hz')},
+      {k:'Closed-Loop Bandwidth',v:eng(bw_closed,'Hz')},
+      {k:'Open-Loop GBW',v:eng(v.Am * bw_open,'Hz')},
+      {k:'Closed-Loop GBW',v:eng(Af * bw_closed,'Hz')},
+      {note:'Notice GBW remains completely constant! Gain was directly traded for bandwidth.'}
+    ];
+  }
+});
+
+WID.vSeriesBJT=h=>widget(h,{
+  title:'Two-Stage BJT Voltage-Series Calculator (Dr. Ghongade Ex. 1)',
+  intro:'Defaults are the exact numbers from Dr. Ghongade’s teaching notes.',
+  fields:[
+    {id:'Av',label:'Open-Loop Gain A_{v}',val:1118,unit:''},
+    {id:'Zi',label:'Open-Loop Z_{i}',val:1.98,unit:'kΩ',scale:1e3},
+    {id:'Zo',label:'Open-Loop Z_{o}',val:12,unit:'kΩ',scale:1e3},
+    {id:'Rf1',label:'Feedback Resistor R_{f1}',val:16.2,unit:'kΩ',scale:1e3},
+    {id:'Rf2',label:'Feedback Resistor R_{f2}',val:220,unit:'Ω'}
+  ],
+  run(v){
+    const beta = v.Rf2 / (v.Rf1 + v.Rf2), D = 1 + v.Av * beta;
+    const Avf = v.Av / D, Zif = v.Zi * D, Zof = v.Zo / D;
+    return [
+      {k:'Feedback Factor β',v:fmt3(beta)},
+      {k:'1 + A_{v}β',v:fmt3(D)},
+      {k:'Closed-Loop Gain A_{vf}',v:fmt3(Avf)},
+      {k:'Ideal Gain (R_{f1}+R_{f2})/R_{f2}',v:fmt3(1/beta)},
+      {k:'Closed-Loop Z_{if}',v:eng(Zif,'Ω')},
+      {k:'Closed-Loop Z_{of}',v:eng(Zof,'Ω')},
+      {note:'Matches the notes: Gain drops from 1118 to 70; Z_{in} jumps to 31.6 kΩ; Z_{out} drops to 751 Ω.'}
+    ];
+  }
+});
+
+WID.cSeriesBJT=h=>widget(h,{
+  title:'BJT Current-Series (Emitter Degeneration) Analyser',
+  intro:'Test how unbypassed R_{E1} desensitizes gain across the full transistor batch spread (h_{fe} = 100 to 400).',
+  fields:[
+    {id:'RC',label:'Collector Resistor R_{C}',val:12,unit:'kΩ',scale:1e3},
+    {id:'RL',label:'Load Resistor R_{L}',val:120,unit:'kΩ',scale:1e3},
+    {id:'RE1',label:'Unbypassed R_{E1}',val:150,unit:'Ω'},
+    {id:'hfe',label:'Transistor h_{fe}',val:200,unit:''},
+    {id:'hie',label:'Transistor h_{ie}',val:3,unit:'kΩ',scale:1e3}
+  ],
+  run(v){
+    const rac = par(v.RC, v.RL);
+    const Zb = v.hie + (1 + v.hfe) * v.RE1;
+    const Av = (v.hfe * rac) / Zb;
+    const Av_approx = rac / v.RE1;
+    return [
+      {k:'R_{C} ∥ R_{L}',v:eng(rac,'Ω')},
+      {k:'Base Impedance Z_{b}',v:eng(Zb,'Ω')},
+      {k:'Exact |A_{v}|',v:fmt3(Av)},
+      {k:'Approximate |A_{v}| ≈ (R_{C}∥R_{L})/R_{E1}',v:fmt3(Av_approx)},
+      {note:'The gain is anchored near 70 by the ratio (R_{C}∥R_{L})/R_{E1}, regardless of h_{fe}!'}
+    ];
+  }
+});
+
+WID.cShuntBJT=h=>widget(h,{
+  title:'BJT Current-Shunt Pair Calculator (Dr. Ghongade Ex. 3)',
+  intro:'Calculates open-loop gain, feedback factor β, and closed-loop current gain A_{if}.',
+  fields:[
+    {id:'Ai',label:'Open-Loop Current Gain A_{i}',val:6226,unit:''},
+    {id:'hie1',label:'h_{ie1} of Q_{1}',val:2,unit:'kΩ',scale:1e3},
+    {id:'Rf1',label:'R_{f1}',val:5.6,unit:'kΩ',scale:1e3},
+    {id:'Rf2',label:'R_{f2}',val:100,unit:'Ω'}
+  ],
+  run(v){
+    const beta = v.Rf2 / (v.Rf1 + v.Rf2), D = 1 + v.Ai * beta;
+    const Aif = v.Ai / D, Zif = v.hie1 / D;
+    return [
+      {k:'Feedback Factor β',v:fmt3(beta)},
+      {k:'Loop Gain A_{i}β',v:fmt3(v.Ai * beta)},
+      {k:'Closed-Loop Current Gain A_{if}',v:fmt3(Aif)},
+      {k:'Ideal A_{if} ≈ (R_{f1}+R_{f2})/R_{f2}',v:fmt3(1/beta)},
+      {k:'Closed-Loop Input Impedance Z_{if}',v:eng(Zif,'Ω')},
+      {note:'Notice how tiny Z_{if} becomes (17.5 Ω)! Perfect for receiving current signals.'}
+    ];
+  }
+});
+
+WID.vShuntBJT=h=>widget(h,{
+  title:'BJT Voltage-Shunt Transresistance Calculator',
+  intro:'Examine the collector-to-base feedback stage. Calculates closed-loop R_{mf} and voltage gain A_{vf}.',
+  fields:[
+    {id:'Rs',label:'Source Resistance R_{s}',val:1,unit:'kΩ',scale:1e3},
+    {id:'RC',label:'Collector Resistor R_{C}',val:4.7,unit:'kΩ',scale:1e3},
+    {id:'Rf',label:'Feedback Resistor R_{f}',val:47,unit:'kΩ',scale:1e3},
+    {id:'hfe',label:'Transistor h_{fe}',val:150,unit:''},
+    {id:'hie',label:'Transistor h_{ie}',val:2,unit:'kΩ',scale:1e3}
+  ],
+  run(v){
+    const beta = -1 / v.Rf;
+    const R = par(v.Rs, v.Rf);
+    const RCp = par(v.RC, v.Rf);
+    const Rm = -(v.hfe * RCp * R) / (R + v.hie);
+    const Rmf = Rm / (1 + beta * Rm);
+    const Avf = Rmf / v.Rs;
+    return [
+      {k:'Feedback Factor β',v:fmt3(beta)+' S'},
+      {k:'Open-Loop Transresistance R_{m}',v:eng(Math.abs(Rm),'Ω')},
+      {k:'Closed-Loop Transresistance R_{mf}',v:eng(Math.abs(Rmf),'Ω')},
+      {k:'Ideal R_{mf} ≈ −R_{f}',v:eng(v.Rf,'Ω')},
+      {k:'Closed-Loop Voltage Gain A_{vf} = R_{mf}/R_{s}',v:fmt3(Avf)},
+      {note:'Closed-loop transresistance is pinned precisely by R_{f}.'}
+    ];
+  }
+});
+
+/* ---------- Page Initialization ---------- */
+function init(){
+  document.querySelectorAll('[data-dg]').forEach(el=>{
+    const f=DG[el.dataset.dg];
+    if(f) el.innerHTML=f();
+    else el.textContent='diagram: '+el.dataset.dg;
+  });
+  document.querySelectorAll('[data-w]').forEach(el=>{
+    const f=WID[el.dataset.w];
+    if(f) f(el);
+  });
+  mathify($('main'));
+
+  // Theme toggle
+  $('#themeBtn').addEventListener('click',()=>{
+    const r=document.documentElement;
+    const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    r.dataset.theme=cur==='dark'?'light':'dark';
+  });
+
+  // Progress tracking via localStorage
+  const chips=[...document.querySelectorAll('#chips a')];
+  let done=[];
+  try{done=JSON.parse(localStorage.getItem('feedback-guide-done')||'[]');}catch(e){}
+  const paint=()=>{
+    chips.forEach(a=>{
+      const id=a.getAttribute('href').slice(1);
+      a.classList.toggle('done',done.includes(id));
+    });
+    document.querySelectorAll('input[data-done]').forEach(i=>{
+      i.checked=done.includes(i.dataset.done);
+    });
+  };
+  document.querySelectorAll('input[data-done]').forEach(i=>i.addEventListener('change',()=>{
+    const id=i.dataset.done;
+    done=done.filter(x=>x!==id);
+    if(i.checked) done.push(id);
+    try{localStorage.setItem('feedback-guide-done',JSON.stringify(done));}catch(e){}
+    paint();
+  }));
+  paint();
+
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{
+      es.forEach(e=>{
+        if(e.isIntersecting){
+          chips.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));
+          const on=chips.find(a=>a.classList.contains('on'));
+          const nav = document.getElementById('chips'); if(on && nav){ nav.scrollLeft = on.offsetLeft - (nav.clientWidth - on.clientWidth) / 2; }
+        }
+      });
+    },{rootMargin:'-20% 0px -70% 0px'});
+    document.querySelectorAll('section.sec').forEach(s=>io.observe(s));
+  }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
+</script>
+</body>
+</html>

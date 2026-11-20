@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Current Mirrors & Differential Amplifiers Study Guide · Unit 6</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout concept: engineer's graph-paper notebook. Sticky chip bar, single reading column, every topic = intuition > diagram > mechanism > derivation > example > try-it > exam skeleton. */
+:root{
+  --bg:#EEF2F5; --grid:rgba(18,32,41,.045); --surface:#FFFFFF; --surface2:#E7EDF2; --fg:#112029; --muted:#4A5E6C; --line:#C6D2DA;
+  --accent:#0B5FD3; --accent-ink:#FFFFFF; --dc:#B84E06; --ac:#087A5A; --bad:#B82633; --wire:#1B2B36; --fill:#DCE8F6;
+  --display:"Space Grotesk","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B131A; --grid:rgba(190,215,235,.045); --surface:#121D26; --surface2:#1A2833; --fg:#E3ECF2; --muted:#9BAFBD; --line:#2A3B48;
+  --accent:#62A8FF; --accent-ink:#06121F; --dc:#F2A24E; --ac:#3ED3A4; --bad:#FF808B; --wire:#CFE0EC; --fill:#1D3550; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{margin:0;font:16px/1.65 var(--body);color:var(--fg);
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  background-attachment:fixed;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 4rem}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,3.6vw,2rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:600;margin:2rem 0 .5rem}
+p{margin:.6rem 0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,.mono{font-family:var(--mono);font-size:.9em}
+sub,sup{line-height:0}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);
+  margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.bar .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:.75rem;min-height:52px}
+.brand{font:700 .95rem var(--display);color:var(--fg);text-decoration:none;white-space:nowrap}
+.chips{display:flex;gap:.35rem;overflow-x:auto;flex:1;min-width:0;scrollbar-width:thin;padding:.4rem 0}
+.chips a{white-space:nowrap;font:500 .8rem var(--body);text-decoration:none;color:var(--muted);padding:.25rem .6rem;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.chips a:hover{color:var(--fg);border-color:var(--accent)}
+.chips a.done::before{content:"✓ ";color:var(--ac)}
+.chips a.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#themeBtn{font:500 .8rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:.3rem .6rem;cursor:pointer}
+
+/* hero */
+.hero{padding:2.6rem 0 1.2rem}
+.kicker{font:500 .75rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{font-size:1.08rem;color:var(--muted);max-width:64ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:.6rem;margin:1.2rem 0}
+.topic{display:block;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.7rem .85rem}
+.topic:hover{border-color:var(--accent)}
+.topic b{display:block;font:600 .95rem var(--display)}
+.topic span{font-size:.8rem;color:var(--muted)}
+.topic .q{display:inline-block;margin-top:.3rem;font:500 .68rem var(--mono);color:var(--dc)}
+
+/* sections */
+section.sec{padding:2.8rem 0 .5rem;border-top:2px solid var(--fg);margin-top:2.4rem;}
+.sechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem .8rem;margin-bottom:.4rem}
+.secno{font:500 .8rem var(--mono);color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0 1rem}
+.tag{font:500 .72rem var(--mono);padding:.15rem .5rem;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--muted)}
+.tag.hot{background:var(--dc);color:#fff;border-color:var(--dc)}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1rem 1.15rem;margin:1rem 0}
+.card.intuition{border-left:4px solid var(--ac)}
+.card.exam{border-left:4px solid var(--dc);background:rgba(184,78,6,.04)}
+.card.watch{border-left:4px solid var(--bad);background:rgba(184,38,51,.04)}
+.card.try{border-left:4px solid var(--accent);background:rgba(11,95,211,.04)}
+.card .label{display:block;font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.card.intuition .label{color:var(--ac)}
+.card.exam .label{color:var(--dc)}
+.card.watch .label{color:var(--bad)}
+.card.try .label{color:var(--accent)}
+
+/* equations & steps */
+.eq{font-family:var(--mono);font-size:.95rem;background:var(--surface2);padding:.6rem .9rem;border-radius:6px;margin:.7rem 0;overflow-x:auto}
+.eq.key{background:var(--fill);border-left:3.5px solid var(--accent)}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;line-height:1.35}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .35em}
+.frac>span:last-child{padding:0 .35em}
+.steps{counter-reset:s;list-style:none;padding:0;margin:.8rem 0}
+.steps>li{counter-increment:s;position:relative;padding-left:2.2rem;margin:.7rem 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:.05rem;width:1.55rem;height:1.55rem;border-radius:50%;background:var(--fg);color:var(--bg);font:600 .78rem/1.55rem var(--mono);text-align:center}
+
+/* tables */
+.tw{overflow-x:auto;margin:.9rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+th,td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface2);font:600 .78rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+
+/* diagrams */
+figure{margin:1.1rem 0}
+figcaption{font-size:.85rem;color:var(--muted);margin-top:.35rem}
+svg.dg{display:block;width:100%;height:auto;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+svg.dg path{fill:none;stroke:var(--wire);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+svg.dg path.fl{fill:var(--wire);stroke:none}
+svg.dg path.dc{stroke:var(--dc)}svg.dg path.ac{stroke:var(--ac)}svg.dg path.ac2{stroke:var(--accent)}svg.dg path.bad{stroke:var(--bad)}
+svg.dg path.dash{stroke-dasharray:5 4}
+svg.dg path.thin{stroke-width:1;stroke:var(--line)}
+svg.dg path.shade{fill:var(--fill);stroke:none;opacity:.85}
+svg.dg path.shadeb{fill:var(--bad);stroke:none;opacity:.14}
+svg.dg path.shadeg{fill:var(--ac);stroke:none;opacity:.14}
+svg.dg circle.dot{fill:var(--wire);stroke:none}
+svg.dg circle.node{fill:var(--surface);stroke:var(--wire);stroke-width:1.6}
+svg.dg circle.sym{fill:var(--surface);stroke:var(--wire);stroke-width:1.7}
+svg.dg circle.q{fill:var(--bad);stroke:none}
+svg.dg polygon{stroke:var(--wire);stroke-width:1.7;fill:var(--surface)}
+svg.dg rect.box{fill:var(--surface2);stroke:var(--wire);stroke-width:1.7}
+svg.dg text{fill:var(--fg);font:12.5px var(--mono)}
+svg.dg text.s{font-size:11px;fill:var(--muted)}
+svg.dg text.b{font-weight:600;font-size:13px}
+svg.dg text.dc{fill:var(--dc)}svg.dg text.ac{fill:var(--ac)}svg.dg text.ac2{fill:var(--accent)}svg.dg text.bad{fill:var(--bad)}
+
+/* widgets */
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:1.2rem 0}
+.wlabel{display:inline-block;font:600 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.1rem .5rem;border-radius:4px;background:var(--dc);color:var(--bg);margin-bottom:.5rem}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem .9rem;margin:.6rem 0}
+.fld{display:flex;flex-direction:column;gap:.15rem;font-size:.82rem;color:var(--muted);min-width:0}
+.fld .row{display:flex;gap:.4rem;align-items:center}
+.fld input[type=number],.fld select{font:500 .95rem var(--mono);width:100%;min-width:0;padding:.3rem .45rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.fld input[type=range]{width:100%;accent-color:var(--accent)}
+.fld .u{font:.8rem var(--mono);white-space:nowrap}
+.fld output{font:600 .85rem var(--mono);color:var(--fg)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem;margin-top:.8rem}
+.res div{background:var(--surface2);border-radius:8px;padding:.5rem .7rem;min-width:0}
+.res small{display:block;font:500 .7rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.res b{font:600 1.05rem var(--mono);overflow-wrap:anywhere}
+.res .note{grid-column:1/-1;background:none;padding:0;font-size:.85rem;color:var(--muted)}
+.res .warn{grid-column:1/-1;background:var(--bad);color:var(--bg);font-size:.85rem;border-radius:8px;padding:.5rem .7rem}
+.pill{display:inline-block;font:600 .8rem var(--mono);padding:.15rem .6rem;border-radius:999px;color:var(--bg)}
+details{margin:.5rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:.1rem .8rem}
+summary{cursor:pointer;padding:.5rem 0;font-weight:500}
+details[open]>summary{border-bottom:1px solid var(--line);margin-bottom:.4rem}
+.done-row{display:flex;align-items:center;gap:.5rem;margin:1.6rem 0 .5rem;font-size:.9rem;color:var(--muted)}
+.done-row input{width:1.1rem;height:1.1rem;accent-color:var(--ac)}
+footer{margin-top:3rem;font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.brand{display:none}.eq{font-size:.88rem}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.sqrt{display:inline-flex;align-items:baseline;vertical-align:middle;margin:0 .15em;line-height:1}
+.radic{font-size:1.25em;line-height:.9;padding-right:1px;font-family:var(--display),serif;transform:translateY(1px)}
+.radicand{border-top:1.6px solid currentColor;padding:.05em .25em 0 .15em;display:inline-block;line-height:1.25}
+</style>
+</head>
+<body>
+
+<header class="bar"><div class="in">
+  <a class="brand" href="#top">Current Mirrors &amp; Diff Amps</a>
+  <nav class="chips" id="chips" aria-label="Topics">
+    <a href="#s0">Start</a>
+    <a href="#s1">Basic Mirror</a>
+    <a href="#s2">Widlar Source</a>
+    <a href="#s3">Wilson Mirror</a>
+    <a href="#s4">CE Limitations</a>
+    <a href="#s5">Split-Supply DC</a>
+    <a href="#s6">Diff &amp; CM Modes</a>
+    <a href="#s7">4 Configurations</a>
+    <a href="#s8">Dual-In Balanced</a>
+    <a href="#s9">Dual-In Unbalanced</a>
+    <a href="#s10">Single-In Modes</a>
+    <a href="#s11">Tail Bias &amp; CMRR</a>
+    <a href="#s12">Large-Signal Tanh</a>
+    <a href="#s13">Master Comparison</a>
+    <a href="#s14">Exam Map &amp; Formulas</a>
+  </nav>
+  <button id="themeBtn" type="button" aria-label="Switch light or dark theme">Theme</button>
+</div></header>
+
+<main class="wrap" id="top">
+<div class="hero">
+  <div class="kicker">Semiconductor Devices &amp; Circuits · Unit 6 (NEP 2020)</div>
+  <h1>Current Mirrors and Differential Amplifiers, from Silicon Physics to Op-Amps</h1>
+  <p class="lead">A complete, mathematically rigorous engineering study guide covering BJT current mirrors (Basic, Widlar, Wilson), split-supply differential pairs, the four configurations, common-mode rejection (CMRR), constant-current tail biasing, large-signal hyperbolic-tangent dynamics, 13 complete worked examples, and university exam solutions for Bharati Vidyapeeth (DU) COE Pune.</p>
+
+  <div class="grid">
+    <a class="topic" href="#s0"><b>Start Here</b><span>Core intuitions &amp; silicon rationale</span><span class="q">5 Foundation Rules</span></a>
+    <a class="topic" href="#s1"><b>Basic BJT Mirror</b><span>Diode-connected reference, β error &amp; r_{o}</span><span class="q">Winter 2025 SDC-I Q6 · 10M</span></a>
+    <a class="topic" href="#s2"><b>Widlar Current Source</b><span>Logarithmic sub-mA source without huge R</span><span class="q">Summer 2026 Q6 · 10M</span></a>
+    <a class="topic" href="#s3"><b>Wilson Current Mirror</b><span>Negative feedback, β² error &amp; megohm R_{o}</span><span class="q">Winter 2025 Q6 · 10M</span></a>
+    <a class="topic" href="#s4"><b>CE Limitations</b><span>Single-ended drift vs diff-pair immunity</span><span class="q">Winter 2025 Q6 OR · 10M</span></a>
+    <a class="topic" href="#s5"><b>Split-Supply DC Bias</b><span>±V_{CC} supplies, 0V DC offset &amp; tail splitting</span><span class="q">DC Operating Point</span></a>
+    <a class="topic" href="#s6"><b>Diff &amp; CM Modes</b><span>Input decomposition: v_{id}, v_{cm}, v_{1}, v_{2}</span><span class="q">Signal Decomposition</span></a>
+    <a class="topic" href="#s7"><b>4 Diff Configurations</b><span>Dual/Single In, Balanced/Unbalanced Out</span><span class="q">Winter 2025 SDC-II Q5 · 10M</span></a>
+    <a class="topic" href="#s8"><b>Dual-In Balanced Out</b><span>Virtual ground, A_{d} = -g_{m}R_{C} = -R_{C}/r_{e}</span><span class="q">Half-Circuit Analysis</span></a>
+    <a class="topic" href="#s9"><b>Dual-In Unbalanced</b><span>Single-ended pickoff: A_{d} = -R_{C}/(2r_{e})</span><span class="q">Op-Amp Front End</span></a>
+    <a class="topic" href="#s10"><b>Single-In Configs</b><span>Phase splitting &amp; AC grounded base</span><span class="q">Balanced &amp; Unbalanced</span></a>
+    <a class="topic" href="#s11"><b>Tail Bias &amp; CMRR</b><span>Resistor tail vs Current source tail (86 dB)</span><span class="q">Winter 2025 SDC-II Q5 OR · 10M</span></a>
+    <a class="topic" href="#s12"><b>Large-Signal Tanh</b><span>Exact i_{C1}-i_{C2} = I_{T} tanh(v_{id}/2V_{T})</span><span class="q">Linear Limit &amp; Clipping</span></a>
+    <a class="topic" href="#s13"><b>Master Comparison</b><span>Mirror &amp; Diff-Amp matrix + 9 Exam Traps</span><span class="q">Cautions &amp; Pitfalls</span></a>
+    <a class="topic" href="#s14"><b>Exam Map &amp; Formulas</b><span>Mapping 4 exam papers + Master formula sheet</span><span class="q">10 Practice Numericals</span></a>
+  </div>
+</div>
+
+<!-- ============ S0: START HERE ============ -->
+<section class="sec" id="s0">
+  <div class="sechead"><span class="secno">Start Here</span></div>
+  <h2>The core intuitions behind Unit 6</h2>
+  <div class="tags"><span class="tag">IC Design Philosophy</span><span class="tag">Active Loads</span><span class="tag">Differential Symmetry</span></div>
+
+  <div class="card intuition"><span class="label">Intuition 1 · Why Current Mirrors Replace Resistors in Integrated Circuits</span>
+  <p>In discrete circuits, resistors set bias currents and collector loads. On a silicon integrated circuit chip, <b>resistors are expensive, bulky, and inaccurate</b>. A 100 kΩ diffused resistor consumes over 10,000 µm² of precious silicon area, possesses a poor absolute tolerance of ±20% to ±30%, and drifts severely with temperature. In stark contrast, an NPN transistor consumes less than 100 µm² (100 times smaller!) and adjacent transistors on the same silicon die match their base-emitter voltages V_{BE} within 1 mV. Current mirrors exploit this near-perfect matching to replace passive resistors with compact, stable <b>active current sources and active loads</b>.</p></div>
+
+  <div class="card intuition"><span class="label">Intuition 2 · The Widlar Breakthrough for Microamperes</span>
+  <p>To bias the sensitive input stages of an operational amplifier with 10 µA to 20 µA using a simple current mirror from a 10 V supply, one would need a reference resistor R_{ref} = (10 - 0.7 V) / 20 µA = <b>465 kΩ</b>! Fabricating nearly half a megohm on a chip is economically prohibitive. Robert Widlar's stroke of genius was adding a small resistor R_{E} to only the output transistor. Dropping just ~100 mV across R_{E} reduces V_{BE2} relative to V_{BE1}. Because collector current depends <i>exponentially</i> on V_{BE}, that tiny 100 mV drop reduces current by 50-fold (from 1 mA down to 20 µA) using an R_{E} of only <b>5.09 kΩ</b>, slashing required resistor area by 97%!</p></div>
+
+  <div class="card intuition"><span class="label">Intuition 3 · The Wilson Negative-Feedback Loop</span>
+  <p>A simple BJT mirror has an output resistance limited by the Early effect to r_{o} ≈ 100 kΩ and a base-current error of order 2/β (≈ 2%). George Wilson added a third transistor and closed a local <b>negative feedback loop</b> inside the mirror: any rise in output current is sensed by the bottom transistors and immediately robs base current from the output transistor. This internal negative feedback squares the base current error to order <b>2/β² (≈ 0.02%)</b> and boosts the dynamic output resistance by β/2 into <b>megohms (R_{o} ≈ 5 MΩ)</b>.</p></div>
+
+  <div class="card intuition"><span class="label">Intuition 4 · The Differential Pair as the Universal Op-Amp Front End</span>
+  <p>A conventional common-emitter stage is fundamentally single-ended: it cannot distinguish between an input sensor signal and ground noise, supply ripple, or thermal V_{BE} drift (-2 mV/°C). The <b>differential pair</b> amplifies only the <i>difference</i> between its two input terminals (v_{id} = v_{1} - v_{2}) while completely suppressing any voltage common to both (v_{cm}). Because of thermal and device symmetry, temperature drift affects both sides identically and cancels out at the differential output. Furthermore, direct DC coupling eliminates coupling capacitors, allowing amplification down to 0 Hz.</p></div>
+
+  <div class="card intuition"><span class="label">Intuition 5 · The Split-Supply Magic (±V_{CC})</span>
+  <p>By powering the differential amplifier from symmetrical dual supplies (+V_{CC} and -V_{EE}), both input bases can be held directly at <b>0 V DC ground potential</b> while the joined emitters rest at -0.7 V. This completely eliminates input coupling capacitors and bulky voltage-divider bias networks, allowing external transducers, bio-electrodes, and previous DC stages to connect directly to the inputs with zero DC offset voltage.</p></div>
+</section>
+
+<!-- ============ S1: BASIC BJT CURRENT MIRROR ============ -->
+<section class="sec" id="s1">
+  <div class="sechead"><span class="secno">Topic 1</span></div>
+  <h2>The Basic BJT Current Mirror</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 SDC-I Q6 (10 Marks)</span><span class="tag">Diode-Connected BJT</span><span class="tag">Finite Beta Error</span><span class="tag">Compliance Voltage</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · Why Diode Connection Works</span>
+  <p>Tying the collector of Q_{1} directly to its own base forces V_{CE1} = V_{BE1} ≈ 0.7 V. Since the collector-base junction voltage V_{CB1} = 0 V, Q_{1} is guaranteed to operate at the edge of the forward-active region (no saturation). It automatically adjusts its V_{BE1} to absorb whatever reference current I_{ref} flows through R_{ref}. Because Q_{2}'s base and emitter are tied in parallel with Q_{1}, Q_{2} experiences the exact same V_{BE} and replicates the identical collector current into the load.</p></div>
+
+  <figure><div data-dg="basicMirror"></div><figcaption>Basic two-transistor BJT current mirror showing reference branch, diode-connected Q_{1}, output Q_{2}, and base current division.</figcaption></figure>
+
+  <h3>1. Ideal Current Source vs. Basic Current Mirror</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Parameter</th><th>Ideal Current Source</th><th>Basic BJT Current Mirror Approximation</th></tr></thead>
+    <tbody>
+      <tr><td><b>Output Resistance (R_{o})</b></td><td>∞ (horizontal I-V line)</td><td>Finite: R_{o} = r_{o2} = V_{A} / I_{O} (typically 50 kΩ to 150 kΩ due to Early effect)</td></tr>
+      <tr><td><b>Current Gain Accuracy (I_{O} / I_{ref})</b></td><td>Exactly 1.000 (100% transfer)</td><td>I_{O} = I_{ref} / (1 + 2/β); error ≈ 2/β (≈ 2% for β = 100) due to base currents</td></tr>
+      <tr><td><b>Compliance Voltage Range</b></td><td>Can operate down to 0 V or negative</td><td>Minimum voltage V_{O(min)} ≥ V_{CE(sat)} ≈ 0.2 V to 0.3 V to keep Q_{2} in active region</td></tr>
+      <tr><td><b>Temperature Sensitivity</b></td><td>Zero temperature coefficient</td><td>I_{O} tracks I_{ref} closely because matched transistors track each other's V_{BE}(T)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>2. Systematic Mathematical Derivation</h3>
+  <ol class="steps">
+    <li><b>Reference Current Calculation:</b> Resistor R_{ref} connects from +V_{CC} to the collector of diode-connected transistor Q_{1}:
+      <div class="eq">I_{ref} = [[V_{CC} - V_{BE1}|R_{ref}]] ≈ [[V_{CC} - 0.7 V|R_{ref}]]</div>
+    </li>
+    <li><b>Base-Emitter Matching:</b> Because the bases are shorted together (V_{B1} = V_{B2}) and both emitters connect to ground:
+      <div class="eq">V_{BE1} = V_{BE2} = V_{BE}</div>
+      For monolithic matched transistors fabricated with equal emitter areas at the same temperature:
+      <div class="eq">I_{C1} = I_{C2} = I_{C} = I_{S} · e^{V_{BE}/V_{T}}</div>
+    </li>
+    <li><b>KCL at the Reference Node:</b> Applying Kirchhoff's Current Law at the collector/base junction of Q_{1}:
+      <div class="eq">I_{ref} = I_{C1} + I_{B1} + I_{B2}</div>
+      Since both transistors have identical current gain β:
+      <div class="eq">I_{B1} = I_{B2} = [[I_{C}|β]]</div>
+      Substituting into the KCL node equation:
+      <div class="eq">I_{ref} = I_{C} + [[I_{C}|β]] + [[I_{C}|β]] = I_{C} · (1 + [[2|β]])</div>
+    </li>
+    <li><b>Output Current Transfer Equation:</b> Since I_{O} = I_{C2} = I_{C}:
+      <div class="eq key">I_{O} = [[I_{ref}|1 + [[2|β]]]] = I_{ref} · [[β|β + 2]]</div>
+    </li>
+    <li><b>Fractional Base-Current Error:</b> The difference between reference and output current is:
+      <div class="eq">I_{ref} - I_{O} = I_{ref} - [[I_{ref}|1 + [[2|β]]]] = I_{ref} · [[2/β|1 + 2/β]] ≈ I_{ref} · [[2|β]]   (for β &gt;&gt; 1)</div>
+      Thus, for β = 100, the fractional error is 2/102 ≈ 1.96%.
+    </li>
+    <li><b>Output Resistance &amp; Early Effect:</b> A practical BJT has finite base-width modulation represented by Early voltage V_{A}:
+      <div class="eq">I_{O} = I_{C2} · (1 + [[V_{CE2}|V_{A}]]) ⇒ r_{o} = [[V_{A} + V_{CE2}|I_{O}]] ≈ [[V_{A}|I_{O}]]</div>
+      The small-signal output resistance of the basic mirror is therefore R_{o} ≈ r_{o}.
+    </li>
+    <li><b>Compliance Voltage:</b> For Q_{2} to maintain constant current, its collector-base junction must remain reverse biased (active region):
+      <div class="eq">V_{O(min)} = V_{CE2(sat)} ≈ 0.2 V to 0.3 V</div>
+    </li>
+  </ol>
+
+  <!-- WORKED EXAMPLE 1 -->
+  <div class="card try"><span class="label">Worked Example 1 · Basic Current Mirror (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> A matched BJT current mirror has V_{CC} = 10 V, R_{ref} = 9.3 kΩ, V_{BE} = 0.7 V, and β = 100. Calculate (a) the reference current I_{ref}, (b) the actual output current I_{O}, and (c) the percentage current transfer error.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Reference Current:</b>
+      <div class="eq">I_{ref} = [[V_{CC} - V_{BE}|R_{ref}]] = [[10 V - 0.7 V|9.3 kΩ]] = [[9.3 V|9300 Ω]] = 1.00 mA</div>
+    </li>
+    <li><b>Output Current including finite β = 100:</b>
+      <div class="eq">I_{O} = [[I_{ref}|1 + [[2|β]]]] = [[1.00 mA|1 + [[2|100]]]] = [[1.00 mA|1.02]] = 0.9804 mA</div>
+    </li>
+    <li><b>Percentage Current Error:</b>
+      <div class="eq">Error % = [[I_{ref} - I_{O}|I_{ref}]] × 100% = [[1.00 - 0.9804|1.00]] × 100% = 1.96%</div>
+    </li>
+  </ol>
+  <p><b>Conclusion:</b> Finite transistor base currents steal 19.6 µA from the reference branch, resulting in an output current 1.96% below reference.</p>
+  </div>
+
+  <div data-w="mirrorCompare"></div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Answer Skeleton · Winter 2025 SDC-I Q6</span>
+  <ol>
+    <li><b>Define Ideal Current Source:</b> Infinite internal impedance (R_{o} = ∞), terminal current completely independent of load voltage and supply variations, zero compliance voltage (operates down to 0 V), zero thermal drift (2 marks).</li>
+    <li><b>Draw Circuit Diagram:</b> Neat schematic showing V_{CC}, R_{ref}, diode-connected Q_{1}, output Q_{2}, and clear branch current arrows for I_{ref}, I_{C1}, I_{C2}, I_{B1}, I_{B2} (2 marks).</li>
+    <li><b>Derive Transfer Equation:</b> Write KCL at diode node: I_{ref} = I_{C} + 2(I_{C}/β); derive I_{O} = I_{ref}/(1 + 2/β); derive fractional base-current error 2/β (3 marks).</li>
+    <li><b>Output Resistance &amp; Compliance Voltage:</b> State Early effect equation r_{o} = V_{A}/I_{O}; show Norton equivalent; state compliance limit V_{O(min)} = V_{CE(sat)} ≈ 0.2 V (3 marks).</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why does tying the collector to the base prevent Q_{1} from saturating?</summary><p>In saturation, both the base-emitter and base-collector junctions must be forward-biased (V_{CB} &lt; -0.4 V for NPN). When the collector is physically shorted to the base, V_{CB} = V_{C} - V_{B} = 0 V. A junction with zero applied voltage cannot be forward-biased. Thus Q_{1} operates strictly at the active/saturation boundary, conducting active collector current.</p></details>
+
+  <label class="done-row"><input type="checkbox" data-done="s1"> Mark topic 1 as done</label>
+</section>
+
+<!-- ============ S2: WIDLAR CURRENT SOURCE ============ -->
+<section class="sec" id="s2">
+  <div class="sechead"><span class="secno">Topic 2</span></div>
+  <h2>The Widlar Current Source</h2>
+  <div class="tags"><span class="tag hot">Summer 2026 Q6 (10 Marks)</span><span class="tag">Sub-Milliampere Biasing</span><span class="tag">Logarithmic Emitter Degeneration</span><span class="tag">Silicon Area Economy</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · The Logarithmic Leverage of R_{E}</span>
+  <p>In analog IC design, bias currents of 10 µA to 20 µA are required to achieve low power dissipation and high input impedance. In a basic current mirror, generating 20 µA from a 10 V supply requires a huge 465 kΩ resistor that would consume colossal silicon die area. Robert Widlar inserted an emitter resistor R_{E} into <b>only the output transistor Q_{2}</b>. By dropping just ~100 mV across R_{E}, V_{BE2} is made slightly smaller than V_{BE1}. Because bipolar collector current depends exponentially on V_{BE}, that tiny 100 mV drop reduces the output current by a factor of 50 using a compact <b>5.09 kΩ</b> resistor!</p></div>
+
+  <figure><div data-dg="widlarSource"></div><figcaption>Widlar BJT current source with emitter degeneration resistor R_{E} in the output branch.</figcaption></figure>
+
+  <h3>1. Systematic Mathematical Derivation of Widlar Design Equation</h3>
+  <ol class="steps">
+    <li><b>KVL around the Base-Emitter Loop:</b> Tracing the voltage loop from ground, through Q_{1}'s base-emitter junction, through Q_{2}'s base-emitter junction, and through R_{E} back to ground:
+      <div class="eq">V_{B1} = V_{BE1}   and   V_{B2} = V_{BE2} + I_{E2}R_{E}</div>
+      Since the two bases are tied together (V_{B1} = V_{B2}):
+      <div class="eq">V_{BE1} = V_{BE2} + I_{E2}R_{E} ⇒ V_{BE1} - V_{BE2} = I_{E2}R_{E}</div>
+      Assuming high current gain β &gt;&gt; 1, the emitter current I_{E2} ≈ I_{C2} = I_{O}:
+      <div class="eq key">V_{BE1} - V_{BE2} ≈ I_{O}R_{E}</div>
+    </li>
+    <li><b>BJT Exponential Current Relationship:</b> For matched transistors at the same die temperature:
+      <div class="eq">I_{C1} = I_{S} · e^{V_{BE1}/V_{T}} ⇒ V_{BE1} = V_{T} · ln([[I_{C1}|I_{S}]])</div>
+      <div class="eq">I_{C2} = I_{S} · e^{V_{BE2}/V_{T}} ⇒ V_{BE2} = V_{T} · ln([[I_{C2}|I_{S}]])</div>
+    </li>
+    <li><b>Subtracting the Base-Emitter Voltages:</b>
+      <div class="eq">V_{BE1} - V_{BE2} = V_{T} · ln([[I_{C1}|I_{S}]]) - V_{T} · ln([[I_{C2}|I_{S}]]) = V_{T} · ln([[I_{C1}|I_{C2}]])</div>
+      Since I_{C1} ≈ I_{ref} and I_{C2} = I_{O}:
+      <div class="eq">V_{BE1} - V_{BE2} = V_{T} · ln([[I_{ref}|I_{O}]])</div>
+    </li>
+    <li><b>Equating KVL to the Logarithmic Voltage:</b>
+      <div class="eq key">I_{O}R_{E} = V_{T} · ln([[I_{ref}|I_{O}]])</div>
+    </li>
+    <li><b>The Widlar Design Equation for R_{E}:</b> Rearranging gives the explicit design formula:
+      <div class="eq key">R_{E} = [[V_{T}|I_{O}]] · ln([[I_{ref}|I_{O}]])</div>
+    </li>
+  </ol>
+
+  <h3>2. Critical Engineering Observations</h3>
+  <ul>
+    <li><b>Direct Design vs. Transcendental Analysis:</b> If reference current I_{ref} and desired output current I_{O} are known, R_{E} is calculated in closed form. However, if R_{E} and I_{ref} are given, finding I_{O} requires solving a transcendental equation iteratively.</li>
+    <li><b>Higher Output Resistance:</b> Resistor R_{E} introduces negative current-series feedback into Q_{2}, multiplying the dynamic output resistance:
+      <div class="eq">R_{o} ≈ r_{o2} · [1 + g_{m2}(R_{E} || r_{&pi;2})] ≈ r_{o2} · (1 + g_{m2}R_{E})</div>
+      Since g_{m2}R_{E} = (I_{O}/V_{T}) · [(V_{T}/I_{O}) · ln(I_{ref}/I_{O})] = ln(I_{ref}/I_{O}) ≈ 3 to 5, the output resistance is 4 to 6 times higher than a simple mirror!</li>
+    <li><b>Compliance Voltage Requirement:</b> Because the emitter of Q_{2} rests at V_{RE} = I_{O}R_{E} above ground, the output compliance requires slightly more headroom:
+      <div class="eq">V_{O(min)} ≥ V_{CE2(sat)} + I_{O}R_{E} ≈ 0.2 V + 0.1 V = 0.3 V</div>
+    </li>
+  </ul>
+
+  <!-- WORKED EXAMPLE 2 -->
+  <div class="card try"><span class="label">Worked Example 2 · Design of a Widlar Source (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> Design the emitter resistor R_{E} required to generate an output current I_{O} = 20 µA from a reference current I_{ref} = 1 mA at room temperature (V_{T} = 26 mV). Also calculate the DC voltage drop across R_{E} and compare silicon resistance area with a basic mirror.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Current Ratio:</b>
+      <div class="eq">[[I_{ref}|I_{O}]] = [[1 mA|20 µA]] = [[1 × 10^{-3} A|20 × 10^{-6} A]] = 50</div>
+    </li>
+    <li><b>Natural Logarithm of Ratio:</b>
+      <div class="eq">ln(50) ≈ 3.912</div>
+    </li>
+    <li><b>Calculate Required Emitter Resistor R_{E}:</b>
+      <div class="eq">R_{E} = [[V_{T}|I_{O}]] · ln([[I_{ref}|I_{O}]]) = [[26 × 10^{-3} V|20 × 10^{-6} A]] × 3.912 = 1300 × 3.912 = 5085.6 Ω ≈ 5.09 kΩ</div>
+    </li>
+    <li><b>Voltage Drop Across R_{E}:</b>
+      <div class="eq">V_{RE} = I_{O}R_{E} = (20 µA)(5.086 kΩ) = 101.7 mV ≈ 102 mV</div>
+    </li>
+    <li><b>Silicon Area Comparison:</b>
+      <p>To produce 20 µA using a basic current mirror from a 10 V supply would require:</p>
+      <div class="eq">R_{ref,basic} = [[10 V - 0.7 V|20 µA]] = 465 kΩ</div>
+      <p>With the Widlar circuit, we use R_{ref} = 9.3 kΩ (for 1 mA) and R_{E} = 5.09 kΩ. Total resistance = <b>14.39 kΩ vs. 465 kΩ</b>—a massive <b>97% reduction in silicon area</b>!</p>
+    </li>
+  </ol>
+  </div>
+
+  <div data-w="widlarDesigner"></div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Answer Skeleton · Summer 2026 Q6 (a)</span>
+  <ol>
+    <li><b>IC Motivation:</b> Explain why simple current mirrors cannot economically generate microampere currents in ICs due to excessive resistor silicon area (2 marks).</li>
+    <li><b>Neat Circuit Diagram:</b> Draw diode-connected Q_{1}, Q_{2} with emitter resistor R_{E}, branch currents I_{ref}, I_{O}, and junction voltages V_{BE1}, V_{BE2}, V_{RE} (2 marks).</li>
+    <li><b>Mathematical Derivation:</b> State KVL: V_{BE1} - V_{BE2} = I_{O}R_{E}; substitute exponential laws V_{BE} = V_{T} · ln(I_{C}/I_{S}); derive V_{BE1} - V_{BE2} = V_{T} · ln(I_{ref}/I_{O}); arrive at R_{E} = (V_{T}/I_{O}) · ln(I_{ref}/I_{O}) (4 marks).</li>
+    <li><b>Performance Discussion:</b> State output resistance improvement R_{o} ≈ r_{o}(1 + g_{m}R_{E}) and compliance voltage penalty V_{O(min)} = V_{CE(sat)} + I_{O}R_{E} (2 marks).</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why must the natural logarithm ln be used instead of log10?</summary><p>The BJT collector current follows Boltzmann thermodynamics: I_{C} = I_{S} · e^{V_{BE}/V_{T}}, where the base of the exponent is the natural mathematical constant e (2.71828). Inverting this exponential relationship yields the natural logarithm ln. Using base-10 log10 introduces a severe error by a factor of ln(10) ≈ 2.303.</p></details>
+
+  <label class="done-row"><input type="checkbox" data-done="s2"> Mark topic 2 as done</label>
+</section>
+
+<!-- ============ S3: WILSON CURRENT MIRROR ============ -->
+<section class="sec" id="s3">
+  <div class="sechead"><span class="secno">Topic 3</span></div>
+  <h2>The Wilson Current Mirror</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 Q6 (10 Marks)</span><span class="tag">Internal Negative Feedback</span><span class="tag">Order β² Accuracy</span><span class="tag">Megohm Output Resistance</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · Stabilizing Current via Negative Feedback</span>
+  <p>The simple two-transistor current mirror suffers from two serious defects: (1) base currents cause a ~2% error, and (2) Early effect limits output resistance to ~100 kΩ. George Wilson added a third transistor (Q_{3}) that closes a <b>negative feedback loop</b>: If output current I_{O} attempts to rise due to output voltage fluctuations, that extra current flows through Q_{3}'s emitter directly into Q_{2}. This increases V_{BE2} and V_{BE1}, causing Q_{1} to conduct more current away from Q_{3}'s base, which immediately throttles Q_{3} back down! This feedback squares the base-current cancellation error to order <b>2/β²</b> and multiplies output resistance by <b>β/2</b> into the megohm realm.</p></div>
+
+  <figure><div data-dg="wilsonMirror"></div><figcaption>Three-transistor Wilson current mirror with internal negative feedback loop.</figcaption></figure>
+
+  <h3>1. Systematic Current Ratio Derivation</h3>
+  <ol class="steps">
+    <li><b>Matched Transistor Base Currents:</b> Transistors Q_{1} and Q_{2} share identical base-emitter connections (V_{BE1} = V_{BE2}). Assuming matched devices and identical β:
+      <div class="eq">I_{C1} = I_{C2} = I_{C}   and   I_{B1} = I_{B2} = [[I_{C}|β]]</div>
+    </li>
+    <li><b>KCL at the Emitter of Output Transistor Q_{3}:</b> The emitter current I_{E3} flows into the collector of Q_{2} and supplies the bases of both Q_{1} and Q_{2}:
+      <div class="eq">I_{E3} = I_{C2} + I_{B1} + I_{B2} = I_{C} + [[I_{C}|β]] + [[I_{C}|β]] = I_{C} · [[β + 2|β]]</div>
+    </li>
+    <li><b>Relating Emitter Current to Output Collector Current:</b> For transistor Q_{3}, where I_{C3} = I_{O}:
+      <div class="eq">I_{E3} = [[β + 1|β]] · I_{C3} = [[β + 1|β]] · I_{O}</div>
+    </li>
+    <li><b>Equating Expressions for I_{E3}:</b>
+      <div class="eq">[[β + 1|β]] · I_{O} = [[β + 2|β]] · I_{C} ⇒ I_{C} = [[β + 1|β + 2]] · I_{O}</div>
+    </li>
+    <li><b>KCL at the Reference Input Node:</b> The input current I_{in} splits into collector current I_{C1} and the base current of Q_{3}:
+      <div class="eq">I_{in} = I_{C1} + I_{B3} = I_{C} + [[I_{O}|β]]</div>
+      Substitute the expression for I_{C}:
+      <div class="eq">I_{in} = ([[β + 1|β + 2]] + [[1|β]]) · I_{O} = [[β(β + 1) + (β + 2)|β(β + 2)]] · I_{O} = [[β^{2} + 2β + 2|β(β + 2)]] · I_{O}</div>
+    </li>
+    <li><b>Final Wilson Output Current Equation:</b> Inverting the relation yields:
+      <div class="eq key">I_{O} = [[β^{2} + 2β|β^{2} + 2β + 2]] · I_{in} = (1 - [[2|β^{2} + 2β + 2]]) · I_{in}</div>
+    </li>
+    <li><b>Order 1/β² Fractional Error:</b>
+      <div class="eq key">[[I_{in} - I_{O}|I_{in}]] = [[2|β^{2} + 2β + 2]] ≈ [[2|β^{2}]]   (for β &gt;&gt; 1)</div>
+      For β = 100, the error is 2/10,202 ≈ <b>0.0196%</b>! Compared to 1.96% for the simple mirror, the Wilson mirror is <b>100 times more accurate</b>.
+    </li>
+  </ol>
+
+  <h3>2. Dynamic Output Resistance</h3>
+  <p>The small-signal output resistance looking into the collector of Q_{3} is derived by applying a test voltage v_{x} and solving for i_{x}. Due to local series-shunt negative feedback:</p>
+  <div class="eq key">R_{o} ≈ [[β · r_{o}|2]] = [[β · V_{A}|2 · I_{O}]]</div>
+  <p>For a basic mirror, R_{o} = r_{o} ≈ 100 kΩ. For a Wilson mirror with β = 100, R_{o} ≈ (100)(100 kΩ)/2 = <b>5.0 MΩ</b> (a 50-fold enhancement!).</p>
+
+  <h3>3. Compliance Voltage Trade-Off</h3>
+  <p>The cascade of Q_{3} atop Q_{2} increases the minimum operating voltage required at the output terminal:</p>
+  <div class="eq">V_{O(min)} ≥ V_{BE3} + V_{CE2(sat)} ≈ 0.7 V + 0.2 V = 0.9 V</div>
+  <p>While the basic mirror can operate down to ~0.2 V, the Wilson mirror requires ~0.9 V of headroom.</p>
+
+  <!-- WORKED EXAMPLES 3 & 4 -->
+  <div class="card try"><span class="label">Worked Example 3 · Wilson Current Transfer Accuracy (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> A Wilson current mirror has I_{in} = 1.00 mA and β = 100. Calculate (a) the actual output current I_{O}, (b) the percentage current error, and (c) compare it directly with a basic two-transistor mirror.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Calculate Wilson Output Current:</b>
+      <div class="eq">I_{O} = I_{in} · [[100(100 + 2)|100^{2} + 2(100) + 2]] = 1.00 mA × [[10200|10202]] = 0.999804 mA</div>
+    </li>
+    <li><b>Wilson Percentage Error:</b>
+      <div class="eq">Error_{Wilson} = [[1.00 - 0.999804|1.00]] × 100% = 0.0196%</div>
+    </li>
+    <li><b>Comparison with Basic Current Mirror:</b>
+      <div class="eq">I_{O,basic} = [[1.00 mA|1 + 2/100]] = 0.9804 mA ⇒ Error_{basic} = 1.96%</div>
+      <div class="eq">[[Error_{basic}|Error_{Wilson}]] = [[1.96%|0.0196%]] = 100</div>
+    </li>
+  </ol>
+  <p><b>Conclusion:</b> The Wilson mirror reduces current transfer error by exactly two orders of magnitude (factor of β)!</p>
+  </div>
+
+  <div class="card try"><span class="label">Worked Example 4 · Wilson Output Resistance (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> In a Wilson current mirror, transistors have an Early voltage V_{A} = 100 V, current gain β = 100, and operate at I_{O} = 1.00 mA. Calculate the small-signal output resistance of (a) an individual transistor r_{o}, (b) the basic current mirror, and (c) the Wilson current mirror.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Transistor Early Resistance r_{o}:</b>
+      <div class="eq">r_{o} = [[V_{A}|I_{O}]] = [[100 V|1.00 × 10^{-3} A]] = 100 kΩ</div>
+    </li>
+    <li><b>Basic Mirror Output Resistance:</b>
+      <div class="eq">R_{o,basic} ≈ r_{o} = 100 kΩ</div>
+    </li>
+    <li><b>Wilson Mirror Output Resistance:</b>
+      <div class="eq">R_{o,Wilson} ≈ [[β · r_{o}|2]] = [[100 × 100 kΩ|2]] = [[10,000 kΩ|2]] = 5000 kΩ = 5.0 MΩ</div>
+    </li>
+  </ol>
+  </div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Answer Skeleton · Winter 2025 Q6 (a)</span>
+  <ol>
+    <li><b>Neat Sketch:</b> Draw 3-transistor Wilson schematic with reference current I_{in}, output current I_{O}, Q_{1}, Q_{2}, Q_{3}, and clear loop node currents (2 marks).</li>
+    <li><b>Negative Feedback Mechanism:</b> Explain how an increase in I_{O} drives Q_{2} and Q_{1} harder, which diverts base current from Q_{3} to regulate I_{O} (2 marks).</li>
+    <li><b>Derivation:</b> Derive I_{E3} in terms of I_{C} and I_{O}; relate I_{in} = I_{C} + I_{O}/β; prove I_{O} = I_{in}(β²+2β)/(β²+2β+2); show fractional error ≈ 2/β² (4 marks).</li>
+    <li><b>Output Resistance &amp; Headroom:</b> State R_{o} ≈ β·r_{o}/2 (megohm range) and compliance headroom V_{O(min)} = V_{BE3} + V_{CE2(sat)} ≈ 0.9 V (2 marks).</li>
+  </ol></div>
+
+  <details><summary>Quick check: What is the modified Wilson current mirror and why was it invented?</summary><p>In the basic 3-transistor Wilson mirror, Q_{1} has V_{CE1} = 2V_{BE} ≈ 1.4 V, whereas Q_{2} has V_{CE2} = V_{BE} ≈ 0.7 V. This collector voltage mismatch introduces a slight Early-effect error. The <b>4-transistor modified Wilson mirror</b> inserts a diode-connected transistor Q_{4} above Q_{1}, equalizing both collector voltages at 2V_{BE} and eliminating Early mismatch entirely.</p></details>
+
+  <label class="done-row"><input type="checkbox" data-done="s3"> Mark topic 3 as done</label>
+</section>
+
+<!-- ============ S4: CE LIMITATIONS & DIFF-AMP ADVANTAGES ============ -->
+<section class="sec" id="s4">
+  <div class="sechead"><span class="secno">Topic 4</span></div>
+  <h2>Limitations of the CE Amplifier &amp; Why the Differential Pair is Preferred</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 Q6 OR (10 Marks)</span><span class="tag">Single-Ended vs Differential</span><span class="tag">DC Drift</span><span class="tag">Miller Effect</span><span class="tag">Op-Amp Front End</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · The Vulnerability of Single-Ended Stages</span>
+  <p>The Common-Emitter (CE) amplifier is an effective general-purpose AC amplifier, but it is fundamentally crippled when used in direct-coupled precision systems or as an operational amplifier input stage. Because it is single-ended, it cannot distinguish between a true input signal and ambient 50 Hz power hum, supply voltage ripple, or temperature-induced transistor drift. The differential amplifier overcomes every single limitation of the CE stage by exploiting <b>bilateral symmetry</b>.</p></div>
+
+  <h3>1. Detailed Analysis of CE Amplifier Limitations</h3>
+  <ol class="steps">
+    <li><b>Fundamentally Single-Ended (Zero Common-Mode Rejection):</b> A CE amplifier measures voltage between a single base node and signal ground. Any noise, supply ripple, or ground-bounce voltage appearing in the circuit is directly amplified along with the input signal. It has no mechanism to reject common interference.</li>
+    <li><b>Coupling Capacitors Block DC and Low Frequencies:</b> In multi-stage CE amplifiers, stages are separated by coupling and bypass capacitors to prevent DC bias interactions. However, capacitors establish a high-pass cutoff frequency:
+      <div class="eq">f_{L} = [[1|2π R_{eq}C]]</div>
+      Consequently, a capacitor-coupled CE amplifier cannot amplify true DC (0 Hz) or slowly changing biological/sensor voltages. Furthermore, physical capacitors larger than ~50 pF cannot be fabricated inside integrated circuits.</li>
+    <li><b>Direct Coupling Causes Catastrophic DC Bias Drift:</b> If coupling capacitors are omitted, the collector DC voltage of one stage sets the base DC voltage of the next. Thermal variations in base-emitter voltage (dV_{BE}/dT ≈ -2 mV/°C) and current gain β cause the quiescent point to drift with temperature. In high-gain multi-stage cascades, this DC drift is amplified until the output stage saturates at V_{CC} or cuts off at ground.</li>
+    <li><b>Miller Effect Restricts High-Frequency Bandwidth:</b> In an inverting CE stage with voltage gain A_{v}, the collector-base capacitance C_{μ} is multiplied at the input port by the Miller effect:
+      <div class="eq">C_{M,in} = C_{μ}(1 - A_{v}) = C_{μ}(1 + |A_{v}|)</div>
+      For a stage with |A_{v}| = 100 and C_{μ} = 2 pF, the effective input capacitance becomes 202 pF, drastically lowering the upper 3-dB cutoff frequency f_{H}.</li>
+    <li><b>Parameter Sensitivity &amp; Distortion:</b> The voltage gain of a simple CE stage is A_{v} = -g_{m}R_{C} = -I_{C}R_{C}/V_{T}, which is directly proportional to quiescent current and inversely proportional to absolute temperature. It is also limited to linear signal swings of only ±10 mV before severe harmonic distortion occurs.</li>
+  </ol>
+
+  <h3>2. How the Differential Amplifier Overcomes CE Limitations</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Performance Dimension</th><th>Common-Emitter (CE) Stage</th><th>BJT Differential Pair</th><th>Underlying Physical Reason</th></tr></thead>
+    <tbody>
+      <tr><td><b>Input Structure</b></td><td>Single-ended (Base to Ground)</td><td>True differential (Two independent inputs v_{1}, v_{2})</td><td>Responds strictly to v_{id} = v_{1} - v_{2}</td></tr>
+      <tr><td><b>Common-Mode Noise &amp; Ripple</b></td><td>Amplified with full gain (CMRR = 0 dB)</td><td>Completely suppressed (CMRR &gt; 80 dB to 100 dB)</td><td>Symmetric tail source degenerates common-mode signals</td></tr>
+      <tr><td><b>DC Coupling (0 Hz to High Freq)</b></td><td>Requires bulky AC coupling capacitors; cannot amplify DC</td><td>Fully direct-coupled from DC (0 Hz) to megahertz</td><td>Emitter junction sits at fixed DC voltage without coupling capacitors</td></tr>
+      <tr><td><b>Thermal Drift Immunity</b></td><td>Severe drift: dV_{BE}/dT shifts bias and saturates stages</td><td>Near-zero output drift: equal shifts cancel symmetrically</td><td>Matched transistors on identical substrate drift in unison: ΔV_{BE1} = ΔV_{BE2}</td></tr>
+      <tr><td><b>High-Frequency Response</b></td><td>Severe Miller multiplication C_{in} = C_{μ}(1 + |A_{v}|)</td><td>Minimized Miller effect when driven differentially or with cascode</td><td>Virtual ground at emitters isolates common-mode capacitances</td></tr>
+      <tr><td><b>Role in Op-Amps</b></td><td>Unusable as input stage</td><td>Universal, mandatory front-end of all op-amps &amp; diff-amps</td><td>Enables inverting and non-inverting terminals, high input Z, and low offset</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Answer Skeleton · Winter 2025 Q6 (OR)</span>
+  <ol>
+    <li><b>State 5 Key CE Limitations:</b> Detail single-ended nature, capacitor DC blocking f_{L} = 1/(2πRC), thermal bias drift dV_{BE}/dT, Miller bandwidth restriction C_{M} = C_{μ}(1+|Av|), and parameter distortion (4 marks).</li>
+    <li><b>Explain Differential Pair Solutions:</b> Explain differential sensing v_{id} = v_{1} - v_{2}, common-mode noise cancellation, thermal drift tracking ΔV_{BE1} = ΔV_{BE2}, and direct coupling capability (4 marks).</li>
+    <li><b>Comparative Engineering Matrix:</b> Provide comparison table showing input mode, CMRR, coupling, drift, and op-amp suitability (2 marks).</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why does thermal drift cancel out in a differential pair?</summary><p>Both transistors Q_{1} and Q_{2} are fabricated micrometers apart on the same silicon die and share identical thermal environments. If temperature rises, both base-emitter voltages decrease at the exact same rate (-2 mV/°C). Consequently, both collector currents shift by identical amounts ΔI_{C1} = ΔI_{C2}. At the balanced output, v_{od} = (V_{CC} - I_{C1}R_{C}) - (V_{CC} - I_{C2}R_{C}) = (I_{C2} - I_{C1})R_{C} = 0 V. The thermal drift is a pure common-mode signal and cancels completely!</p></details>
+
+  <label class="done-row"><input type="checkbox" data-done="s4"> Mark topic 4 as done</label>
+</section>
+
+<!-- ============ S5: SPLIT-SUPPLY BIASING ============ -->
+<section class="sec" id="s5">
+  <div class="sechead"><span class="secno">Topic 5</span></div>
+  <h2>Split-Supply Biasing of the BJT Differential Pair</h2>
+  <div class="tags"><span class="tag">Dual Rail (±V_{CC}, -V_{EE})</span><span class="tag">Zero DC Offset</span><span class="tag">Quiescent Operating Point</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · The Beauty of Dual Supplies</span>
+  <p>In single-supply systems, input bases must be biased at half the supply (e.g. +6 V on a 12 V rail) using resistor dividers, which requires blocking capacitors at the inputs. By using <b>split supplies (+V_{CC} and -V_{EE})</b>, both input bases sit comfortably at <b>0 V DC ground potential</b>. The joined emitters rest at -0.7 V, and the tail resistor drops the rest of the voltage down to -V_{EE}. With zero input voltage, the circuit is perfectly balanced, and the differential output voltage is ideally <b>0.00 V</b>.</p></div>
+
+  <figure><div data-dg="diffAmpSplit"></div><figcaption>Basic split-supply BJT differential amplifier showing dual supplies (+V_{CC}, -V_{EE}), tail resistor R_{E}, and collector loads R_{C1}, R_{C2}.</figcaption></figure>
+
+  <h3>1. Quiescent DC Analysis Steps</h3>
+  <ol class="steps">
+    <li><b>Input Base DC Potentials:</b> With both inputs connected to ground or signal sources with zero DC offset:
+      <div class="eq">V_{B1} = V_{B2} = 0 V</div>
+    </li>
+    <li><b>Emitter Junction DC Voltage:</b> Since both forward-biased base-emitter junctions are connected to the joined emitter node:
+      <div class="eq">V_{E} = V_{B} - V_{BE} = 0 V - 0.7 V = -0.7 V</div>
+    </li>
+    <li><b>Voltage Across Tail Resistor R_{E}:</b> The tail resistor connects from the joined emitter node (V_{E} = -0.7 V) to the negative supply rail (-V_{EE}):
+      <div class="eq">V_{RE} = V_{E} - (-V_{EE}) = V_{EE} - V_{BE} = V_{EE} - 0.7 V</div>
+      <i>(Note: V_{EE} denotes the positive magnitude of the negative rail, e.g. 12 V for a -12 V supply).</i>
+    </li>
+    <li><b>Total Quiescent Tail Current I_{T}:</b>
+      <div class="eq key">I_{T} = [[V_{EE} - V_{BE}|R_{E}]] ≈ [[V_{EE} - 0.7 V|R_{E}]]</div>
+    </li>
+    <li><b>Current Splitting in Matched Transistors:</b> By perfect circuit symmetry, the total tail current divides equally between the two branches:
+      <div class="eq key">I_{E1} = I_{E2} = [[I_{T}|2]] ⇒ I_{C1} = I_{C2} = α · [[I_{T}|2]] ≈ [[I_{T}|2]]   (for β &gt;&gt; 1)</div>
+    </li>
+    <li><b>Quiescent Collector Voltages:</b>
+      <div class="eq">V_{C1} = V_{CC} - I_{C1}R_{C} = V_{CC} - [[I_{T}|2]] · R_{C}</div>
+      <div class="eq">V_{C2} = V_{CC} - I_{C2}R_{C} = V_{CC} - [[I_{T}|2]] · R_{C}</div>
+    </li>
+    <li><b>Quiescent Differential DC Output:</b> The balanced output voltage between the two collectors is:
+      <div class="eq key">V_{OD} = V_{C1} - V_{C2} = 0 V</div>
+      This zero-volt DC quiescent differential output is the hallmark of the differential pair.
+    </li>
+  </ol>
+
+  <!-- WORKED EXAMPLE 5 -->
+  <div class="card try"><span class="label">Worked Example 5 · Split-Supply DC Operating Point (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> A BJT differential amplifier uses split supplies of +V_{CC} = +12 V and -V_{EE} = -12 V. The tail resistor is R_{E} = 11.3 kΩ, collector resistors are R_{C} = 4.7 kΩ on each side, and transistors have V_{BE} = 0.7 V. Both bases are held at 0 V. Calculate (a) total tail current I_{T}, (b) collector current in each transistor, (c) quiescent collector voltages V_{C1} and V_{C2}, and (d) collector-emitter voltage V_{CE}.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Tail Current I_{T}:</b>
+      <div class="eq">I_{T} = [[V_{EE} - V_{BE}|R_{E}]] = [[12 V - 0.7 V|11.3 kΩ]] = [[11.3 V|11,300 Ω]] = 1.00 mA</div>
+    </li>
+    <li><b>Transistor Quiescent Currents:</b>
+      <div class="eq">I_{C1} = I_{C2} ≈ [[I_{T}|2]] = [[1.00 mA|2]] = 0.50 mA</div>
+    </li>
+    <li><b>Quiescent Collector Voltages:</b>
+      <div class="eq">V_{C1} = V_{C2} = V_{CC} - I_{C}R_{C} = 12 V - (0.50 mA)(4.7 kΩ) = 12 V - 2.35 V = 9.65 V</div>
+    </li>
+    <li><b>Quiescent Differential Output Voltage:</b>
+      <div class="eq">V_{OD} = V_{C1} - V_{C2} = 9.65 V - 9.65 V = 0.00 V</div>
+    </li>
+    <li><b>Transistor Active-Region Check:</b>
+      <div class="eq">V_{CE1} = V_{CE2} = V_{C} - V_{E} = 9.65 V - (-0.7 V) = 10.35 V &gt;&gt; V_{CE(sat)}</div>
+      Transistors are safely operating in the linear forward-active region.
+    </li>
+  </ol>
+  </div>
+
+  <details><summary>Quick check: What happens to quiescent currents if -V_{EE} is reduced from -12 V to -6 V?</summary><p>Tail current drops to I_{T} = (6 - 0.7)/11.3 kΩ = 0.469 mA. Each collector current drops from 0.50 mA to ~0.235 mA, and collector voltages rise to V_{C} = 12 - (0.235m)(4.7k) = 10.9 V. However, because both sides change identically, the quiescent differential output remains V_{OD} = 0 V!</p></details>
+
+  <label class="done-row"><input type="checkbox" data-done="s5"> Mark topic 5 as done</label>
+</section>
+
+<!-- ============ S6: DIFF & CM REPRESENTATIONS ============ -->
+<section class="sec" id="s6">
+  <div class="sechead"><span class="secno">Topic 6</span></div>
+  <h2>Differential and Common-Mode Signal Representations</h2>
+  <div class="tags"><span class="tag">Signal Decomposition</span><span class="tag">Differential Input v_{id}</span><span class="tag">Common-Mode Input v_{cm}</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · Decomposing Any Two Signals into Odd and Even Modes</span>
+  <p>When two voltages v_{1} and v_{2} enter a differential amplifier, they can always be decomposed mathematically into two orthogonal components: an anti-symmetric <b>differential-mode signal v_{id}</b> (the pure difference we want to amplify) and a symmetric <b>common-mode signal v_{cm}</b> (the average noise or interference we want to reject).</p></div>
+
+  <h3>1. Mathematical Decomposition</h3>
+  <ol class="steps">
+    <li><b>Differential Input Voltage (v_{id}):</b> Defined as the algebraic difference across the two inputs:
+      <div class="eq key">v_{id} = v_{1} - v_{2}</div>
+    </li>
+    <li><b>Common-Mode Input Voltage (v_{cm}):</b> Defined as the arithmetic average of the two inputs:
+      <div class="eq key">v_{cm} = [[v_{1} + v_{2}|2]]</div>
+    </li>
+    <li><b>Constituent Signal Synthesis:</b> Reconstructing the original inputs from their modes:
+      <div class="eq key">v_{1} = v_{cm} + [[v_{id}|2]]   and   v_{2} = v_{cm} - [[v_{id}|2]]</div>
+      This shows that input 1 receives the common-mode voltage plus half the differential voltage, while input 2 receives the common-mode voltage minus half the differential voltage.
+    </li>
+    <li><b>General Amplifier Output Equation:</b> By superposition in the linear small-signal regime:
+      <div class="eq key">v_{o} = A_{d}v_{id} + A_{c}v_{cm} = A_{d}(v_{1} - v_{2}) + A_{c} · [[v_{1} + v_{2}|2]]</div>
+      where A_{d} is the differential voltage gain and A_{c} is the common-mode voltage gain.
+    </li>
+    <li><b>Factoring Out the CMRR:</b> Expressing output voltage in terms of Common-Mode Rejection Ratio (CMRR = |A_{d}/A_{c}|):
+      <div class="eq">v_{o} = A_{d}v_{id} · (1 + [[1|CMRR]] · [[v_{cm}|v_{id}]])</div>
+      This formula reveals that even when the common-mode noise v_{cm} is hundreds of times larger than the weak differential sensor signal v_{id}, a sufficiently high CMRR renders the error term negligible!
+    </li>
+  </ol>
+
+  <label class="done-row"><input type="checkbox" data-done="s6"> Mark topic 6 as done</label>
+</section>
+
+<!-- ============ S7: THE FOUR CONFIGURATIONS ============ -->
+<section class="sec" id="s7">
+  <div class="sechead"><span class="secno">Topic 7</span></div>
+  <h2>The Four Differential Amplifier Configurations</h2>
+  <div class="tags"><span class="tag hot">Summer 2026 Q6 OR (10 Marks)</span><span class="tag hot">Winter 2025 SDC-II Q5 (10 Marks)</span><span class="tag">Topologies Matrix</span><span class="tag">DIBO · DIUO · SIBO · SIUO</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · Input Drive and Output Pick-Off Combinations</span>
+  <p>A differential amplifier has two input terminals (Base 1, Base 2) and two output terminals (Collector 1, Collector 2). We can drive both bases or just one base (with the other at AC ground). We can extract the output differentially between the two collectors (balanced) or between one collector and ground (unbalanced/single-ended). This produces exactly <b>four distinct configurations</b>.</p></div>
+
+  <figure><div data-dg="fourDiffConfigs"></div><figcaption>The four standard BJT differential amplifier configurations: (1) Dual-Input Balanced-Output, (2) Dual-Input Unbalanced-Output, (3) Single-Input Balanced-Output, (4) Single-Input Unbalanced-Output.</figcaption></figure>
+
+  <h3>Master Comparison Matrix of the Four Configurations</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Configuration</th><th>Input Excitation</th><th>Output Measurement</th><th>Differential Gain (A_{d})</th><th>Input Resistance (R_{id})</th><th>Output Resistance (R_{od})</th><th>Common-Mode Cancellation</th></tr></thead>
+    <tbody>
+      <tr><td><b>1. Dual-Input, Balanced-Output (DIBO)</b></td><td>Two signals v_{1}, v_{2} applied at bases</td><td>Between collectors: v_{o} = v_{o1} - v_{o2}</td><td><b>A_{d} = -g_{m}R_{C} = -R_{C}/r_{e}</b></td><td>2r_{π} = 2βr_{e}</td><td>2R_{C}</td><td><b>Maximum</b> (ideal A_{c} = 0, CMRR = ∞)</td></tr>
+      <tr><td><b>2. Dual-Input, Unbalanced-Output (DIUO)</b></td><td>Two signals v_{1}, v_{2} applied at bases</td><td>Single collector to ground: v_{o} = v_{o1}</td><td><b>A_{d} = -g_{m}R_{C}/2 = -R_{C}/(2r_{e})</b></td><td>2r_{π} = 2βr_{e}</td><td>R_{C}</td><td>Finite (depends on tail resistance R_{E} or R_{t})</td></tr>
+      <tr><td><b>3. Single-Input, Balanced-Output (SIBO)</b></td><td>Input v_{in} at Base 1; Base 2 at AC ground</td><td>Between collectors: v_{o} = v_{o1} - v_{o2}</td><td><b>A_{d} = -g_{m}R_{C} = -R_{C}/r_{e}</b></td><td>2r_{π} = 2βr_{e}</td><td>2R_{C}</td><td><b>Maximum</b> (operates as precision phase-splitter)</td></tr>
+      <tr><td><b>4. Single-Input, Unbalanced-Output (SIUO)</b></td><td>Input v_{in} at Base 1; Base 2 at AC ground</td><td>Single collector to ground: v_{o} = v_{o1}</td><td><b>A_{d} = -g_{m}R_{C}/2 = -R_{C}/(2r_{e})</b></td><td>2r_{π} = 2βr_{e}</td><td>R_{C}</td><td>Finite (standard single-ended op-amp stage)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Answer Skeleton · Winter 2025 SDC-II Q5 / Summer 2026 Q6 (OR)</span>
+  <ol>
+    <li><b>State Definitions:</b> Define all 4 configurations based on input driving condition (dual vs single) and output extraction pickoff (balanced vs unbalanced) (2 marks).</li>
+    <li><b>Circuit Diagrams:</b> Draw neat, clearly labeled circuit schematics for all 4 configurations showing input connections and output nodes (4 marks).</li>
+    <li><b>Gain Expressions:</b> State and contrast balanced gain magnitude |A_{d,bal}| = g_{m}R_{C} = R_{C}/r_{e} vs. unbalanced gain magnitude |A_{d,se}| = g_{m}R_{C}/2 = R_{C}/(2r_{e}) (2 marks).</li>
+    <li><b>Comparison Table:</b> Tabulate gains, input resistances (2r_{π}), output resistances (2R_{C} vs R_{C}), and common-mode performance (2 marks).</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why does an unbalanced (single-ended) output have exactly half the differential gain of a balanced output?</summary><p>In a balanced differential pair, a differential input v_{id} causes collector 1 to swing downward by -g_{m}R_{C}(v_{id}/2) and collector 2 to swing upward by +g_{m}R_{C}(v_{id}/2). Measuring differentially between both collectors takes the full difference (-g_{m}R_{C}v_{id}). Measuring from only one collector to ground observes only one half of the total voltage swing, yielding exactly half the gain: -g_{m}R_{C}/2.</p></details>
+
+  <label class="done-row"><input type="checkbox" data-done="s7"> Mark topic 7 as done</label>
+</section>
+
+<!-- ============ S8: DUAL-INPUT BALANCED-OUTPUT ============ -->
+<section class="sec" id="s8">
+  <div class="sechead"><span class="secno">Topic 8</span></div>
+  <h2>Dual-Input, Balanced-Output Differential Amplifier Analysis</h2>
+  <div class="tags"><span class="tag">Differential Half-Circuit</span><span class="tag">AC Virtual Ground</span><span class="tag">A_{d} = -R_{C}/r_{e}</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · The AC Virtual Ground</span>
+  <p>Under pure differential drive, input 1 is driven by +v_{id}/2 and input 2 is driven by -v_{id}/2. As Q_{1}'s emitter current increases by Δi_{e}, Q_{2}'s emitter current decreases by the exact same amount: Δi_{e1} + Δi_{e2} = 0. The total current entering the tail element never changes! Because no AC signal current flows into the tail, the common emitter junction experiences <b>zero AC voltage fluctuation</b>. It behaves as a perfect <b>AC virtual ground</b>, splitting the complex two-transistor circuit into two independent, elementary common-emitter half-circuits.</p></div>
+
+  <figure><div data-dg="diffHalfCircuit"></div><figcaption>Differential-mode small-signal half-circuit: emitter node is an AC virtual ground (0 V AC).</figcaption></figure>
+
+  <h3>1. Small-Signal Half-Circuit Derivation</h3>
+  <ol class="steps">
+    <li><b>Differential Base Voltages:</b>
+      <div class="eq">v_{b1} = +[[v_{id}|2]]   and   v_{b2} = -[[v_{id}|2]]</div>
+    </li>
+    <li><b>Virtual Ground at Joined Emitters:</b> Due to anti-symmetry, v_{e} = 0 V AC. Therefore:
+      <div class="eq">v_{be1} = v_{b1} - v_{e} = +[[v_{id}|2]]   and   v_{be2} = v_{b2} - v_{e} = -[[v_{id}|2]]</div>
+    </li>
+    <li><b>Incremental Collector Currents:</b>
+      <div class="eq">i_{c1} = g_{m}v_{be1} = g_{m} · [[v_{id}|2]]   and   i_{c2} = g_{m}v_{be2} = -g_{m} · [[v_{id}|2]]</div>
+    </li>
+    <li><b>Collector AC Voltages:</b>
+      <div class="eq">v_{o1} = -i_{c1}R_{C} = -g_{m}R_{C} · [[v_{id}|2]]</div>
+      <div class="eq">v_{o2} = -i_{c2}R_{C} = +g_{m}R_{C} · [[v_{id}|2]]</div>
+    </li>
+    <li><b>Balanced Differential Output Voltage (v_{od}):</b>
+      <div class="eq">v_{od} = v_{o1} - v_{o2} = -g_{m}R_{C} · [[v_{id}|2]] - (+g_{m}R_{C} · [[v_{id}|2]]) = -g_{m}R_{C}v_{id}</div>
+    </li>
+    <li><b>Balanced Differential Voltage Gain (A_{d,bal}):</b>
+      <div class="eq key">A_{d,bal} = [[v_{od}|v_{id}]] = -g_{m}R_{C} = -[[R_{C}|r_{e}]]</div>
+      where r_{e} = V_{T} / I_{E} ≈ 26 mV / I_{C}.
+    </li>
+    <li><b>Differential Input Resistance (R_{id}):</b> Looking between Base 1 and Base 2, the signal sees the series combination of r_{π1} and r_{π2} through the virtual ground:
+      <div class="eq key">R_{id} = r_{π1} + r_{π2} = 2r_{π} = 2βr_{e}</div>
+    </li>
+    <li><b>Balanced Output Resistance (R_{od}):</b> Looking between Collector 1 and Collector 2:
+      <div class="eq key">R_{od} = R_{C1} + R_{C2} = 2R_{C}   (or 2(R_{C} || r_{o}))</div>
+    </li>
+  </ol>
+
+  <!-- WORKED EXAMPLE 6 -->
+  <div class="card try"><span class="label">Worked Example 6 · Dual-Input Balanced-Output (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> Using the amplifier from Worked Example 5 with I_{C} = 0.50 mA, R_{C} = 4.7 kΩ, β = 150, and differential input v_{id} = 10 mV. Calculate (a) small-signal r_{e}, (b) transconductance g_{m}, (c) balanced differential gain A_{d,bal}, (d) differential input resistance R_{id}, (e) balanced output resistance R_{od}, and (f) balanced output voltage v_{od}.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Small-Signal Emitter Resistance r_{e}:</b>
+      <div class="eq">r_{e} = [[V_{T}|I_{E}]] ≈ [[26 mV|0.50 mA]] = 52 Ω</div>
+    </li>
+    <li><b>Transconductance g_{m}:</b>
+      <div class="eq">g_{m} = [[I_{C}|V_{T}]] = [[0.50 mA|26 mV]] = 19.23 mS = 0.01923 S</div>
+    </li>
+    <li><b>Balanced Differential Voltage Gain A_{d,bal}:</b>
+      <div class="eq">A_{d,bal} = -[[R_{C}|r_{e}]] = -[[4700 Ω|52 Ω]] = -90.38 ≈ -90.4</div>
+      <i>(Alternatively: A_{d,bal} = -g_{m}R_{C} = -(0.01923)(4700) = -90.4).</i>
+    </li>
+    <li><b>Differential Input Resistance R_{id}:</b>
+      <div class="eq">R_{id} = 2βr_{e} = 2(150)(52 Ω) = 15,600 Ω = 15.6 kΩ</div>
+    </li>
+    <li><b>Balanced Output Resistance R_{od}:</b>
+      <div class="eq">R_{od} = 2R_{C} = 2(4.7 kΩ) = 9.4 kΩ</div>
+    </li>
+    <li><b>Balanced Output Voltage v_{od}:</b>
+      <div class="eq">v_{od} = A_{d,bal} · v_{id} = (-90.4)(10 mV) = -904 mV = -0.904 V</div>
+    </li>
+  </ol>
+  </div>
+
+  <div data-w="diffAnalyser"></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s8"> Mark topic 8 as done</label>
+</section>
+
+<!-- ============ S9: DUAL-INPUT UNBALANCED-OUTPUT ============ -->
+<section class="sec" id="s9">
+  <div class="sechead"><span class="secno">Topic 9</span></div>
+  <h2>Dual-Input, Unbalanced-Output Differential Amplifier Analysis</h2>
+  <div class="tags"><span class="tag">Single-Ended Output</span><span class="tag">A_{d,se} = -R_{C}/(2r_{e})</span><span class="tag">Gain Halving</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · Interfacing to Single-Ended Circuits</span>
+  <p>Most downstream electronic circuits (such as audio power amplifiers, analog filters, and analog-to-digital converters) are referenced to a single ground rail. To drive them, the differential amplifier's output is taken from <b>only one collector with respect to ground</b>. Because we extract only one side of the differential swing, the voltage gain is exactly <b>half</b> that of the balanced configuration.</p></div>
+
+  <h3>1. Mathematical Derivations</h3>
+  <ol class="steps">
+    <li><b>Output from Collector 1 (Inverting Gain):</b>
+      <div class="eq">v_{o1} = -i_{c1}R_{C} = -g_{m}R_{C} · [[v_{id}|2]] = -[[g_{m}R_{C}|2]] · v_{id}</div>
+      <div class="eq key">A_{d,se1} = [[v_{o1}|v_{id}]] = -[[g_{m}R_{C}|2]] = -[[R_{C}|2r_{e}]]</div>
+    </li>
+    <li><b>Output from Collector 2 (Non-Inverting Gain):</b>
+      <div class="eq">v_{o2} = -i_{c2}R_{C} = +g_{m}R_{C} · [[v_{id}|2]] = +[[g_{m}R_{C}|2]] · v_{id}</div>
+      <div class="eq key">A_{d,se2} = [[v_{o2}|v_{id}]] = +[[g_{m}R_{C}|2]] = +[[R_{C}|2r_{e}]]</div>
+      Taking output from Collector 2 provides a non-inverting differential voltage gain.
+    </li>
+    <li><b>Input and Output Resistances:</b>
+      <div class="eq">R_{id} = 2r_{π} = 2βr_{e}   and   R_{o} ≈ R_{C}   (or R_{C} || r_{o})</div>
+    </li>
+  </ol>
+
+  <!-- WORKED EXAMPLE 7 -->
+  <div class="card try"><span class="label">Worked Example 7 · Dual-Input Unbalanced-Output (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> Using the amplifier from Worked Example 6 (R_{C} = 4.7 kΩ, r_{e} = 52 Ω, v_{id} = 10 mV), calculate (a) single-ended differential gain A_{d,se} at Collector 1, (b) output voltage v_{o1}, and (c) single-ended output resistance R_{o}.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Single-Ended Gain A_{d,se}:</b>
+      <div class="eq">A_{d,se} = -[[R_{C}|2r_{e}]] = -[[4700 Ω|2(52 Ω)]] = -[[4700|104]] = -45.19 ≈ -45.2</div>
+      Notice that |A_{d,se}| = 45.2, which is exactly half of the balanced gain (|A_{d,bal}| = 90.4).
+    </li>
+    <li><b>Single-Ended Output Voltage v_{o1}:</b>
+      <div class="eq">v_{o1} = A_{d,se} · v_{id} = (-45.2)(10 mV) = -452 mV = -0.452 V</div>
+    </li>
+    <li><b>Single-Ended Output Resistance:</b>
+      <div class="eq">R_{o} ≈ R_{C} = 4.7 kΩ</div>
+    </li>
+  </ol>
+  </div>
+
+  <label class="done-row"><input type="checkbox" data-done="s9"> Mark topic 9 as done</label>
+</section>
+
+<!-- ============ S10: SINGLE-INPUT CONFIGURATIONS ============ -->
+<section class="sec" id="s10">
+  <div class="sechead"><span class="secno">Topic 10</span></div>
+  <h2>Single-Input Differential Amplifier Configurations</h2>
+  <div class="tags"><span class="tag">Phase-Splitting Action</span><span class="tag">Common-Collector / Common-Base Cascade</span><span class="tag">SIBO &amp; SIUO</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · How One Driven Base Operates the Entire Pair</span>
+  <p>When an input signal v_{in} is applied to Base 1 while Base 2 is tied to AC ground, transistor Q_{1} acts as an <b>emitter follower</b> (common collector). It drives the common emitter node with a signal v_{e} ≈ v_{in}/2. In turn, this emitter signal drives transistor Q_{2} in <b>common-base mode</b> (since its base is grounded). Thus, the differential pair naturally functions as an active <b>phase splitter</b>, generating two equal-magnitude, opposite-phase signals at the two collectors!</p></div>
+
+  <h3>1. Mathematical Analysis</h3>
+  <ol class="steps">
+    <li><b>Input Signal Definitions:</b>
+      <div class="eq">v_{1} = v_{in}   and   v_{2} = 0 V (AC ground) ⇒ v_{id} = v_{1} - v_{2} = v_{in}</div>
+    </li>
+    <li><b>Emitter Motion:</b> For a high-resistance tail element, the emitter node moves by:
+      <div class="eq">v_{e} ≈ [[v_{in}|2]]</div>
+    </li>
+    <li><b>Base-Emitter Voltages:</b>
+      <div class="eq">v_{be1} = v_{b1} - v_{e} = v_{in} - [[v_{in}|2]] = +[[v_{in}|2]]</div>
+      <div class="eq">v_{be2} = v_{b2} - v_{e} = 0 - [[v_{in}|2]] = -[[v_{in}|2]]</div>
+      The base-emitter junctions receive identical magnitudes and opposite phases!
+    </li>
+    <li><b>Collector AC Outputs:</b>
+      <div class="eq">v_{o1} = -g_{m}R_{C} · [[v_{in}|2]]   and   v_{o2} = +g_{m}R_{C} · [[v_{in}|2]]</div>
+    </li>
+    <li><b>Single-Input Balanced-Output Gain (SIBO):</b>
+      <div class="eq key">A_{d,sibo} = [[v_{o1} - v_{o2}|v_{in}]] = -g_{m}R_{C} = -[[R_{C}|r_{e}]]</div>
+      Remarkably, the balanced gain for a single-ended input is <i>identical</i> to the balanced gain for dual inputs!
+    </li>
+    <li><b>Single-Input Unbalanced-Output Gain (SIUO):</b>
+      <div class="eq key">A_{d,siuo} = [[v_{o1}|v_{in}]] = -[[g_{m}R_{C}|2]] = -[[R_{C}|2r_{e}]]</div>
+    </li>
+    <li><b>Input Resistance at Driven Base:</b> Because Q_{2}'s input impedance reflects through the joined emitter node:
+      <div class="eq key">R_{in} ≈ 2r_{π} = 2βr_{e}</div>
+    </li>
+  </ol>
+
+  <!-- WORKED EXAMPLES 8 & 9 -->
+  <div class="card try"><span class="label">Worked Example 8 · Single-Input, Balanced-Output (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> Using R_{C} = 4.7 kΩ, r_{e} = 52 Ω, and applying v_{in} = 8 mV at Base 1 with Base 2 grounded, calculate (a) balanced differential gain A_{d,sibo} and (b) balanced output voltage v_{od}.</p>
+  <p><b>Solution:</b></p>
+  <div class="eq">A_{d,sibo} = -[[R_{C}|r_{e}]] = -[[4700 Ω|52 Ω]] ≈ -90.4</div>
+  <div class="eq">v_{od} = A_{d,sibo} · v_{in} = (-90.4)(8 mV) = -723.2 mV ≈ -0.723 V</div>
+  </div>
+
+  <div class="card try"><span class="label">Worked Example 9 · Single-Input, Unbalanced-Output (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> For the same circuit with v_{in} = 8 mV, calculate (a) single-ended gain at Collector 1 and (b) single-ended output voltage v_{o1}.</p>
+  <p><b>Solution:</b></p>
+  <div class="eq">A_{d,siuo} = -[[R_{C}|2r_{e}]] = -[[4700 Ω|2(52 Ω)]] ≈ -45.2</div>
+  <div class="eq">v_{o1} = A_{d,siuo} · v_{in} = (-45.2)(8 mV) = -361.6 mV ≈ -0.362 V</div>
+  </div>
+
+  <label class="done-row"><input type="checkbox" data-done="s10"> Mark topic 10 as done</label>
+</section>
+
+<!-- ============ S11: TAIL BIAS & CMRR ============ -->
+<section class="sec" id="s11">
+  <div class="sechead"><span class="secno">Topic 11</span></div>
+  <h2>Constant-Current Tail Bias and Common-Mode Rejection Ratio (CMRR)</h2>
+  <div class="tags"><span class="tag hot">Winter 2025 SDC-II Q5 OR (10 Marks)</span><span class="tag">Common-Mode Half Circuit</span><span class="tag">CMRR in dB</span><span class="tag">Active Tail Source</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · Why Common-Mode Signals See 2R_{E}</span>
+  <p>When an identical common-mode signal (v_{1} = v_{2} = v_{cm}) strikes both inputs, both transistors try to increase their emitter currents simultaneously. The total current rushing into the tail element is the sum of both: i_{tail} = i_{e1} + i_{e2} = 2i_{e}. In the symmetrical common-mode half-circuit, each transistor's emitter is degenerated not by R_{E}, but by <b>2R_{E}</b>! This heavy negative feedback crushes the common-mode gain. If we replace the passive resistor R_{E} (~11 kΩ) with an active BJT current mirror having dynamic resistance R_{t} = r_{o} ≈ <b>1.0 MΩ</b>, common-mode gain plummets from 0.2 down to 0.002, rocketing the CMRR from <b>46.8 dB to 85.7 dB</b>!</p></div>
+
+  <figure><div data-dg="cmHalfCircuit"></div><figcaption>Common-mode half-circuit: both transistors conduct in-phase current, creating effective emitter degeneration of 2R_{E} (or 2R_{t}).</figcaption></figure>
+
+  <figure><div data-dg="currentSourceTail"></div><figcaption>Differential pair biased with active BJT current mirror tail source (Q_{3}, Q_{4}) providing megohm dynamic impedance R_{t}.</figcaption></figure>
+
+  <h3>1. Systematic Derivation of Common-Mode Gain (A_{c})</h3>
+  <ol class="steps">
+    <li><b>Common-Mode Half-Circuit Model:</b> With v_{b} = v_{cm}, each emitter experiences an effective degenerating resistance of 2R_{E} to ground.</li>
+    <li><b>Base Current and Input Loop KVL:</b>
+      <div class="eq">v_{cm} = i_{b}r_{π} + (1 + β)i_{b}(2R_{E}) = i_{b} · [r_{π} + 2(1 + β)R_{E}]</div>
+    </li>
+    <li><b>Single-Ended Common-Mode Collector Output:</b>
+      <div class="eq">v_{o1,cm} = -i_{c}R_{C} = -β i_{b}R_{C} = -β · [[v_{cm}|r_{π} + 2(1 + β)R_{E}]] · R_{C}</div>
+    </li>
+    <li><b>Common-Mode Gain Expression (A_{c}):</b> Dividing by v_{cm}:
+      <div class="eq">A_{c} = -[[β R_{C}|r_{π} + 2(1 + β)R_{E}]] = -[[R_{C}|r_{e} + 2R_{E} · [[β + 1|β]]]] ≈ -[[R_{C}|r_{e} + 2R_{E}]]</div>
+    </li>
+    <li><b>High Tail-Resistance Approximation (2R_{E} &gt;&gt; r_{e}):</b>
+      <div class="eq key">A_{c} ≈ -[[R_{C}|2R_{E}]]   (or with current source tail: -[[R_{C}|2R_{t}]])</div>
+    </li>
+    <li><b>Ideal Balanced-Output Common-Mode Gain:</b> By perfect symmetry, v_{o1,cm} = v_{o2,cm}. The differential balanced output is:
+      <div class="eq">v_{od,cm} = v_{o1,cm} - v_{o2,cm} = 0 V ⇒ A_{c,bal} = 0   (ideal CMRR = ∞)</div>
+      In practice, slight transistor and resistor mismatches make A_{c,bal} small but non-zero.
+    </li>
+  </ol>
+
+  <h3>2. Derivation of Common-Mode Rejection Ratio (CMRR)</h3>
+  <p>CMRR is defined as the ratio of differential voltage gain magnitude to common-mode voltage gain magnitude:</p>
+  <div class="eq key">CMRR = | [[A_{d}|A_{c}]] |</div>
+  <p>For a single-ended output with resistor tail R_{E}:</p>
+  <div class="eq key">CMRR = | [[-[[R_{C}|2r_{e}]]| -[[R_{C}|r_{e} + 2R_{E}]] ]] | = [[r_{e} + 2R_{E}|2r_{e}]] = [[1|2]] + [[R_{E}|r_{e}]] ≈ [[R_{E}|r_{e}]]   (since R_{E} &gt;&gt; r_{e})</div>
+  <p>When biased by a constant-current source with dynamic output resistance R_{t}:</p>
+  <div class="eq key">CMRR ≈ [[R_{t}|r_{e}]]</div>
+  <p>In decibels (dB), CMRR is expressed logarithmically as:</p>
+  <div class="eq key">CMRR_{dB} = 20 log_{10}(CMRR) = 20 log_{10}(| [[A_{d}|A_{c}]] |)</div>
+
+  <h3>3. Four Concrete Methods to Improve CMRR</h3>
+  <ol class="steps">
+    <li><b>Replace Passive Resistor with Active Current Mirror Tail:</b> A passive resistor R_{E} is limited to ~10-20 kΩ by DC supply headroom. Replacing it with a BJT current source provides a dynamic impedance R_{t} = r_{o} ≈ 1 MΩ, immediately boosting CMRR by ~40 dB without requiring high DC supply voltages.</li>
+    <li><b>Use Wilson or Cascode Current Source Tail:</b> Employing a Wilson mirror (R_{t} ≈ β·r_{o}/2 ≈ 5 MΩ) or cascode mirror increases the dynamic tail resistance into tens of megohms, raising CMRR beyond 100 dB.</li>
+    <li><b>Use Balanced (Differential) Output:</b> Common-mode signals produce identical in-phase shifts at both collectors. Measuring the output differentially (v_{o1} - v_{o2}) causes common-mode signals to subtract and cancel out.</li>
+    <li><b>Precision Monolithic Transistor Matching:</b> Fabricating transistors Q_{1} and Q_{2} on the same die with cross-coupled quad layout minimizes lithographic and thermal gradients, ensuring Δg_{m} ≈ 0 and ΔR_{C} ≈ 0.</li>
+  </ol>
+
+  <!-- WORKED EXAMPLES 10 & 11 -->
+  <div class="card try"><span class="label">Worked Example 10 · Resistor Tail CMRR (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> A differential amplifier has R_{C} = 4.7 kΩ, tail resistor R_{E} = 11.3 kΩ, and operating current giving r_{e} = 52 Ω. For a single-ended output, calculate (a) differential gain A_{d}, (b) common-mode gain A_{c}, (c) CMRR as a ratio, and (d) CMRR in decibels.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Differential Gain A_{d}:</b>
+      <div class="eq">A_{d} = -[[R_{C}|2r_{e}]] = -[[4700 Ω|2(52 Ω)]] = -[[4700|104]] = -45.19 ≈ -45.2</div>
+    </li>
+    <li><b>Common-Mode Gain A_{c}:</b>
+      <div class="eq">A_{c} ≈ -[[R_{C}|r_{e} + 2R_{E}]] = -[[4700|52 + 2(11,300)]] = -[[4700|52 + 22,600]] = -[[4700|22,652]] = -0.2075</div>
+    </li>
+    <li><b>CMRR Ratio:</b>
+      <div class="eq">CMRR = | [[-45.2|-0.2075]] | ≈ 217.8 ≈ 218</div>
+    </li>
+    <li><b>CMRR in Decibels:</b>
+      <div class="eq">CMRR_{dB} = 20 log_{10}(217.8) = 20(2.338) = 46.77 dB ≈ 46.8 dB</div>
+    </li>
+  </ol>
+  </div>
+
+  <div class="card try"><span class="label">Worked Example 11 · CMRR Improvement with Current-Source Tail (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> In the amplifier of Example 10, the 11.3 kΩ tail resistor is replaced by a BJT constant-current source having a small-signal output resistance R_{t} = 1.0 MΩ (10⁶ Ω). Recalculate (a) common-mode gain A_{c}, (b) CMRR, and (c) CMRR in dB. State the improvement.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Differential Gain A_{d}:</b> Remains unchanged at A_{d} = -45.2.</li>
+    <li><b>New Common-Mode Gain A_{c}:</b>
+      <div class="eq">A_{c} ≈ -[[R_{C}|r_{e} + 2R_{t}]] = -[[4700|52 + 2(10^{6})]] = -[[4700|2,000,052]] ≈ -0.00235</div>
+    </li>
+    <li><b>New CMRR Ratio:</b>
+      <div class="eq">CMRR = | [[-45.2|-0.00235]] | ≈ 19,234 ≈ 1.92 × 10^{4}</div>
+    </li>
+    <li><b>New CMRR in Decibels:</b>
+      <div class="eq">CMRR_{dB} = 20 log_{10}(19,234) = 20(4.284) = 85.68 dB ≈ 85.7 dB</div>
+    </li>
+  </ol>
+  <p><b>Dramatic Conclusion:</b> By replacing the resistor with an active transistor current source, CMRR jumped from <b>46.8 dB to 85.7 dB</b>—an astonishing <b>88-fold rejection improvement (+38.9 dB)</b>!</p>
+  </div>
+
+  <div data-w="cmrrCalc"></div>
+
+  <div class="card exam"><span class="label">10-Mark Exam Answer Skeleton · Winter 2025 SDC-II Q5 (OR)</span>
+  <ol>
+    <li><b>Define CMRR:</b> State mathematical definition CMRR = |A_{d}/A_{c}|, logarithmic formula CMRR_{dB} = 20·log10(CMRR), and explain its physical necessity in rejecting supply noise and 50 Hz pick-up (2 marks).</li>
+    <li><b>Derive Expression for A_{c}:</b> Draw common-mode half-circuit with 2R_{E} degeneration; derive A_{c} = -R_{C}/(r_{e} + 2R_{E}) ≈ -R_{C}/(2R_{E}) (3 marks).</li>
+    <li><b>Derive Expression for CMRR:</b> Combine single-ended gains: CMRR = [R_{C}/(2r_{e})] / [R_{C}/(2R_{E})] = R_{E}/r_{e} (2 marks).</li>
+    <li><b>Explain 4 Methods of Improvement:</b> Constant-current mirror tail (R_{t} ≈ 1 MΩ), Wilson current tail, balanced output pick-off, and monolithic transistor matching, accompanied by circuit diagram (3 marks).</li>
+  </ol></div>
+
+  <details><summary>Quick check: Why does CMRR use 20·log10 instead of 10·log10?</summary><p>In electrical engineering, decibels are defined for power as 10·log10(P_{1}/P_{2}). Because electrical power is proportional to the square of voltage (P = V²/R), the ratio of voltage gains squared becomes 10·log10((A_{d}/A_{c})²) = 2·10·log10(|A_{d}/A_{c}|) = <b>20·log10(CMRR)</b>.</p></details>
+
+  <label class="done-row"><input type="checkbox" data-done="s11"> Mark topic 11 as done</label>
+</section>
+
+<!-- ============ S12: LARGE-SIGNAL DIFFERENTIAL ANALYSIS ============ -->
+<section class="sec" id="s12">
+  <div class="sechead"><span class="secno">Topic 12</span></div>
+  <h2>Large-Signal Differential Analysis &amp; The Hyperbolic-Tangent Transfer Curve</h2>
+  <div class="tags"><span class="tag">Exact Exponential Transfer</span><span class="tag">tanh Function</span><span class="tag">Linear Region Limit</span><span class="tag">Current Steering</span></div>
+
+  <div class="card intuition"><span class="label">Intuition · Beyond the Small-Signal Approximation</span>
+  <p>Small-signal analysis (A_{d} = -g_{m}R_{C}) assumes that input voltages are so microscopic that the transistor's exponential curve appears straight. In reality, as differential input voltage v_{id} expands beyond ±20 mV, the differential pair acts as an electronic <b>current steering switch</b>. The total tail current I_{T} is smoothly steered entirely into Q_{1} for positive v_{id}, or entirely into Q_{2} for negative v_{id}. The exact large-signal transfer relationship is governed rigorously by the <b>hyperbolic tangent function: tanh(v_{id}/2V_{T})</b>.</p></div>
+
+  <figure><div data-dg="largeSignalCurve"></div><figcaption>Large-signal differential transfer curve showing normalized differential current (i_{C1} - i_{C2})/I_{T} = tanh(v_{id}/2V_{T}) vs. differential input voltage v_{id}.</figcaption></figure>
+
+  <h3>1. Systematic Derivation of the tanh Characteristic</h3>
+  <ol class="steps">
+    <li><b>BJT Collector Current Law:</b> Assuming forward-active operation with matched saturation currents I_{S}:
+      <div class="eq">i_{C1} = I_{S} · e^{v_{BE1}/V_{T}}   and   i_{C2} = I_{S} · e^{v_{BE2}/V_{T}}</div>
+    </li>
+    <li><b>Ratio of Collector Currents:</b>
+      <div class="eq">[[i_{C1}|i_{C2}]] = e^{(v_{BE1} - v_{BE2})/V_{T}} = e^{v_{id}/V_{T}}</div>
+      where v_{id} = v_{b1} - v_{b2} = v_{BE1} - v_{BE2}.
+    </li>
+    <li><b>Constant Tail-Current Constraint:</b> Neglecting base currents (α ≈ 1):
+      <div class="eq">i_{C1} + i_{C2} = I_{T} ⇒ [[i_{C1}|i_{C2}]] + 1 = [[I_{T}|i_{C2}]]</div>
+    </li>
+    <li><b>Solving for Individual Collector Currents:</b>
+      <div class="eq key">i_{C2} = [[I_{T}|1 + e^{v_{id}/V_{T}}]]   and   i_{C1} = [[I_{T} · e^{v_{id}/V_{T}}|1 + e^{v_{id}/V_{T}}]] = [[I_{T}|1 + e^{-v_{id}/V_{T}}]]</div>
+    </li>
+    <li><b>Differential Collector Current (i_{C1} - i_{C2}):</b>
+      <div class="eq">i_{C1} - i_{C2} = I_{T} · [[e^{v_{id}/V_{T}} - 1|e^{v_{id}/V_{T}} + 1]] = I_{T} · [[e^{v_{id}/(2V_{T})} - e^{-v_{id}/(2V_{T})}|e^{v_{id}/(2V_{T})} + e^{-v_{id}/(2V_{T})}]]</div>
+      Recognizing the definition of the hyperbolic tangent function tanh(x) = (e^{x} - e^{-x})/(e^{x} + e^{-x}):
+      <div class="eq key">i_{C1} - i_{C2} = I_{T} tanh([[v_{id}|2V_{T}]])</div>
+    </li>
+    <li><b>Exact Balanced Differential Output Voltage (v_{od}):</b>
+      <div class="eq key">v_{od} = v_{o1} - v_{o2} = -R_{C}(i_{C1} - i_{C2}) = -I_{T}R_{C} tanh([[v_{id}|2V_{T}]])</div>
+    </li>
+    <li><b>Verification of the Small-Signal Linear Limit:</b> Using the Taylor expansion tanh(x) ≈ x - x³/3 for |x| &lt;&lt; 1:
+      <div class="eq">v_{od} ≈ -I_{T}R_{C} · [[v_{id}|2V_{T}]] = -[[I_{T}|2V_{T}]] · R_{C}v_{id} = -g_{m}R_{C}v_{id}</div>
+      since g_{m} = (I_{T}/2)/V_{T} at the quiescent balance point! The small-signal formula is simply the first-order tangent of the exact tanh curve at the origin.
+    </li>
+  </ol>
+
+  <!-- WORKED EXAMPLE 12 -->
+  <div class="card try"><span class="label">Worked Example 12 · Large-Signal Output and Nonlinearity (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> A differential amplifier has tail current I_{T} = 1.00 mA, collector load resistors R_{C} = 5.0 kΩ, and thermal voltage V_{T} = 26 mV. An input differential voltage v_{id} = 50 mV is applied. Calculate (a) the exact differential output voltage using the large-signal tanh relation, (b) the output voltage predicted by the small-signal linear model, and (c) the percentage overestimation error of the linear model.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Dimensionless Argument x = v_{id} / (2V_{T}):</b>
+      <div class="eq">x = [[v_{id}|2V_{T}]] = [[50 mV|2(26 mV)]] = [[50|52]] ≈ 0.9615</div>
+    </li>
+    <li><b>Evaluate Hyperbolic Tangent:</b>
+      <div class="eq">tanh(0.9615) = [[e^{0.9615} - e^{-0.9615}|e^{0.9615} + e^{-0.9615}]] = [[2.6156 - 0.3823|2.6156 + 0.3823]] = [[2.2333|2.9979]] ≈ 0.7449 ≈ 0.745</div>
+    </li>
+    <li><b>Exact Differential Output Voltage:</b>
+      <div class="eq">v_{od,exact} = -I_{T}R_{C} tanh(0.9615) = -(1.00 mA)(5.0 kΩ)(0.7449) = -(5.0 V)(0.7449) ≈ -3.725 V ≈ -3.73 V</div>
+    </li>
+    <li><b>Small-Signal Linear Prediction:</b>
+      <div class="eq">g_{m} = [[I_{T}/2|V_{T}]] = [[0.50 mA|26 mV]] = 19.23 mS</div>
+      <div class="eq">A_{d} = -g_{m}R_{C} = -(19.23 mS)(5.0 kΩ) = -96.15</div>
+      <div class="eq">v_{od,linear} = A_{d} · v_{id} = (-96.15)(50 mV) = -4808 mV ≈ -4.81 V</div>
+    </li>
+    <li><b>Percentage Overestimation Error:</b>
+      <div class="eq">Error % = [[|v_{od,linear}| - |v_{od,exact}|||v_{od,exact}|]] × 100% = [[4.81 - 3.73|3.73]] × 100% = +28.9%</div>
+    </li>
+  </ol>
+  <p><b>Physical Takeaway:</b> An input of 50 mV causes severe gain compression (+28.9% distortion). The linear small-signal approximation is accurate only for |v_{id}| &lt; ~15 mV.</p>
+  </div>
+
+  <div data-w="tanhExplorer"></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s12"> Mark topic 12 as done</label>
+</section>
+
+<!-- ============ S13: MASTER SUMMARY & COMPARISONS ============ -->
+<section class="sec" id="s13">
+  <div class="sechead"><span class="secno">Topic 13</span></div>
+  <h2>Master Summary &amp; Comprehensive Engineering Comparisons</h2>
+  <div class="tags"><span class="tag">Master Comparison Tables</span><span class="tag">Simultaneous Signals</span><span class="tag">9 Exam Pitfalls</span></div>
+
+  <h3>1. Master Comparison of BJT Current Mirrors</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Feature</th><th>Basic Current Mirror</th><th>Widlar Current Source</th><th>Wilson Current Mirror</th></tr></thead>
+    <tbody>
+      <tr><td><b>Primary IC Purpose</b></td><td>Replicate bias current (I_{O} ≈ I_{ref})</td><td>Generate microampere bias (I_{O} &lt;&lt; I_{ref})</td><td>Precision current copy with megohm output impedance</td></tr>
+      <tr><td><b>Number of Transistors</b></td><td>2 matched NPN transistors</td><td>2 matched NPN transistors</td><td>3 matched NPN transistors</td></tr>
+      <tr><td><b>Resistor Requirements</b></td><td>R_{ref} only</td><td>R_{ref} + small emitter resistor R_{E}</td><td>R_{ref} only (no emitter resistors)</td></tr>
+      <tr><td><b>Current Transfer Law</b></td><td>I_{O} = I_{ref} / (1 + 2/β)</td><td>I_{O}R_{E} = V_{T} ln(I_{ref} / I_{O})</td><td>I_{O} = I_{in}(β² + 2β) / (β² + 2β + 2)</td></tr>
+      <tr><td><b>Fractional β Error</b></td><td>Order <b>2/β</b> (≈ 1.96% for β=100)</td><td>Set by logarithmic drop V_{BE1} - V_{BE2}</td><td>Order <b>2/β²</b> (≈ 0.0196% for β=100; 100x better!)</td></tr>
+      <tr><td><b>Dynamic Output Resistance</b></td><td>R_{o} ≈ r_{o} ≈ 100 kΩ</td><td>R_{o} ≈ r_{o}(1 + g_{m}R_{E}) ≈ 400-600 kΩ</td><td>R_{o} ≈ <b>β·r_{o}/2 ≈ 5.0 MΩ</b> (50x boost!)</td></tr>
+      <tr><td><b>Compliance Headroom V_{O(min)}</b></td><td>V_{CE(sat)} ≈ 0.2 V</td><td>V_{CE(sat)} + I_{O}R_{E} ≈ 0.3 V</td><td>V_{BE} + V_{CE(sat)} ≈ 0.9 V</td></tr>
+      <tr><td><b>Common Application</b></td><td>General-purpose analog IC biasing</td><td>Sub-mA input stage &amp; op-amp biasing</td><td>High-performance active loads &amp; high-CMRR tail sources</td></tr>
+    </tbody>
+  </table></div>
+
+  <!-- WORKED EXAMPLE 13 -->
+  <div class="card try"><span class="label">Worked Example 13 · Output with Simultaneous Differential &amp; Common-Mode Signals (Dr. Ghongade Notes)</span>
+  <p><b>Problem:</b> A differential amplifier has differential gain A_{d} = 50 and common-mode gain A_{c} = 0.02. The applied input voltages are v_{1} = 102 mV and v_{2} = 98 mV. Calculate (a) differential input v_{id}, (b) common-mode input v_{cm}, (c) total output voltage v_{o}, and (d) the percentage of output voltage representing desired signal vs. common-mode error.</p>
+  <p><b>Solution:</b></p>
+  <ol class="steps">
+    <li><b>Differential Input Signal v_{id}:</b>
+      <div class="eq">v_{id} = v_{1} - v_{2} = 102 mV - 98 mV = 4 mV</div>
+    </li>
+    <li><b>Common-Mode Input Signal v_{cm}:</b>
+      <div class="eq">v_{cm} = [[v_{1} + v_{2}|2]] = [[102 mV + 98 mV|2]] = 100 mV</div>
+    </li>
+    <li><b>Total Output Voltage by Superposition:</b>
+      <div class="eq">v_{o} = A_{d}v_{id} + A_{c}v_{cm} = (50)(4 mV) + (0.02)(100 mV) = 200 mV + 2 mV = 202 mV</div>
+    </li>
+    <li><b>Signal vs. Noise Analysis:</b>
+      <p>Desired differential signal component = <b>200 mV (99.01%)</b>.</p>
+      <p>Undesired common-mode noise component = <b>2 mV (0.99%)</b>.</p>
+      <div class="eq">CMRR = [[A_{d}|A_{c}]] = [[50|0.02]] = 2500 ⇒ CMRR_{dB} = 20 log_{10}(2500) ≈ 67.96 dB ≈ 68 dB</div>
+    </li>
+  </ol>
+  <p><b>Key Insight:</b> At the input, the common-mode interference was 25 times <i>larger</i> than the differential signal (100 mV vs. 4 mV). Thanks to the amplifier's CMRR of 68 dB, the common-mode noise at the output is 100 times <i>smaller</i> than the signal (2 mV vs. 200 mV)!</p>
+  </div>
+
+  <h3>2. Nine Critical Examination Traps &amp; Student Cautions</h3>
+  <div class="card watch"><span class="label">Caution · Avoid These Common Exam Mistakes</span>
+  <ol>
+    <li><b>Balanced vs. Single-Ended Gain:</b> Do not confuse balanced gain (-g_{m}R_{C} = -R_{C}/r_{e}) with single-ended gain (-g_{m}R_{C}/2 = -R_{C}/(2r_{e})). Balanced gain is exactly double!</li>
+    <li><b>Tail Resistor in Common-Mode Half-Circuit:</b> Never use R_{E} directly in the common-mode half-circuit. Each transistor conducts half the tail current, so each side sees an effective degenerating resistance of <b>2R_{E}</b>!</li>
+    <li><b>Single-Ended CMRR is Never Infinite:</b> Common-mode cancellation is ideally complete only for a balanced differential output (v_{o1} - v_{o2} = 0). For a single-ended output, common-mode gain A_{c} is finite (~0.2 for resistor tail, ~0.002 for current source tail), so CMRR is finite.</li>
+    <li><b>Quiescent Current for r_{e}:</b> When calculating small-signal parameters r_{e} = V_{T}/I_{E} and g_{m} = I_{C}/V_{T}, remember that each transistor carries only <b>half</b> the tail current: I_{C} ≈ I_{T}/2. Using total I_{T} yields r_{e} that is half its true value!</li>
+    <li><b>Natural Logarithm in Widlar:</b> In the Widlar equation R_{E} = (V_{T}/I_{O}) ln(I_{ref}/I_{O}), always use the natural logarithm ln, never base-10 log_{10}.</li>
+    <li><b>CMRR in Decibels:</b> Always compute CMRR in dB using <b>20·log10(CMRR)</b>, never 10·log10(CMRR).</li>
+    <li><b>Compliance Voltage Check:</b> Remember that current sources cease regulating when output voltage falls below compliance headroom: V_{CE(sat)} ≈ 0.2 V for basic mirror, V_{CE(sat)} + I_{O}R_{E} for Widlar, and V_{BE} + V_{CE(sat)} ≈ 0.9 V for Wilson.</li>
+    <li><b>Small-Signal Linearity Bounds:</b> Small-signal formulas apply only for |v_{id}| &lt; 15-20 mV. For larger signals, you must use the hyperbolic tangent transfer equation.</li>
+    <li><b>Split-Supply Emitter Potential:</b> With bases at 0 V ground, the joined emitter node does not sit at 0 V; it sits at -0.7 V (one diode drop below ground).</li>
+  </ol></div>
+
+  <label class="done-row"><input type="checkbox" data-done="s13"> Mark topic 13 as done</label>
+</section>
+
+<!-- ============ S14: EXAM MAP & MASTER FORMULAS ============ -->
+<section class="sec" id="s14">
+  <div class="sechead"><span class="secno">Topic 14</span></div>
+  <h2>University Exam Map, Master Formula Sheet &amp; Practice Problems</h2>
+  <div class="tags"><span class="tag hot">Exam Mapping (4 Papers)</span><span class="tag">Master Formula Reference</span><span class="tag">10 Solved Numericals</span></div>
+
+  <h3>1. Direct Mapping to Bharati Vidyapeeth University Question Papers</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Exam Paper</th><th>Question Number</th><th>Exact University Exam Question Text</th><th>Marks</th><th>Guide Sections</th></tr></thead>
+    <tbody>
+      <tr><td><b>Summer 2026</b></td><td>Q6 (a)</td><td>Give a detailed analysis of BJT based Widlar Current Source.</td><td>10 M</td><td><a href="#s2">Topic 2</a> &amp; <a href="#s13">Topic 13</a></td></tr>
+      <tr><td><b>Summer 2026</b></td><td>Q6 (a) OR</td><td>Which are the configurations of Differential amplifier? Explain any one configuration of differential amplifier.</td><td>10 M</td><td><a href="#s7">Topic 7</a> &amp; <a href="#s8">Topic 8</a></td></tr>
+      <tr><td><b>Winter 2025</b></td><td>Q6 (a)</td><td>With the help of neat sketch, explain BJT based Wilson Current Mirror.</td><td>10 M</td><td><a href="#s3">Topic 3</a></td></tr>
+      <tr><td><b>Winter 2025</b></td><td>Q6 (a) OR</td><td>What are the limitations of CE amplifier? How can you overcome them using Differential amplifier? Discuss in detail.</td><td>10 M</td><td><a href="#s4">Topic 4</a></td></tr>
+      <tr><td><b>Winter 2025 SDC-II</b></td><td>Q5</td><td>State the differential amplifier configurations and draw the circuit diagrams.</td><td>10 M</td><td><a href="#s7">Topic 7</a></td></tr>
+      <tr><td><b>Winter 2025 SDC-II</b></td><td>Q5 OR</td><td>What is common mode rejection ratio? State the expression for CMRR and explain different methods of improving CMRR in a differential amplifier.</td><td>10 M</td><td><a href="#s11">Topic 11</a></td></tr>
+      <tr><td><b>Winter 2025 SDC-I</b></td><td>Q6</td><td>What are the characteristics of an ideal current source? How does the basic current mirror approximates these characteristics?</td><td>10 M</td><td><a href="#s1">Topic 1</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>2. Master Engineering Formula Reference</h3>
+  <div class="grid">
+    <div class="card" style="margin:0"><span class="label">Basic BJT Mirror</span>
+      <div class="eq">I_{ref} ≈ [[V_{CC} - V_{BE}|R_{ref}]]</div>
+      <div class="eq">I_{O} = [[I_{ref}|1 + 2/β]]</div>
+      <div class="eq">Error ≈ [[2|β]]   ;   R_{o} ≈ r_{o}</div>
+    </div>
+    <div class="card" style="margin:0"><span class="label">Widlar Current Source</span>
+      <div class="eq">V_{BE1} - V_{BE2} = I_{O}R_{E} = V_{T} ln([[I_{ref}|I_{O}]])</div>
+      <div class="eq">R_{E} = [[V_{T}|I_{O}]] ln([[I_{ref}|I_{O}]])</div>
+      <div class="eq">R_{o} ≈ r_{o}(1 + g_{m}R_{E})</div>
+    </div>
+    <div class="card" style="margin:0"><span class="label">Wilson Current Mirror</span>
+      <div class="eq">I_{O} = I_{in} · [[β^{2} + 2β|β^{2} + 2β + 2]]</div>
+      <div class="eq">Error ≈ [[2|β^{2}]]   (Order 1/β^{2})</div>
+      <div class="eq">R_{o} ≈ [[β · r_{o}|2]] = [[β · V_{A}|2I_{O}]]</div>
+    </div>
+    <div class="card" style="margin:0"><span class="label">Split-Supply DC Biasing</span>
+      <div class="eq">I_{T} = [[V_{EE} - V_{BE}|R_{E}]] ≈ [[V_{EE} - 0.7 V|R_{E}]]</div>
+      <div class="eq">I_{C1} = I_{C2} ≈ [[I_{T}|2]]</div>
+      <div class="eq">V_{C1} = V_{C2} = V_{CC} - I_{C}R_{C}</div>
+      <div class="eq">V_{OD} = V_{C1} - V_{C2} = 0 V</div>
+    </div>
+    <div class="card" style="margin:0"><span class="label">Small-Signal Parameters</span>
+      <div class="eq">r_{e} = [[V_{T}|I_{E}]] ≈ [[26 mV|I_{T}/2]]</div>
+      <div class="eq">g_{m} = [[I_{C}|V_{T}]] = [[1|r_{e}]]</div>
+      <div class="eq">r_{π} = β r_{e} = [[β|g_{m}]]</div>
+    </div>
+    <div class="card" style="margin:0"><span class="label">Differential Voltage Gains</span>
+      <div class="eq">A_{d,bal} = -g_{m}R_{C} = -[[R_{C}|r_{e}]]</div>
+      <div class="eq">A_{d,se} = -[[g_{m}R_{C}|2]] = -[[R_{C}|2r_{e}]]</div>
+      <div class="eq">R_{id} = 2r_{π} = 2β r_{e}</div>
+      <div class="eq">R_{od,bal} = 2R_{C}   ;   R_{od,se} = R_{C}</div>
+    </div>
+    <div class="card" style="margin:0"><span class="label">Common-Mode Gain &amp; CMRR</span>
+      <div class="eq">A_{c} ≈ -[[R_{C}|r_{e} + 2R_{E}]] ≈ -[[R_{C}|2R_{E}]]</div>
+      <div class="eq">CMRR = | [[A_{d,se}|A_{c}]] | ≈ [[R_{E}|r_{e}]]   or   [[R_{t}|r_{e}]]</div>
+      <div class="eq">CMRR_{dB} = 20 log_{10}(CMRR)</div>
+    </div>
+    <div class="card" style="margin:0"><span class="label">Large-Signal Dynamics</span>
+      <div class="eq">i_{C1} - i_{C2} = I_{T} tanh([[v_{id}|2V_{T}]])</div>
+      <div class="eq">v_{od} = -I_{T}R_{C} tanh([[v_{id}|2V_{T}]])</div>
+      <div class="eq">Linear regime for |v_{id}| &lt; 20 mV</div>
+    </div>
+  </div>
+
+  <h3>3. Ten Selected Examination Practice Numericals (Section 25 Notes)</h3>
+  <div class="card try"><span class="label">Practice Problem 1 · Basic Mirror Design</span>
+    <p><b>Problem:</b> A basic BJT current mirror has V_{CC} = 15 V, R_{ref} = 14.3 kΩ, V_{BE} = 0.7 V, and β = 120. Determine reference current I_{ref}, output current I_{O}, and percentage current error.</p>
+    <p><b>Answer:</b> I_{ref} = (15 - 0.7)/14.3k = 1.00 mA. I_{O} = 1.00 mA / (1 + 2/120) = 0.9836 mA. Error = ((1.00 - 0.9836)/1.00) × 100% = 1.64%.</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 2 · Widlar Low-Current Source</span>
+    <p><b>Problem:</b> A Widlar source must produce I_{O} = 10 µA from I_{ref} = 1.00 mA with V_{T} = 26 mV. Calculate required emitter resistor R_{E}.</p>
+    <p><b>Answer:</b> Current ratio = 1 mA / 10 µA = 100. ln(100) = 4.605. R_{E} = (26 mV / 10 µA) × 4.605 = 2600 × 4.605 = 11,973 Ω ≈ 11.97 kΩ.</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 3 · Wilson Mirror Accuracy</span>
+    <p><b>Problem:</b> A Wilson current mirror carries reference current I_{in} = 2.00 mA with β = 80. Calculate output current I_{O} and percentage error.</p>
+    <p><b>Answer:</b> I_{O} = 2.00 mA × [80(82) / (6400 + 160 + 2)] = 2.00 × (6560 / 6562) = 1.99939 mA. Error = ((2.00 - 1.99939)/2.00) × 100% = 0.0305%.</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 4 · Split-Supply DC Bias</span>
+    <p><b>Problem:</b> A differential amplifier operates from ±15 V supplies with tail resistor R_{E} = 14.3 kΩ, collector resistors R_{C} = 6.8 kΩ, and zero-volt base inputs. Determine tail current I_{T}, transistor currents I_{C1}, I_{C2}, and collector voltages V_{C1}, V_{C2}.</p>
+    <p><b>Answer:</b> I_{T} = (15 - 0.7)/14.3k = 1.00 mA. I_{C1} = I_{C2} = 0.50 mA. V_{C1} = V_{C2} = 15 - (0.50m)(6.8k) = 15 - 3.40 = 11.60 V. Quiescent V_{OD} = 0.00 V.</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 5 · AC Parameters of Differential Pair</span>
+    <p><b>Problem:</b> For the circuit in Problem 4 with β = 150, calculate small-signal r_{e}, differential input resistance R_{id}, balanced differential gain A_{d,bal}, and single-ended gain A_{d,se}.</p>
+    <p><b>Answer:</b> r_{e} = 26 mV / 0.50 mA = 52 Ω. R_{id} = 2βr_{e} = 2(150)(52) = 15.6 kΩ. A_{d,bal} = -R_{C}/r_{e} = -6800 / 52 = -130.8. A_{d,se} = -R_{C}/(2r_{e}) = -65.4.</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 6 · CMRR with Resistor Tail</span>
+    <p><b>Problem:</b> A single-ended differential amplifier has A_{d} = 75 and A_{c} = 0.015. Calculate CMRR as a ratio and in dB.</p>
+    <p><b>Answer:</b> CMRR = |75 / 0.015| = 5000. CMRR_{dB} = 20 log_{10}(5000) = 20(3.699) = 73.98 dB ≈ 74.0 dB.</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 7 · Single-Ended CMRR Calculation</span>
+    <p><b>Problem:</b> A differential amplifier has R_{C} = 10 kΩ, r_{e} = 40 Ω, and a tail resistor R_{E} = 100 kΩ. Calculate single-ended A_{d}, A_{c}, and CMRR.</p>
+    <p><b>Answer:</b> A_{d,se} = -10,000 / (2 × 40) = -125. A_{c} = -10,000 / (40 + 2 × 100,000) = -10,000 / 200,040 = -0.04999 ≈ -0.050. CMRR = 125 / 0.050 = 2500 (67.96 dB).</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 8 · CMRR with Active Current-Source Tail</span>
+    <p><b>Problem:</b> Repeat Problem 7 if the 100 kΩ tail resistor is replaced by a BJT current source having dynamic output resistance R_{t} = 2.0 MΩ.</p>
+    <p><b>Answer:</b> A_{d,se} = -125. A_{c} = -10,000 / (40 + 2 × 2 × 10⁶) = -10,000 / 4,000,040 = -0.0025. CMRR = 125 / 0.0025 = 50,000. CMRR_{dB} = 20 log_{10}(50,000) = 93.98 dB ≈ 94.0 dB (+26 dB improvement!).</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 9 · Large-Signal Compression</span>
+    <p><b>Problem:</b> An ideal differential pair has I_{T} = 2.0 mA and R_{C} = 3.3 kΩ. Using the exact tanh relation at V_{T} = 26 mV, determine differential output v_{od} for (a) v_{id} = 10 mV and (b) v_{id} = 60 mV.</p>
+    <p><b>Answer:</b> Maximum saturation swing = I_{T}R_{C} = (2 mA)(3.3k) = 6.6 V.<br>
+    (a) For v_{id} = 10 mV: x = 10 / 52 = 0.1923. tanh(0.1923) = 0.1900. v_{od} = -(6.6 V)(0.1900) = -1.254 V (linear prediction is -1.269 V, only 1.2% error).<br>
+    (b) For v_{id} = 60 mV: x = 60 / 52 = 1.1538. tanh(1.1538) = 0.8190. v_{od} = -(6.6 V)(0.8190) = -5.405 V (linear prediction is -7.615 V, a huge 41% error!).</p>
+  </div>
+
+  <div class="card try"><span class="label">Practice Problem 10 · Balanced Output Common-Mode Rejection</span>
+    <p><b>Problem:</b> Explain why a balanced output ideally rejects common-mode signals completely (v_{od,cm} = 0) even when each collector voltage changes appreciably.</p>
+    <p><b>Answer:</b> A common-mode voltage v_{cm} increases both emitter currents equally. Consequently, both collector currents increase by the exact same amount Δi_{C1} = Δi_{C2} = g_{m,cm}v_{cm}. The individual collector voltages both drop by identical amounts: Δv_{C1} = Δv_{C2} = -g_{m,cm}R_{C}v_{cm}. Because the balanced output measures the difference between collectors, v_{od} = v_{C1} - v_{C2} = (V_{C1,0} + Δv_{C1}) - (V_{C2,0} + Δv_{C2}) = 0 V. The common-mode signal is cancelled through differential subtraction.</p>
+  </div>
+
+  <label class="done-row"><input type="checkbox" data-done="s14"> Mark topic 14 as done</label>
+</section>
+
+<footer>
+  <p style="text-align:center;margin:3rem 0 1rem;font-size:.85rem;color:var(--muted)">
+    Semiconductor Devices and Circuits (SDC) · Unit 6: BJT Current Mirrors &amp; Differential Amplifiers<br>
+    Bharati Vidyapeeth (Deemed to be University) College of Engineering, Pune · B.Tech Electronics &amp; Telecommunication (NEP 2020)<br>
+    Based on teaching notes &amp; numericals by Prof. Dr. R. B. Ghongade · Designed for student excellence.
+  </p>
+</footer>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const par=(a,b)=>a*b/(a+b);
+const F=n=>Math.round(n*10)/10;
+const LOG=Math.log10;
+
+function fmt3(x){
+  if(x===0) return '0';
+  const n = Number(x);
+  if(isNaN(n)) return '—';
+  return String(parseFloat(n.toPrecision(3)));
+}
+
+function eng(v,u){
+  u=u||'';
+  if(!isFinite(v)) return '—';
+  if(v===0) return '0 '+u;
+  const a=Math.abs(v), P=[[1e9,'G'],[1e6,'M'],[1e3,'k'],[1,''],[1e-3,'m'],[1e-6,'µ'],[1e-9,'n'],[1e-12,'p']];
+  for(const [m,s] of P){
+    if(a>=m*0.9995) return fmt3(v/m)+' '+s+u;
+  }
+  return v.toExponential(2)+' '+u;
+}
+
+function mk(s){
+  s=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function rBraced(str,cmd,f){
+    const p='\\'+cmd+'{';let idx;
+    while((idx=str.indexOf(p))!==-1){
+      const st=idx+p.length;let c=1,i=st;
+      while(i<str.length&&c>0){if(str[i]==='{')c++;else if(str[i]==='}')c--;i++;}
+      if(c===0){str=str.slice(0,idx)+f(str.slice(st,i-1))+str.slice(i);}else break;
+    }
+    return str;
+  }
+  s=rBraced(s,'text',x=>x);
+  s=rBraced(s,'mathbf',x=>'<b>'+x+'</b>');
+  s=rBraced(s,'sqrt',x=>'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">'+x+'</span></span>');
+  s=s.replace(/\\sqrt\s*(\d+)/g,'<span class="sqrt"><span class="radic">&radic;</span><span class="radicand">$1</span></span>');
+  
+  // Frac
+  let prev;
+  do{prev=s;s=s.replace(/_\{([^{}]+)\}/g,'<sub>$1</sub>').replace(/\^\{([^{}]+)\}/g,'<sup>$1</sup>');}while(s!==prev);
+  do{prev=s;s=s.replace(/\[\[([^\[\]|]+)\|([^\[\]]+)\]\]/g,'<span class="frac"><span>$1</span><span>$2</span></span>');}while(s!==prev);
+  s=s.replace(/\\left\s*([(\[{|])/g,'$1').replace(/\\right\s*([)\]}|])/g,'$1')
+     .replace(/\\left\b/g,'').replace(/\\right\b/g,'')
+     .replace(/\\implies\b/g,'&rArr;')
+     .replace(/\\approx\b/g,'&approx;')
+     .replace(/\\times\b/g,'&times;')
+     .replace(/\\cdot\b/g,'&middot;')
+     .replace(/\\Omega\b/g,'&Omega;')
+     .replace(/\\mu\b/g,'&mu;')
+     .replace(/\\pi\b/g,'&pi;')
+     .replace(/\\theta\b/g,'&theta;')
+     .replace(/\\eta\b/g,'&eta;')
+     .replace(/\\omega\b/g,'&omega;')
+     .replace(/\\ge\b/g,'&ge;')
+     .replace(/\\le\b/g,'&le;')
+     .replace(/\\pm\b/g,'&plusmn;')
+     .replace(/\\circ\b/g,'&deg;')
+     .replace(/\\dots\b/g,'&hellip;')
+     .replace(/\\quad\b/g,' ')
+     .replace(/\\qquad\b/g,'  ')
+     .replace(/\\parallel\b/g,'||')
+     .replace(/\\%/g,'%');
+  return s;
+}
+
+function cells(arr){
+  return arr.map(c=>{
+    if(c.note) return `<div class="note">${mk(c.note)}</div>`;
+    if(c.warn) return `<div class="warn">${mk(c.warn)}</div>`;
+    return `<div><small>${mk(c.k)}</small><b>${mk(c.v)}</b></div>`;
+  }).join('');
+}
+
+function mathify(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    if(!/_\{|\^\{|\[\[|\\sqrt|\\frac|\\implies|\\times|\\approx|\\mathbf|\\text|\\Omega|\\mu|\\le|\\ge|\\pi|&radic;|√/.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
+    for(let p=n.parentNode;p&&p!==root;p=p.parentNode){
+      const t=p.nodeName.toLowerCase();
+      if(t==='svg'||t==='script'||t==='style'||t==='textarea'||t==='input'||t==='option') return NodeFilter.FILTER_REJECT;
+    }
+    return NodeFilter.FILTER_ACCEPT;
+  }});
+  const list=[];
+  while(w.nextNode()) list.push(w.currentNode);
+  list.forEach(n=>{
+    const sp=document.createElement('span');
+    sp.innerHTML=mk(n.nodeValue);
+    n.replaceWith(...sp.childNodes);
+  });
+}
+
+/* ---------- SVG graphics library ---------- */
+const tx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/_\{([^{}]+)\}/g,'<tspan dy="3" font-size="9">$1</tspan><tspan dy="-3">​</tspan>');
+const W=(d,c)=>`<path${c?` class="${c}"`:''} d="${d}"/>`;
+const T=(x,y,s,c,a)=>`<text x="${x}" y="${y}" text-anchor="${a||'middle'}"${c?` class="${c}"`:''}>${tx(s)}</text>`;
+const dot=(x,y)=>`<circle class="dot" cx="${x}" cy="${y}" r="3"/>`;
+const term=(x,y)=>`<circle class="node" cx="${x}" cy="${y}" r="3.6"/>`;
+const G=(x,y,rot,inner)=>`<g transform="translate(${x} ${y})${rot?` rotate(${rot})`:''}">${inner}</g>`;
+function zig(len){
+  const lead=8,n=3,seg=(len-2*lead)/(2*n);
+  let d=`M0,0H${lead}`;
+  for(let k=1;k<2*n;k++) d+=`L${F(lead+k*seg)},${k%2?-6:6}`;
+  return d+`L${F(len-lead)},0H${len}`;
+}
+const R=(x,y,len,rot,c)=>G(x,y,rot||0,W(zig(len),c));
+const C=(x,y,len,rot,c)=>G(x,y,rot||0,W(`M0,0H${len/2-3}M${len/2-3},-10V10M${len/2+3},-10V10M${len/2+3},0H${len}`,c));
+const ACS=(x,y)=>`<circle class="sym" cx="${x}" cy="${y}" r="13"/>`+G(x,y,0,W('M-7,0q3.5,-8 7,0t7,0'));
+const GND=(x,y)=>G(x,y,0,W('M0,0V6M-9,6H9M-5,10H5M-2,14H2'));
+const NPN=(x,y)=>G(x,y,0,W('M-30,0H0M0,-16V16M0,-8L18,-20V-40M0,8L18,20V40')+W('M17,19.4L8.4,17.9L12.3,12Z','fl'));
+function ARW(x1,y1,x2,y2,c){
+  const a=Math.atan2(y2-y1,x2-x1),h=7;
+  const p1=[x2-h*Math.cos(a-0.4),y2-h*Math.sin(a-0.4)],p2=[x2-h*Math.cos(a+0.4),y2-h*Math.sin(a+0.4)];
+  return W(`M${x1},${y1}L${x2},${y2}M${F(p1[0])},${F(p1[1])}L${x2},${y2}L${F(p2[0])},${F(p2[1])}`,c);
+}
+const SVG=(w,h,inner,label)=>`<svg class="dg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${inner}</svg>`;
+
+const DG={};
+
+/* 1. Basic Mirror */
+DG.basicMirror=()=>{
+  let s='';
+  s+=W('M80,30H420')+T(435,34,'+V_{CC}','b','start')+dot(178,30);
+  s+=R(178,30,60,90)+T(150,65,'R_{ref}','b')+dot(178,90);
+  s+=ARW(178,35,178,55,'dc')+T(198,45,'I_{ref}','dc','start');
+  s+=W('M178,90V100');
+  s+=NPN(160,140)+T(145,120,'Q_{1}','b')+T(145,134,'(diode-conn)','s');
+  s+=W('M178,100H100V140H130')+dot(178,100)+dot(130,140);
+  s+=W('M130,140H290');
+  s+=NPN(320,140)+T(355,120,'Q_{2}','b')+T(355,134,'(output)','s');
+  s+=ARW(130,140,145,140,'ac')+T(140,154,'I_{B1}','s');
+  s+=ARW(270,140,290,140,'ac')+T(280,154,'I_{B2}','s');
+  s+=W('M178,180V205')+GND(178,205);
+  s+=W('M338,180V205')+GND(338,205);
+  s+=W('M338,100V50')+term(338,50)+T(355,54,'Output Node (V_{O})','b','start');
+  s+=ARW(338,55,338,85,'dc')+T(355,75,'I_{O}','dc','start');
+  s+=T(250,230,'I_{O} = I_{ref} / (1 + 2/β) ≈ I_{ref}(1 - 2/β)','b');
+  s+=T(250,250,'Compliance: V_{O} ≥ V_{CE(sat)} ≈ 0.2V  ·  R_{o} ≈ r_{o}','s');
+  return SVG(500,265,s,'Basic BJT Current Mirror Schematic');
+};
+
+/* 2. Widlar Source */
+DG.widlarSource=()=>{
+  let s='';
+  s+=W('M80,30H420')+T(435,34,'+V_{CC}','b','start')+dot(178,30);
+  s+=R(178,30,60,90)+T(150,65,'R_{ref}','b')+dot(178,90);
+  s+=ARW(178,35,178,55,'dc')+T(198,45,'I_{ref}','dc','start');
+  s+=W('M178,90V100');
+  s+=NPN(160,140)+T(145,120,'Q_{1}','b')+T(145,134,'(diode-conn)','s');
+  s+=W('M178,100H100V140H130')+dot(178,100)+dot(130,140);
+  s+=W('M130,140H290');
+  s+=NPN(320,140)+T(355,120,'Q_{2}','b')+T(355,134,'(sub-mA)','s');
+  s+=W('M178,180V220')+GND(178,220);
+  s+=W('M338,180V190')+R(338,190,40,90)+T(365,212,'R_{E}','b','start');
+  s+=W('M338,230V240')+GND(338,240);
+  s+=W('M338,100V50')+term(338,50)+T(355,54,'Output Node (V_{O})','b','start');
+  s+=ARW(338,55,338,85,'dc')+T(355,75,'I_{O} (μA)','dc','start');
+  s+=T(135,165,'V_{BE1}','s');
+  s+=T(300,165,'V_{BE2}','s');
+  s+=T(255,260,'V_{BE1} - V_{BE2} = I_{O}R_{E} = V_{T}ln(I_{ref} / I_{O})','b');
+  s+=T(255,278,'R_{E} = (V_{T} / I_{O}) ln(I_{ref} / I_{O})  ·  R_{o} ≈ r_{o}(1 + g_{m}R_{E})','s');
+  return SVG(520,290,s,'Widlar BJT Current Source Schematic');
+};
+
+/* 3. Wilson Mirror */
+DG.wilsonMirror=()=>{
+  let s='';
+  s+=ARW(178,20,178,60,'dc')+T(150,38,'I_{in}','dc','start')+dot(178,60);
+  s+=NPN(160,110)+T(135,90,'Q_{1}','b');
+  s+=W('M178,60V70');
+  s+=W('M178,150V190')+GND(178,190);
+  s+=W('M178,60H300')+dot(178,60);
+  s+=NPN(330,60)+T(360,40,'Q_{3}','b');
+  s+=W('M348,20V0')+term(348,0)+T(365,6,'I_{O} (Load)','b','start');
+  s+=ARW(348,5,348,20,'dc');
+  s+=W('M348,100V130')+dot(348,130);
+  s+=NPN(330,170)+T(365,150,'Q_{2}','b');
+  s+=W('M348,130H110V210H300')+dot(130,110)+dot(300,170)+dot(110,210);
+  s+=W('M130,110V210');
+  s+=W('M300,170V210');
+  s+=W('M348,130V130');
+  s+=W('M348,210V230')+GND(348,230);
+  s+=W('M110,210V130')+W('M348,100V130');
+  s+=T(260,250,'I_{O} = I_{in}(β² + 2β) / (β² + 2β + 2) ≈ I_{in}(1 - 2/β²)','b');
+  s+=T(260,270,'R_{o} ≈ β·r_{o} / 2 (Megohms)  ·  Error ≈ 2/β² (0.02%)','s');
+  return SVG(520,285,s,'Wilson BJT Current Mirror Schematic');
+};
+
+/* 4. Diff-Amp Split Supply */
+DG.diffAmpSplit=()=>{
+  let s='';
+  s+=W('M60,30H460')+T(475,34,'+V_{CC}','b','start')+dot(188,30)+dot(368,30);
+  s+=R(188,30,50,90)+T(160,60,'R_{C1}','b')+dot(188,80);
+  s+=R(368,30,50,90)+T(396,60,'R_{C2}','b')+dot(368,80);
+  s+=W('M188,80V90');
+  s+=W('M368,80V90');
+  s+=term(188,75)+T(160,78,'V_{o1}','ac','end');
+  s+=term(368,75)+T(396,78,'V_{o2}','ac','start');
+  s+=W('M188,75H220')+W('M368,75H336')+T(278,78,'V_{od} = V_{o1} - V_{o2}','ac2');
+  s+=NPN(170,130)+T(140,110,'Q_{1}','b');
+  s+=NPN(350,130)+T(385,110,'Q_{2}','b');
+  s+=W('M140,130H80')+term(80,130)+T(65,134,'V_{1}','b','end');
+  s+=W('M320,130H270V150H260')+term(450,130)+W('M450,130H320')+T(465,134,'V_{2}','b','start');
+  s+=W('M188,170V185H368V170');
+  s+=dot(278,185)+T(278,175,'V_{E} ≈ -0.7V','s');
+  s+=W('M278,185V195')+R(278,195,50,90)+T(250,225,'R_{E}','b');
+  s+=ARW(278,186,278,194,'dc')+T(295,190,'I_{T}','dc','start');
+  s+=W('M278,245V270')+dot(278,270);
+  s+=W('M60,270H460')+T(475,274,'-V_{EE}','b','start');
+  s+=T(278,295,'I_{T} = (V_{EE} - 0.7V) / R_{E}  ·  I_{C1} = I_{C2} = I_{T}/2  ·  V_{OD} = 0V','b');
+  return SVG(540,305,s,'Split-Supply BJT Differential Pair');
+};
+
+/* 5. Differential Half-Circuit */
+DG.diffHalfCircuit=()=>{
+  let s='';
+  s+=W('M80,25H360')+T(375,29,'AC Ground (V_{CC}=0)','s','start')+dot(218,25);
+  s+=R(218,25,55,90)+T(188,55,'R_{C}','b')+dot(218,80);
+  s+=W('M218,80V90')+term(280,80)+W('M218,80H280')+T(295,84,'v_{o1} = -g_{m}R_{C}(v_{id}/2)','ac','start');
+  s+=NPN(200,130)+T(175,110,'Q_{1}','b');
+  s+=W('M170,130H110')+term(110,130)+T(95,134,'+v_{id}/2','b','end');
+  s+=W('M218,170V190')+GND(218,190);
+  s+=T(218,218,'AC Virtual Ground (0V AC)','ac2');
+  s+=T(240,245,'Balanced Gain: A_{d,bal} = v_{od}/v_{id} = -g_{m}R_{C} = -R_{C}/r_{e}','b');
+  return SVG(460,260,s,'Differential-Mode Small-Signal Half Circuit');
+};
+
+/* 6. Common-Mode Half-Circuit */
+DG.cmHalfCircuit=()=>{
+  let s='';
+  s+=W('M80,25H360')+T(375,29,'AC Ground (V_{CC}=0)','s','start')+dot(218,25);
+  s+=R(218,25,50,90)+T(188,52,'R_{C}','b')+dot(218,75);
+  s+=W('M218,75V85')+term(280,75)+W('M218,75H280')+T(295,79,'v_{o1,cm}','ac','start');
+  s+=NPN(200,125)+T(175,105,'Q_{1}','b');
+  s+=W('M170,125H110')+term(110,125)+T(95,129,'v_{cm}','b','end');
+  s+=W('M218,165V175')+R(218,175,50,90)+T(252,205,'2R_{E} (or 2R_{t})','b','start');
+  s+=W('M218,225V235')+GND(218,235);
+  s+=T(240,255,'A_{c} ≈ -R_{C} / (r_{e} + 2R_{E}) ≈ -R_{C} / (2R_{E})','b');
+  return SVG(460,270,s,'Common-Mode Small-Signal Half Circuit');
+};
+
+/* 7. Four Configurations Matrix */
+DG.fourDiffConfigs=()=>{
+  let s='';
+  const card=(x,y,w,h,title,inS,outS,gain,zin,zout)=>{
+    let r=`<rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="6"/>`;
+    r+=T(x+w/2,y+22,title,'b')+T(x+w/2,y+42,`Input: ${inS}  ·  Output: ${outS}`,'s');
+    r+=`<rect x="${x+15}" y="${y+52}" width="${w-30}" height="${h-64}" rx="4" fill="var(--surface)"/>`;
+    r+=T(x+w/2,y+74,`Gain A_{d}: ${gain}`,'b');
+    r+=T(x+w/2,y+94,`R_{id}: ${zin}   ·   R_{od}: ${zout}`,'s');
+    return r;
+  };
+  s+=card(10,15,290,115,'1. Dual-Input, Balanced-Output','v_{1}, v_{2}','v_{o1} - v_{o2}','-g_{m}R_{C} = -R_{C}/r_{e}','2r_{π}','2R_{C}');
+  s+=card(320,15,290,115,'2. Dual-Input, Unbalanced-Output','v_{1}, v_{2}','v_{o1} to GND','-g_{m}R_{C}/2 = -R_{C}/(2r_{e})','2r_{π}','R_{C}');
+  s+=card(10,145,290,115,'3. Single-Input, Balanced-Output','v_{in} at B1, B2=0','v_{o1} - v_{o2}','-g_{m}R_{C} = -R_{C}/r_{e}','2r_{π}','2R_{C}');
+  s+=card(320,145,290,115,'4. Single-Input, Unbalanced-Output','v_{in} at B1, B2=0','v_{o1} to GND','-g_{m}R_{C}/2 = -R_{C}/(2r_{e})','2r_{π}','R_{C}');
+  return SVG(620,275,s,'Four Differential Amplifier Configurations');
+};
+
+/* 8. Active Current Source Tail */
+DG.currentSourceTail=()=>{
+  let s='';
+  s+=W('M80,25H440')+T(455,29,'+V_{CC}','b','start')+dot(188,25)+dot(368,25);
+  s+=R(188,25,45,90)+T(160,50,'R_{C1}','b')+dot(188,70);
+  s+=R(368,25,45,90)+T(396,50,'R_{C2}','b')+dot(368,70);
+  s+=W('M188,70V80')+W('M368,70V80');
+  s+=NPN(170,120)+T(140,105,'Q_{1}','b');
+  s+=NPN(350,120)+T(385,105,'Q_{2}','b');
+  s+=W('M140,120H90')+term(90,120)+T(75,124,'V_{1}','b','end');
+  s+=W('M320,120H430')+term(430,120)+T(445,124,'V_{2}','b','start');
+  s+=W('M188,160V175H368V160');
+  s+=dot(278,175)+T(278,165,'Joined Emitters','s');
+  s+=W('M278,175V190');
+  s+=NPN(260,230)+T(295,225,'Q_{4} (tail)','b');
+  s+=W('M278,210V190');
+  s+=NPN(160,230)+T(135,225,'Q_{3} (ref)','b');
+  s+=W('M178,190V200')+W('M178,190H100V230H130')+dot(178,190)+dot(130,230);
+  s+=W('M130,230H230');
+  s+=R(178,110,50,90)+T(150,135,'R_{ref}','b')+dot(178,110)+W('M178,25V110');
+  s+=W('M178,160V190');
+  s+=W('M178,270V280')+W('M278,270V280');
+  s+=W('M60,280H460')+T(475,284,'-V_{EE}','b','start')+dot(178,280)+dot(278,280);
+  s+=T(370,195,'R_{t} = r_{o4} ≈ 1 MΩ','ac2','start');
+  s+=T(260,305,'CMRR ≈ R_{t} / r_{e} ≈ 19,200 (85.7 dB vs 46.8 dB with resistor!)','b');
+  return SVG(540,315,s,'Differential Pair with Active BJT Current Mirror Tail');
+};
+
+/* 9. Large-Signal Tanh Curve */
+DG.largeSignalCurve=()=>{
+  let s='';
+  const ox=260, oy=130, sx=1.8, sy=85;
+  s+=W(`M40,${oy}H480`)+T(490,oy+4,'v_{id} (mV)','s','start');
+  s+=W(`M${ox},20V240`)+T(ox,14,'(i_{C1}-i_{C2})/I_{T}','s');
+  s+=W(`M40,${oy-sy}H480`,'dash thin')+T(40,oy-sy-4,'+1.0 (Saturation +I_{T})','s','start');
+  s+=W(`M40,${oy+sy}H480`,'dash thin')+T(40,oy+sy+14,'-1.0 (Saturation -I_{T})','s','start');
+  s+=W(`M${ox-70*sx},25V235`,'dash thin')+W(`M${ox+70*sx},25V235`,'dash thin');
+  s+=T(ox+70*sx,oy+16,'+70 mV','s');
+  s+=T(ox-70*sx,oy+16,'-70 mV','s');
+  // Shaded linear zone
+  s+=`<rect x="${ox-20*sx}" y="25" width="${40*sx}" height="210" fill="var(--ac)" opacity="0.1"/>`;
+  s+=T(ox,oy+45,'Linear Region (|v_{id}| < 20mV)','ac');
+  // Tanh curve
+  let d='M';
+  for(let v=-110;v<=110;v+=2){
+    const x=v/(2*26), th=Math.tanh(x);
+    const px=ox+v*sx, py=oy-th*sy;
+    d+=`${v===-110?'':''}${F(px)},${F(py)} `;
+  }
+  s+=`<path class="dc" stroke-width="2.4" d="${d}"/>`;
+  // Linear tangent line
+  s+=W(`M${ox-50*sx},${oy+50*sx*(sy/(2*26*sx))}L${ox+50*sx},${oy-50*sx*(sy/(2*26*sx))}`,'ac dash');
+  s+=T(ox+45*sx,oy-55,'Slope = g_{m}','ac','start');
+  s+=T(260,255,'Exact Transfer: i_{C1} - i_{C2} = I_{T} tanh(v_{id} / 2V_{T})  ·  v_{od} = -I_{T}R_{C} tanh(v_{id} / 2V_{T})','b');
+  return SVG(520,265,s,'Large-Signal Hyperbolic-Tangent Transfer Characteristic');
+};
+
+/* ---------- Interactive Widgets (WID) ---------- */
+function widget(host,o){
+  host.className='widget';
+  host.innerHTML=`<span class="wlabel">Interactive Tool</span> <b>${mk(o.title)}</b>${o.intro?`<p style="margin:.3rem 0;font-size:.88rem;color:var(--muted)">${mk(o.intro)}</p>`:''}<div class="wgrid"></div><div class="wfig"></div><div class="res"></div>`;
+  const g=$('.wgrid',host), fig=$('.wfig',host), res=$('.res',host), els={};
+  o.fields.forEach(f=>{
+    const id=host.dataset.w+'_'+f.id, d=document.createElement('div');
+    d.className='fld';
+    let ctl;
+    if(f.type==='sel') ctl=`<select id="${id}">${f.opts.map(([v,l])=>`<option value="${v}"${String(v)===String(f.val)?' selected':''}>${l}</option>`).join('')}</select>`;
+    else if(f.type==='range') ctl=`<input id="${id}" type="range" min="${f.min}" max="${f.max}" step="${f.step||'any'}" value="${f.val}"><output id="${id}_o"></output>`;
+    else ctl=`<input id="${id}" type="number" inputmode="decimal" step="any" value="${f.val}"><span class="u">${mk(f.unit||'')}</span>`;
+    d.innerHTML=`<label for="${id}">${mk(f.label)}</label><div class="row">${ctl}</div>`;
+    g.appendChild(d);
+    els[f.id]=$('#'+id,d);
+  });
+  function update(){
+    const v={};
+    o.fields.forEach(f=>{
+      const e=els[f.id];
+      let x;
+      if(f.type==='sel'){ x=e.value; if(x!==''&&!isNaN(+x)) x=+x; }
+      else if(f.type==='range'){ x=parseFloat(e.value); if(isNaN(x)) x=0; }
+      else{ x=parseFloat(e.value); if(isNaN(x)) x=0; x*=(f.scale||1); }
+      v[f.id]=x;
+      if(f.type==='range'){
+        const out=$('#'+e.id+'_o',host);
+        if(out) out.textContent=f.fmt?f.fmt(x):x;
+      }
+    });
+    if(o.figure) fig.innerHTML=o.figure(v);
+    res.innerHTML=cells(o.run(v));
+  }
+  host.addEventListener('input',update);
+  update();
+}
+
+const WID={};
+
+/* Widget 1: Mirrors Comparator */
+WID.mirrorCompare=h=>widget(h,{
+  title:'BJT Current Mirrors Live Comparator (Basic vs Widlar vs Wilson)',
+  intro:'Experiment with reference current, transistor β, and Early voltage V_{A}. Observe how the Wilson mirror reduces transfer error by 100x and boosts output resistance into megohms.',
+  fields:[
+    {id:'Iref',label:'Reference Current I_{ref}',val:1,unit:'mA',scale:1e-3},
+    {id:'beta',label:'Transistor β',val:100,unit:''},
+    {id:'VA',label:'Early Voltage V_{A}',val:100,unit:'V'},
+    {id:'widlarIo',label:'Widlar Target I_{O}',val:20,unit:'µA',scale:1e-6}
+  ],
+  run(v){
+    const Io_basic = v.Iref / (1 + 2/v.beta);
+    const err_basic = ((v.Iref - Io_basic)/v.Iref)*100;
+    const ro_basic = v.VA / Io_basic;
+
+    const ratio = v.Iref / v.widlarIo;
+    const Re_widlar = ratio > 1 ? (26e-3 / v.widlarIo) * Math.log(ratio) : 0;
+    const Vre = v.widlarIo * Re_widlar;
+    const ro_widlar = v.VA / v.widlarIo;
+    const gm_widlar = v.widlarIo / 26e-3;
+    const Ro_widlar = ro_widlar * (1 + gm_widlar * Re_widlar);
+
+    const b = v.beta;
+    const Io_wilson = v.Iref * (b*(b+2)) / (b*b + 2*b + 2);
+    const err_wilson = ((v.Iref - Io_wilson)/v.Iref)*100;
+    const ro_wilson = v.VA / Io_wilson;
+    const Ro_wilson = (b * ro_wilson) / 2;
+
+    return [
+      {k:'Basic Mirror I_{O}', v:eng(Io_basic,'A')},
+      {k:'Basic Mirror Error', v:fmt3(err_basic)+' %'},
+      {k:'Basic Mirror R_{o}', v:eng(ro_basic,'Ω')},
+      {k:'Widlar Emitter R_{E}', v:eng(Re_widlar,'Ω')},
+      {k:'Widlar R_{E} Drop (V_{RE})', v:eng(Vre,'V')},
+      {k:'Widlar Output R_{o}', v:eng(Ro_widlar,'Ω')},
+      {k:'Wilson Mirror I_{O}', v:eng(Io_wilson,'A')},
+      {k:'Wilson Mirror Error', v:fmt3(err_wilson)+' %'},
+      {k:'Wilson Output R_{o}', v:eng(Ro_wilson,'Ω')},
+      {note:`Wilson error (${fmt3(err_wilson)}%) is exactly 100x lower than Basic mirror (${fmt3(err_basic)}%), and its output resistance (${eng(Ro_wilson,'Ω')}) is 50x higher!`}
+    ];
+  }
+});
+
+/* Widget 2: Widlar Designer */
+WID.widlarDesigner=h=>widget(h,{
+  title:'Widlar Current Source IC Designer',
+  intro:'Calculate the exact emitter resistor R_{E} needed to generate microampere bias currents from a milliampere reference.',
+  fields:[
+    {id:'Vcc',label:'Positive Supply +V_{CC}',val:10,unit:'V'},
+    {id:'Vbe',label:'Transistor V_{BE}',val:0.7,unit:'V'},
+    {id:'Rref',label:'Reference Resistor R_{ref}',val:9.3,unit:'kΩ',scale:1e3},
+    {id:'targetIo',label:'Desired Output I_{O}',val:20,unit:'µA',scale:1e-6},
+    {id:'Vt',label:'Thermal Voltage V_{T}',val:26,unit:'mV',scale:1e-3}
+  ],
+  run(v){
+    const Iref = (v.Vcc - v.Vbe) / v.Rref;
+    const ratio = Iref / v.targetIo;
+    if(ratio <= 1){
+      return [{warn:'Desired I_{O} must be smaller than reference current I_{ref} in a Widlar source!'}];
+    }
+    const lnRatio = Math.log(ratio);
+    const Re = (v.Vt / v.targetIo) * lnRatio;
+    const Vre = v.targetIo * Re;
+    const Vmin = 0.2 + Vre;
+    const R_simple = (v.Vcc - v.Vbe) / v.targetIo;
+    const saving = (1 - (v.Rref + Re) / R_simple) * 100;
+
+    return [
+      {k:'Reference Current I_{ref}', v:eng(Iref,'A')},
+      {k:'Current Ratio I_{ref}/I_{O}', v:fmt3(ratio)},
+      {k:'Required Emitter R_{E}', v:eng(Re,'Ω')},
+      {k:'Voltage Drop Across R_{E}', v:eng(Vre,'V')},
+      {k:'Min Compliance V_{O(min)}', v:fmt3(Vmin)+' V'},
+      {k:'Equivalent Resistor without Widlar', v:eng(R_simple,'Ω')},
+      {k:'Silicon Resistor Area Saved', v:fmt3(saving)+' %'},
+      {note:`Instead of a massive ${eng(R_simple,'Ω')} resistor, Widlar uses only ${eng(Re,'Ω')} plus ${eng(v.Rref,'Ω')}, slashing resistor silicon footprint by ${fmt3(saving)}%!`}
+    ];
+  }
+});
+
+/* Widget 3: Diff-Amp DC & AC Analyser */
+WID.diffAnalyser=h=>widget(h,{
+  title:'Differential Amplifier 4-Configuration DC & AC Analyser',
+  intro:'Select any of the 4 configurations and adjust supply rails, component values, and inputs to compute DC bias, gains, and output voltage.',
+  fields:[
+    {id:'cfg',label:'Configuration',type:'sel',val:'dibo',opts:[
+      ['dibo','1. Dual-Input, Balanced-Output (DIBO)'],
+      ['diuo','2. Dual-Input, Unbalanced-Output (DIUO)'],
+      ['sibo','3. Single-Input, Balanced-Output (SIBO)'],
+      ['siuo','4. Single-Input, Unbalanced-Output (SIUO)']
+    ]},
+    {id:'Vcc',label:'+V_{CC} Supply',val:12,unit:'V'},
+    {id:'Vee',label:'-V_{EE} Supply (magnitude)',val:12,unit:'V'},
+    {id:'Rc',label:'Collector Resistor R_{C}',val:4.7,unit:'kΩ',scale:1e3},
+    {id:'Re',label:'Tail Resistor R_{E}',val:11.3,unit:'kΩ',scale:1e3},
+    {id:'beta',label:'Transistor β',val:150,unit:''},
+    {id:'vid',label:'Differential Input v_{id}',val:10,unit:'mV',scale:1e-3}
+  ],
+  run(v){
+    const It = (v.Vee - 0.7) / v.Re;
+    const Ic = It / 2;
+    const Vc = v.Vcc - Ic * v.Rc;
+    const re = 26e-3 / Ic;
+    const gm = Ic / 26e-3;
+    const rpi = v.beta * re;
+    const isBal = (v.cfg === 'dibo' || v.cfg === 'sibo');
+    const Ad = isBal ? (-v.Rc / re) : (-v.Rc / (2 * re));
+    const Rid = 2 * rpi;
+    const Rod = isBal ? (2 * v.Rc) : v.Rc;
+    const vod = Ad * v.vid;
+
+    return [
+      {k:'Tail Current I_{T}', v:eng(It,'A')},
+      {k:'Transistor I_{C1} = I_{C2}', v:eng(Ic,'A')},
+      {k:'Quiescent Collector V_{C}', v:fmt3(Vc)+' V'},
+      {k:'Small-Signal r_{e}', v:eng(re,'Ω')},
+      {k:'Transconductance g_{m}', v:eng(gm,'S')},
+      {k:'Differential Gain A_{d}', v:fmt3(Ad)},
+      {k:'Differential Input R_{id}', v:eng(Rid,'Ω')},
+      {k:'Output Resistance R_{od}', v:eng(Rod,'Ω')},
+      {k:'Output Voltage v_{o}', v:eng(vod,'V')},
+      {note: isBal ? 'Balanced output measures across both collectors (full 2x gain, perfect common-mode cancellation).' : 'Unbalanced output measures from Collector 1 to ground (gain is exactly half of balanced configuration).'}
+    ];
+  }
+});
+
+/* Widget 4: CMRR Calculator */
+WID.cmrrCalc=h=>widget(h,{
+  title:'CMRR Calculator: Resistor Tail vs Active Current Source Tail',
+  intro:'Compare common-mode rejection between a simple tail resistor and an active BJT current mirror tail.',
+  fields:[
+    {id:'Rc',label:'Collector Load R_{C}',val:4.7,unit:'kΩ',scale:1e3},
+    {id:'Ic',label:'Collector Current I_{C}',val:0.5,unit:'mA',scale:1e-3},
+    {id:'tailType',label:'Tail Element',type:'sel',val:'cs',opts:[
+      ['res','Passive Tail Resistor (R_{E} = 11.3 kΩ)'],
+      ['cs','BJT Current Mirror Tail (R_{t} = 1.0 MΩ)'],
+      ['wilson','Wilson Current Mirror Tail (R_{t} = 5.0 MΩ)']
+    ]}
+  ],
+  run(v){
+    const re = 26e-3 / v.Ic;
+    const Ad_se = -v.Rc / (2 * re);
+    let Rt = 11.3e3;
+    if(v.tailType === 'cs') Rt = 1e6;
+    if(v.tailType === 'wilson') Rt = 5e6;
+
+    const Ac = -v.Rc / (re + 2 * Rt);
+    const cmrr = Math.abs(Ad_se / Ac);
+    const cmrr_db = 20 * Math.log10(cmrr);
+
+    return [
+      {k:'Small-Signal r_{e}', v:eng(re,'Ω')},
+      {k:'Single-Ended Diff Gain |A_{d}|', v:fmt3(Math.abs(Ad_se))},
+      {k:'Tail Dynamic Resistance', v:eng(Rt,'Ω')},
+      {k:'Common-Mode Gain |A_{c}|', v:fmt3(Math.abs(Ac))},
+      {k:'CMRR (Ratio)', v:fmt3(cmrr)},
+      {k:'CMRR in Decibels', v:fmt3(cmrr_db)+' dB'},
+      {note: v.tailType === 'res' ? 'With a passive resistor tail, CMRR is only 46.8 dB (common-mode noise is only attenuated by ~218).' : `With an active current source tail, CMRR reaches ${fmt3(cmrr_db)} dB! Common-mode noise is suppressed by a factor of ${fmt3(cmrr)}.`}
+    ];
+  }
+});
+
+/* Widget 5: Tanh Large-Signal Explorer */
+WID.tanhExplorer=h=>widget(h,{
+  title:'Large-Signal Hyperbolic-Tangent Transfer Curve Explorer',
+  intro:'Slide the differential input voltage v_{id} from -100 mV to +100 mV to observe how the exact tanh function compresses and saturates compared to the linear model.',
+  fields:[
+    {id:'vid',label:'Differential Input v_{id}',type:'range',min:-80,max:80,step:1,val:50,fmt:v=>v+' mV'},
+    {id:'It',label:'Tail Current I_{T}',val:1,unit:'mA',scale:1e-3},
+    {id:'Rc',label:'Collector Load R_{C}',val:5,unit:'kΩ',scale:1e3},
+    {id:'Vt',label:'Thermal Voltage V_{T}',val:26,unit:'mV',scale:1e-3}
+  ],
+  figure(v){
+    const ox=260, oy=85, sx=2.2, sy=60;
+    const vid = v.vid;
+    const x = (vid*1e-3)/(2*v.Vt);
+    const curTh = Math.tanh(x);
+    const curPx = ox + vid * sx;
+    const curPy = oy - curTh * sy;
+
+    let s='';
+    s+=W(`M30,${oy}H490`)+T(495,oy+4,'v_{id}','s','start');
+    s+=W(`M${ox},15V155`)+T(ox,10,'Normalized Output','s');
+    s+=W(`M30,${oy-sy}H490`,'dash thin')+T(35,oy-sy-3,'+1.0','s','start');
+    s+=W(`M30,${oy+sy}H490`,'dash thin')+T(35,oy+sy+11,'-1.0','s','start');
+
+    // Tanh path
+    let d='M';
+    for(let val=-90;val<=90;val+=2){
+      const th=Math.tanh((val*1e-3)/(2*v.Vt));
+      d+=`${F(ox+val*sx)},${F(oy-th*sy)} `;
+    }
+    s+=`<path class="dc" stroke-width="2.2" d="${d}"/>`;
+    // Current operating point dot
+    s+=`<circle cx="${F(curPx)}" cy="${F(curPy)}" r="5" fill="var(--bad)" stroke="#fff" stroke-width="1.5"/>`;
+    s+=T(F(curPx),F(curPy-10),`(${vid}mV, ${fmt3(curTh)})`,'bad');
+    return SVG(520,170,s,'Operating Point on Tanh Curve');
+  },
+  run(v){
+    const vid_v = v.vid * 1e-3;
+    const x = vid_v / (2 * v.Vt);
+    const th = Math.tanh(x);
+    const vod_exact = -v.It * v.Rc * th;
+    const gm = (v.It / 2) / v.Vt;
+    const Ad_lin = -gm * v.Rc;
+    const vod_lin = Ad_lin * vid_v;
+    const err = Math.abs(th) > 1e-4 ? ((Math.abs(vod_lin) - Math.abs(vod_exact)) / Math.abs(vod_exact)) * 100 : 0;
+
+    return [
+      {k:'Argument x = v_{id}/(2V_{T})', v:fmt3(x)},
+      {k:'tanh(x) Value', v:fmt3(th)},
+      {k:'Exact Output v_{od} (tanh)', v:eng(vod_exact,'V')},
+      {k:'Linear Output v_{od} (g_{m}R_{C})', v:eng(vod_lin,'V')},
+      {k:'Linear Overestimation Error', v:fmt3(err)+' %'},
+      {note: Math.abs(v.vid) <= 20 ? 'Operating within linear regime (|v_{id}| ≤ 20 mV). Small-signal approximation is highly accurate.' : `Outside linear regime! Output compresses significantly. At ${v.vid} mV, linear theory overshoots by ${fmt3(err)}%!`}
+    ];
+  }
+});
+
+/* ---------- Page Initialization ---------- */
+function init(){
+  document.querySelectorAll('[data-dg]').forEach(el=>{
+    const f=DG[el.dataset.dg];
+    if(f) el.innerHTML=f();
+    else el.textContent='diagram: '+el.dataset.dg;
+  });
+  document.querySelectorAll('[data-w]').forEach(el=>{
+    const f=WID[el.dataset.w];
+    if(f) f(el);
+  });
+  mathify($('main'));
+
+  // Theme toggle
+  $('#themeBtn').addEventListener('click',()=>{
+    const r=document.documentElement;
+    const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    r.dataset.theme=cur==='dark'?'light':'dark';
+  });
+
+  // Progress tracking via localStorage
+  const chips=[...document.querySelectorAll('#chips a')];
+  let done=[];
+  try{done=JSON.parse(localStorage.getItem('unit6-guide-done')||'[]');}catch(e){}
+  const paint=()=>{
+    chips.forEach(a=>{
+      const id=a.getAttribute('href').slice(1);
+      a.classList.toggle('done',done.includes(id));
+    });
+    document.querySelectorAll('input[data-done]').forEach(i=>{
+      i.checked=done.includes(i.dataset.done);
+    });
+  };
+  document.querySelectorAll('input[data-done]').forEach(i=>i.addEventListener('change',()=>{
+    const id=i.dataset.done;
+    done=done.filter(x=>x!==id);
+    if(i.checked) done.push(id);
+    try{localStorage.setItem('unit6-guide-done',JSON.stringify(done));}catch(e){}
+    paint();
+  }));
+  paint();
+
+  // Scroll spy with smooth non-fighting instant inline alignment
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{
+      es.forEach(e=>{
+        if(e.isIntersecting){
+          chips.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));
+          const on=chips.find(a=>a.classList.contains('on'));
+          const nav = document.getElementById('chips'); if(on && nav){ nav.scrollLeft = on.offsetLeft - (nav.clientWidth - on.clientWidth) / 2; }
+        }
+      });
+    },{rootMargin:'-20% 0px -70% 0px'});
+    document.querySelectorAll('section.sec').forEach(s=>io.observe(s));
+  }
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
+</script>
+</body>
+</html>
